@@ -1,0 +1,79 @@
+---
+import { FileCode, Mail, Printer, Usb } from '@lucide/astro';
+import { deckSize } from '@/shared/lib/config';
+import CodeBlock from '@/shared/ui-kit/CodeBlock.astro';
+import Container from '@/shared/ui-kit/Container.astro';
+import SectionHeading from '@/shared/ui-kit/SectionHeading.astro';
+
+const size = deckSize('tour');
+const slide = `- title: Итоги квартала
+  badge: Q3
+  body:
+    - type: chips
+      items: [Выручка +18%*, 24 клиента]
+    - type: bars
+      values: [3, 5, 4, 7]
+      labels: [Июл, Авг, Сен, Окт]`;
+---
+<section id="how" class="relative py-24 sm:py-32">
+  <Container>
+    <SectionHeading eyebrow="Как это работает" lead="Никакой вёрстки и перетаскивания блоков. Текст и цифры — в одном файле, внешний вид — в компонентах движка.">
+      <Fragment slot="title">Три шага от текста<br class="hidden sm:block" /> до показа</Fragment>
+    </SectionHeading>
+
+    <div class="relative mt-16 grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-3">
+      <!-- линия с бегущим импульсом между шагами -->
+      <div aria-hidden="true" class="absolute left-[16%] right-[16%] top-[30px] hidden h-px bg-gradient-to-r from-transparent via-bd2 to-transparent lg:block">
+        <span class="pulse-x absolute -top-[3px] size-[7px] rounded-full bg-ac shadow-[0_0_12px_var(--ac)]"></span>
+        <span class="pulse-x absolute -top-[3px] size-[7px] rounded-full bg-cy shadow-[0_0_12px_var(--cy)]" style="--d:1.2s"></span>
+      </div>
+
+      <!-- 1 -->
+      <article data-reveal class="relative flex flex-col rounded-3xl border border-bd bg-surf p-6 shadow-[var(--shadow-sm)]">
+        <span class="relative z-10 grid size-[60px] place-items-center self-start rounded-2xl bg-ac font-mono text-2xl font-bold text-white shadow-[0_10px_30px_-8px_var(--ac)]">1</span>
+        <h3 class="mt-5 text-xl font-bold text-tx">Создайте</h3>
+        <p class="mt-2 text-[15px] leading-relaxed text-mu">Новая презентация из шаблона: логотип, титульный слайд, примеры блоков.</p>
+        <div class="mt-auto pt-6">
+          <div class="rounded-2xl border border-white/10 bg-[#0B1020] p-4 font-mono text-[12.5px] leading-[1.8] text-white/85 shadow-[var(--shadow-md)]">
+            <div><span class="text-[#7DD3FC]">$</span> yarn new q3-report <span class="text-[#A5D6FF]">"Итоги квартала"</span></div>
+            <div class="text-[#7EE787]">✓ Создана presentations/q3-report/deck.yaml</div>
+            <div class="text-white/45">  Просмотр: yarn dev → localhost:5173</div>
+          </div>
+        </div>
+      </article>
+
+      <!-- 2 -->
+      <article data-reveal class="relative flex flex-col rounded-3xl border border-bd bg-surf p-6 shadow-[var(--shadow-sm)]" style="--d:.1s">
+        <span class="relative z-10 grid size-[60px] place-items-center self-start rounded-2xl bg-[linear-gradient(135deg,var(--ac),var(--cy))] font-mono text-2xl font-bold text-white shadow-[0_10px_30px_-8px_var(--cy)]">2</span>
+        <h3 class="mt-5 text-xl font-bold text-tx">Пишите</h3>
+        <p class="mt-2 text-[15px] leading-relaxed text-mu">Только тексты и цифры. Правки видны сразу, ошибка в данных — с номером строки.</p>
+        <div class="mt-auto pt-6">
+          <CodeBlock code={slide} dark class="text-[12px] [&_div.p-4]:py-3" />
+        </div>
+      </article>
+
+      <!-- 3 -->
+      <article data-reveal class="relative flex flex-col rounded-3xl border border-bd bg-surf p-6 shadow-[var(--shadow-sm)]" style="--d:.2s">
+        <span class="relative z-10 grid size-[60px] place-items-center self-start rounded-2xl bg-[linear-gradient(135deg,var(--cy),var(--vi))] font-mono text-2xl font-bold text-white shadow-[0_10px_30px_-8px_var(--vi)]">3</span>
+        <h3 class="mt-5 text-xl font-bold text-tx">Соберите и отправьте</h3>
+        <p class="mt-2 text-[15px] leading-relaxed text-mu">Один файл со всем внутри: картинки, шрифты, анимации, режим докладчика.</p>
+        <div class="mt-auto flex flex-col gap-3 pt-6">
+          <div class="rounded-2xl border border-white/10 bg-[#0B1020] p-4 font-mono text-[12.5px] leading-[1.8] text-white/85 shadow-[var(--shadow-md)]">
+            <div><span class="text-[#7DD3FC]">$</span> yarn build q3-report</div>
+            <div class="text-[#7EE787]">✓ dist/q3-report.html  <span class="text-white/60">{size} КБ</span></div>
+          </div>
+          <div class="flex items-center gap-3 rounded-2xl border border-bd bg-alt/60 p-3">
+            <span class="grid size-11 shrink-0 place-items-center rounded-xl bg-surf text-ac shadow-[var(--shadow-sm)]"><FileCode class="size-5" /></span>
+            <span class="min-w-0 flex-1">
+              <b class="block truncate text-[14px] text-tx">q3-report.html</b>
+              <span class="text-[12px] text-mu">открывается двойным щелчком</span>
+            </span>
+            <span class="flex gap-1.5 text-mu" aria-label="Почта, флешка, PDF">
+              <Mail class="size-4" /><Usb class="size-4" /><Printer class="size-4" />
+            </span>
+          </div>
+        </div>
+      </article>
+    </div>
+  </Container>
+</section>

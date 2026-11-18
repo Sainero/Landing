@@ -1,0 +1,60 @@
+---
+import { Check } from '@lucide/astro';
+import CodeBlock from '@/shared/ui-kit/CodeBlock.astro';
+import CommandLine from '@/shared/ui-kit/CommandLine.astro';
+import Container from '@/shared/ui-kit/Container.astro';
+import SectionHeading from '@/shared/ui-kit/SectionHeading.astro';
+
+const code = `import { defineBlock } from '../../engine/component';
+import { t } from '../../engine/html';
+import './big-number.css';
+
+defineBlock<{ title: string; value: number }>('big-number', {
+  // Разметка самодостаточна: из неё же строятся миниатюры и печать
+  render(p) {
+    return \`<div class="big-number r">
+      <b>\${t(p.value)}</b><span>\${t(p.title)}</span>
+    </div>\`;
+  },
+  // Необязательно: интерактивность после вставки в страницу
+  mount(el) {
+    el.addEventListener('click', () => el.classList.toggle('active'));
+  },
+});`;
+
+const rules = [
+  ['Цвета только через переменные темы', 'var(--ac), var(--surf), var(--tx) — тёмная тема заработает сама'],
+  ['Класс r — появление по очереди', 'движок сам расставит задержки при открытии слайда'],
+  ['Текст из данных — через t()', 'экранирование и **жирный** из коробки'],
+  ['yarn verify перед коммитом', 'проверка типов и сборка всех презентаций'],
+];
+---
+<section id="developers" class="relative py-24 sm:py-32">
+  <Container class="grid grid-cols-[minmax(0,1fr)] items-center gap-12 lg:grid-cols-[1fr_1.1fr]">
+    <div>
+      <SectionHeading
+        align="left"
+        eyebrow="Для разработчиков"
+        title="Свой компонент — 20 строк TypeScript"
+        lead="Нет нужного блока — напишите. Компонент возвращает HTML-строку, регистрируется одной функцией и сразу доступен во всех презентациях как type: big-number."
+      />
+      <ul data-reveal class="mt-8 flex flex-col gap-4">
+        {rules.map(([a, b]) => (
+          <li class="flex gap-3">
+            <span class="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-acs text-ac"><Check class="size-3.5" stroke-width={3} /></span>
+            <span><b class="block text-[15px] text-tx">{a}</b><span class="text-[14px] text-mu">{b}</span></span>
+          </li>
+        ))}
+      </ul>
+      <CommandLine command="yarn verify" class="mt-8 max-w-xs" />
+    </div>
+    <div data-reveal class="relative" style="--d:.1s">
+      <div aria-hidden="true" class="absolute -inset-6 -z-10 rounded-[40px] max-lg:hidden bg-[radial-gradient(closest-side,color-mix(in_srgb,var(--ac)_18%,transparent),transparent)] blur-xl"></div>
+      <CodeBlock code={code} lang="ts" file="src/components/big-number/big-number.ts" dark lines />
+      <div class="absolute right-8 top-full -mt-3 hidden rounded-2xl border border-bd bg-surf p-3 shadow-[var(--shadow-md)] sm:block">
+        <div class="font-mono text-[11px] text-mu">deck.yaml</div>
+        <div class="mt-1 font-mono text-[12.5px] text-tx"><span class="text-ac">- type:</span> big-number<br /><span class="text-ac">  value:</span> 99,7<br /><span class="text-ac">  title:</span> доступность, %</div>
+      </div>
+    </div>
+  </Container>
+</section>

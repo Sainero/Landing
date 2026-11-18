@@ -1,0 +1,27 @@
+---
+/**
+ * Настоящее окно докладчика движка (tour.html?view=presenter), уменьшенное до карточки.
+ * Оно само находит презентацию на первом экране через BroadcastChannel и листается вместе с ней.
+ */
+interface Props { deck: string; class?: string }
+const { deck, class: cls } = Astro.props;
+---
+<div data-presenter-preview class:list={['relative aspect-[1280/760] overflow-hidden', cls]}>
+  <iframe
+    src={`/demo/${deck}.html?view=presenter#1`}
+    title="Окно докладчика"
+    loading="lazy"
+    tabindex="-1"
+    aria-hidden="true"
+    class="pointer-events-none absolute left-0 top-0 h-[760px] w-[1280px] origin-top-left border-0 bg-alt"
+  ></iframe>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-presenter-preview]').forEach((box) => {
+    const frame = box.querySelector('iframe')!;
+    const fit = () => { frame.style.transform = `scale(${box.clientWidth / 1280})`; };
+    new ResizeObserver(fit).observe(box);
+    fit();
+  });
+</script>

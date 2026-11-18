@@ -1,0 +1,162 @@
+---
+import { CircleAlert, FileCode, Keyboard, Moon, Presentation, Printer, Smartphone, Sun } from '@lucide/astro';
+import PresenterPreview from '@/entities/deck/ui/PresenterPreview.astro';
+import { deckSize } from '@/shared/lib/config';
+import Container from '@/shared/ui-kit/Container.astro';
+import Kbd from '@/shared/ui-kit/Kbd.astro';
+import SectionHeading from '@/shared/ui-kit/SectionHeading.astro';
+
+const size = deckSize('tour');
+const keys = [
+  { k: '→', label: 'дальше', codes: 'ArrowRight ArrowDown PageDown Space' },
+  { k: '←', label: 'назад', codes: 'ArrowLeft ArrowUp PageUp Backspace' },
+  { k: 'O', label: 'обзор', codes: 'o щ' },
+  { k: 'P', label: 'докладчик', codes: 'p з' },
+  { k: 'F', label: 'экран', codes: 'f а' },
+  { k: 'T', label: 'тема', codes: 't е' },
+  { k: 'B', label: 'пауза', codes: 'b и .' },
+  { k: '5↵', label: 'к слайду', codes: 'Enter 1 2 3 4 5 6 7 8 9 0' },
+];
+const card = 'group/card relative overflow-hidden rounded-3xl border border-bd bg-surf p-6 shadow-[var(--shadow-sm)] transition duration-300 hover:-translate-y-0.5 hover:border-acb/70 hover:shadow-[var(--shadow-md)]';
+const icon = 'grid size-10 place-items-center rounded-xl bg-acs text-ac';
+---
+<section id="features" class="relative py-24 sm:py-32">
+  <div aria-hidden="true" class="dot-grid pointer-events-none absolute inset-0 -z-10 [mask-image:linear-gradient(transparent,#000_20%,#000_80%,transparent)]"></div>
+  <Container>
+    <SectionHeading eyebrow="Возможности" lead="Всё, что нужно на сцене, уже встроено в движок: от обзора слайдов до окна докладчика с таймером.">
+      <Fragment slot="title">Презентация, которая<br class="hidden sm:block" /> <span class="text-gradient">умеет всё сама</span></Fragment>
+    </SectionHeading>
+
+    <div class="mt-16 grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-6">
+      <!-- Режим докладчика: настоящее окно движка, листается вместе с демо наверху -->
+      <article data-reveal class:list={[card, 'md:col-span-4 md:row-span-2 flex flex-col']}>
+        <div class="flex items-start gap-4">
+          <span class={icon}><Presentation class="size-5" /></span>
+          <div>
+            <h3 class="text-lg font-bold text-tx">Режим докладчика</h3>
+            <p class="mt-1 max-w-lg text-[15px] leading-relaxed text-mu">Второе окно: текущий и следующий слайд, заметки, таймер и часы. Окна синхронизированы — даже у файла, открытого с диска.</p>
+          </div>
+        </div>
+        <div class="relative mt-6 flex-1">
+          <div class="overflow-hidden rounded-2xl border border-bd2/70 shadow-[var(--shadow-md)]">
+            <PresenterPreview deck="tour" />
+          </div>
+          <span class="absolute -bottom-2 right-4 inline-flex items-center gap-1.5 rounded-full border border-bd bg-surf px-2.5 py-1 text-[11.5px] font-semibold text-tx2 shadow-[var(--shadow-sm)]">
+            <span class="size-1.5 animate-pulse rounded-full bg-ok"></span> живое окно — следует за демо наверху
+          </span>
+        </div>
+      </article>
+
+      <!-- Один файл -->
+      <article data-reveal class:list={[card, 'md:col-span-2']} style="--d:.05s">
+        <span class={icon}><FileCode class="size-5" /></span>
+        <h3 class="mt-4 text-lg font-bold text-tx">Один HTML-файл</h3>
+        <p class="mt-1 text-[15px] leading-relaxed text-mu">Картинки и шрифты внутри. Почта, флешка, мессенджер — откроется везде.</p>
+        <div class="mt-5 flex items-end gap-3">
+          <div class="relative h-[88px] w-[70px] rounded-lg border border-bd2 bg-alt [clip-path:polygon(0_0,72%_0,100%_22%,100%_100%,0_100%)]">
+            <span class="absolute bottom-2 left-2 rounded bg-ac px-1.5 py-0.5 font-mono text-[10px] font-bold text-white">HTML</span>
+          </div>
+          <div class="pb-1">
+            <div class="font-mono text-[28px] font-bold leading-none tracking-tight text-tx">{size}<span class="ml-1 text-sm text-mu">КБ</span></div>
+            <div class="mt-1 text-[12px] text-mu">вся демо-презентация</div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Темы -->
+      <article data-reveal class:list={[card, 'md:col-span-2']} style="--d:.1s">
+        <span class={icon}><Moon class="size-5" /></span>
+        <h3 class="mt-4 text-lg font-bold text-tx">Светлая и тёмная тема</h3>
+        <p class="mt-1 text-[15px] leading-relaxed text-mu">Следует за системой, переключается клавишей <Kbd>T</Kbd>. Попробуйте:</p>
+        <button type="button" data-theme-toggle class="mt-4 flex w-full items-center gap-3 rounded-2xl border border-bd bg-alt/70 p-2 text-left transition hover:border-acb">
+          <span class="relative h-9 w-16 rounded-full bg-bd2/70 p-1">
+            <span class="grid size-7 place-items-center rounded-full bg-surf text-ac shadow transition-transform duration-500 dark:translate-x-7">
+              <Sun class="size-4 dark:hidden" /><Moon class="hidden size-4 dark:block" />
+            </span>
+          </span>
+          <span class="text-[13.5px] font-semibold text-tx2">Сайт и все презентации на странице</span>
+        </button>
+      </article>
+
+      <!-- Клавиатура -->
+      <article data-reveal class:list={[card, 'md:col-span-3']} data-keys-card>
+        <span class={icon}><Keyboard class="size-5" /></span>
+        <h3 class="mt-4 text-lg font-bold text-tx">Управление с клавиатуры</h3>
+        <p class="mt-1 text-[15px] leading-relaxed text-mu">Буквы работают и в русской раскладке. Нажмите любую — она подсветится.</p>
+        <div class="mt-5 grid grid-cols-4 gap-2">
+          {keys.map((x) => (
+            <div data-key={x.codes} class="flex flex-col items-center gap-1 rounded-xl border border-bd bg-alt/60 py-2.5 transition data-[hit]:border-ac data-[hit]:bg-acs">
+              <span class="grid h-8 min-w-8 place-items-center rounded-lg border border-bd2 border-b-[3px] bg-surf px-1.5 font-mono text-[13px] font-bold text-tx">{x.k}</span>
+              <span class="text-[11.5px] text-mu">{x.label}</span>
+            </div>
+          ))}
+        </div>
+      </article>
+
+      <!-- Ошибки -->
+      <article data-reveal class:list={[card, 'md:col-span-3']} style="--d:.05s">
+        <span class={icon}><CircleAlert class="size-5" /></span>
+        <h3 class="mt-4 text-lg font-bold text-tx">Понятные ошибки</h3>
+        <p class="mt-1 text-[15px] leading-relaxed text-mu">Опечатка в данных не ломает показ: <code class="font-mono text-[13px]">yarn dev</code> покажет файл, строку и что поправить.</p>
+        <div class="mt-5 rounded-xl border-2 border-dashed border-[#DC2626]/70 bg-[#DC2626]/[.06] p-3.5 font-mono text-[12.5px] leading-relaxed text-[#DC2626]">
+          <div class="font-bold">Ошибка в presentations/q3/deck.yaml:14:7</div>
+          <div class="mt-1 text-tx2">Неизвестный компонент «chart». Доступны: bars, card, chips, grid, hub, kv, line-chart…</div>
+        </div>
+      </article>
+
+      <!-- PDF -->
+      <article data-reveal class:list={[card, 'md:col-span-2']}>
+        <span class={icon}><Printer class="size-5" /></span>
+        <h3 class="mt-4 text-lg font-bold text-tx">PDF за секунду</h3>
+        <p class="mt-1 text-[15px] leading-relaxed text-mu"><Kbd>Ctrl</Kbd> + <Kbd>P</Kbd> → «Сохранить как PDF». Слайд на страницу, 16:9.</p>
+        <div class="relative mt-6 h-20">
+          {[0, 1, 2].map((k) => (
+            <div class="absolute left-0 h-[68px] w-[120px] translate-x-[var(--x0)] rounded-lg border border-bd2 bg-surf shadow-[var(--shadow-sm)] transition-[translate] duration-500 group-hover/card:translate-x-[var(--x1)]" style={`--x0:${k * 14}px;--x1:${k * 64}px;top:${k * 4}px;z-index:${3 - k}`}>
+              <div class="m-2.5 h-2 w-12 rounded bg-tx/80"></div>
+              <div class="mx-2.5 h-1.5 w-20 rounded bg-bd2"></div>
+              <div class="mx-2.5 mt-2 flex items-end gap-1"><i class="h-3 w-2 rounded-sm bg-ac/70"></i><i class="h-5 w-2 rounded-sm bg-ac"></i><i class="h-4 w-2 rounded-sm bg-ac/80"></i></div>
+            </div>
+          ))}
+        </div>
+      </article>
+
+      <!-- Телефон -->
+      <article data-reveal class:list={[card, 'md:col-span-2']} style="--d:.05s">
+        <span class={icon}><Smartphone class="size-5" /></span>
+        <h3 class="mt-4 text-lg font-bold text-tx">Телефон и планшет</h3>
+        <p class="mt-1 text-[15px] leading-relaxed text-mu">Слайды листаются свайпом, сцена 16:9 вписывается в любой экран.</p>
+        <div class="mt-5 flex items-center gap-3 font-mono text-[12px] text-mu">
+          <span class="rounded-lg border border-bd bg-alt px-2 py-1">…/q3.html<b class="text-ac">#4</b></span>
+          номер слайда в адресе
+        </div>
+      </article>
+
+      <!-- Компоненты на CSS-переменных -->
+      <article data-reveal class:list={[card, 'md:col-span-2']} style="--d:.1s">
+        <span class={icon}><svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9" /><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" /></svg></span>
+        <h3 class="mt-4 text-lg font-bold text-tx">Свой фирменный стиль</h3>
+        <p class="mt-1 text-[15px] leading-relaxed text-mu">Цвета — в переменных темы. Поменяли <code class="font-mono text-[13px]">--ac</code> — перекрасились все слайды.</p>
+        <div class="mt-5 flex gap-2">
+          {['#2563EB', '#0EA5E9', '#7C3AED', '#16A34A', '#EA580C'].map((c) => <span class="size-8 rounded-full ring-2 ring-surf shadow-[var(--shadow-sm)]" style={`background:${c}`}></span>)}
+        </div>
+      </article>
+    </div>
+  </Container>
+</section>
+
+<script>
+  const card = document.querySelector<HTMLElement>('[data-keys-card]');
+  if (card) {
+    const cells = [...card.querySelectorAll<HTMLElement>('[data-key]')].map((el) => ({ el, codes: el.dataset.key!.split(' ') }));
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      const key = e.key === ' ' ? 'Space' : e.key.length === 1 ? e.key.toLowerCase() : e.key;
+      const hit = cells.find((c) => c.codes.includes(key));
+      if (!hit) return;
+      hit.el.setAttribute('data-hit', '');
+      setTimeout(() => hit.el.removeAttribute('data-hit'), 450);
+    });
+  }
+</script>

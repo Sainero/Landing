@@ -1,0 +1,6 @@
+---
+import { cn } from '../lib/cn';
+interface Props { class?: string; [key: `data-${string}`]: string | undefined }
+const { class: cls, ...rest } = Astro.props;
+---
+<kbd class={cn('inline-grid min-w-7 place-items-center rounded-md border border-bd2 border-b-[3px] bg-surf px-1.5 py-0.5 font-mono text-xs font-semibold text-tx transition', cls)} {...rest}><slot /></kbd>

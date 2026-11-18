@@ -1,0 +1,44 @@
+---
+/**
+ * Корневой каркас: <html>, <head>, тема без мигания, глобальные стили и общие скрипты.
+ * Аналог src/app/layout.tsx из примера структуры.
+ */
+import '@/shared/styles/globals.css';
+import { siteConfig } from '@/shared/lib/config';
+import { themeInitScript } from '@/shared/lib/theme';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const { title, description = siteConfig.description } = Astro.props;
+const fullTitle = title ? `${title} — ${siteConfig.name}` : `${siteConfig.name} — ${siteConfig.tagline}`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content="ru_RU" />
+    <meta name="theme-color" content="#F8FAFC" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#070B16" media="(prefers-color-scheme: dark)" />
+    <script is:inline set:html={themeInitScript} />
+  </head>
+  <body class="min-h-dvh overflow-x-clip">
+    <slot />
+    <script>
+      import '@/shared/lib/client/site';
+    </script>
+  </body>
+</html>

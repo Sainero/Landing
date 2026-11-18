@@ -1,0 +1,50 @@
+---
+import { BookOpen } from '@lucide/astro';
+import qrcode from 'qrcode-generator';
+import CloudLink from '@/entities/cloud/CloudLink.astro';
+import { siteConfig } from '@/shared/lib/config';
+import Button from '@/shared/ui-kit/Button.astro';
+import CommandLine from '@/shared/ui-kit/CommandLine.astro';
+import Container from '@/shared/ui-kit/Container.astro';
+import GithubIcon from '@/shared/ui-kit/GithubIcon.astro';
+import LogoMark from '@/shared/ui-kit/LogoMark.astro';
+
+// QR-код строится из ссылки на этапе сборки — как в финальном слайде движка
+const qr = qrcode(0, 'M');
+qr.addData(siteConfig.github);
+qr.make();
+const qrSvg = qr.createSvgTag({ cellSize: 4, margin: 0, scalable: true });
+const title = ['Соберите', 'свою', 'презентацию'];
+---
+<section class="relative isolate overflow-hidden py-28 sm:py-36">
+  <svg aria-hidden="true" class="pointer-events-none absolute left-1/2 top-[30%] -z-10 size-[160px] -translate-x-1/2 overflow-visible" viewBox="0 0 160 160">
+    {[0, 1.5, 3, 4.5].map((d) => <circle class="ring" cx="80" cy="80" r="54" fill="none" stroke="var(--ac)" stroke-width="1.3" vector-effect="non-scaling-stroke" style={`--d:${d}s`} />)}
+  </svg>
+  <div aria-hidden="true" class="dot-grid pointer-events-none absolute inset-0 -z-20 [mask-image:radial-gradient(ellipse_50%_60%_at_50%_45%,#000,transparent)]"></div>
+
+  <Container class="flex flex-col items-center text-center">
+    <div data-reveal class="grid size-24 place-items-center rounded-[26px] border-2 border-acb bg-surf shadow-[0_0_0_12px_color-mix(in_srgb,var(--ac)_8%,transparent),0_10px_30px_-6px_rgba(37,99,235,.35)]">
+      <LogoMark class="size-16" />
+    </div>
+    <h2 data-reveal class="mt-8 flex flex-wrap justify-center gap-x-[.28em] text-[clamp(38px,7vw,84px)] font-extrabold leading-[1.02] tracking-[-.04em] text-tx">
+      {title.map((w) => <span>{w}</span>)}
+    </h2>
+    <div data-reveal class="mx-auto mt-5 h-0.5 w-48 rounded bg-ac"></div>
+    <p data-reveal class="mt-5 text-lg tracking-wide text-tx2">Одна команда — и первый слайд готов</p>
+    <CommandLine command={'yarn new q3-report "Итоги квартала"'} class="mt-7 w-full max-w-md" />
+
+    <div data-reveal class="mt-10 flex w-full max-w-xl flex-col items-center gap-5 rounded-3xl border border-bd bg-surf p-4 text-left shadow-[var(--shadow-md)] sm:flex-row sm:p-5">
+      <div class="size-[120px] shrink-0 rounded-2xl border border-bd bg-white p-2.5 [&_svg]:size-full" set:html={qrSvg} aria-label={`QR-код: ${siteConfig.github}`} />
+      <div class="flex w-full flex-col gap-3 sm:border-l sm:border-bd sm:pl-5">
+        <a href={siteConfig.github} target="_blank" rel="noopener" class="group flex items-center gap-3">
+          <span class="grid size-11 shrink-0 place-items-center rounded-xl bg-ac text-white"><GithubIcon class="size-5" /></span>
+          <span class="min-w-0"><small class="block text-[12px] text-mu">Исходный код</small><b class="block truncate text-[19px] text-tx group-hover:text-ach">github.com/HTMLPPTX</b></span>
+        </a>
+        <div class="flex flex-wrap gap-2">
+          <Button href="/docs" variant="secondary" size="sm"><BookOpen class="size-4" />Документация</Button>
+          <CloudLink size="sm" label="Облако" />
+        </div>
+      </div>
+    </div>
+  </Container>
+</section>

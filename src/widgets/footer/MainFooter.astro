@@ -1,0 +1,37 @@
+---
+import { siteConfig } from '@/shared/lib/config';
+import { footerColumns } from '@/shared/lib/data/mainData';
+import Container from '@/shared/ui-kit/Container.astro';
+import GithubIcon from '@/shared/ui-kit/GithubIcon.astro';
+import Logo from '@/shared/ui-kit/Logo.astro';
+
+const { engine } = siteConfig;
+---
+<footer class="relative border-t border-bd bg-alt/60">
+  <Container class="grid gap-10 py-14 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+    <div class="flex flex-col gap-4">
+      <Logo />
+      <p class="max-w-xs text-sm leading-relaxed text-mu">Презентации как данные: YAML на входе, один HTML-файл на выходе. Открытый движок под лицензией {siteConfig.license}.</p>
+      <a href={siteConfig.github} target="_blank" rel="noopener" class="inline-flex w-fit items-center gap-2 rounded-lg border border-bd bg-surf px-3 py-1.5 text-sm font-semibold text-tx2 transition hover:border-acb hover:text-tx">
+        <GithubIcon class="size-4" /> kotomoran070-source/HTMLPPTX
+      </a>
+    </div>
+    {footerColumns.map((col) => (
+      <div>
+        <h3 class="mb-3 text-xs font-bold uppercase tracking-[.14em] text-mu">{col.title}</h3>
+        <ul class="flex flex-col gap-2">
+          {col.links.map((l) => <li><a href={l.href} class="text-[15px] text-tx2 transition hover:text-ac">{l.label}</a></li>)}
+        </ul>
+      </div>
+    ))}
+    <div>
+      <h3 class="mb-3 text-xs font-bold uppercase tracking-[.14em] text-mu">Облако</h3>
+      <p class="text-[15px] leading-relaxed text-tx2">Отдельное приложение: редактор в браузере и ссылка на показ вместо файла.</p>
+      <a href="/#cloud" class="mt-2 inline-block text-[15px] font-semibold text-ac hover:underline">Что будет в облаке →</a>
+    </div>
+  </Container>
+  <Container class="flex flex-wrap items-center justify-between gap-3 border-t border-bd py-5 text-[13px] text-mu">
+    <span>© 2026 HTMLPPTX</span>
+    <span class="font-mono">движок v{engine.version}{engine.commit && ` · ${engine.commit}`} · синхронизировано {engine.syncedAt}</span>
+  </Container>
+</footer>

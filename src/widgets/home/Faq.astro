@@ -1,0 +1,22 @@
+---
+import { Plus } from '@lucide/astro';
+import { faq } from '@/shared/lib/data/mainData';
+import Container from '@/shared/ui-kit/Container.astro';
+import SectionHeading from '@/shared/ui-kit/SectionHeading.astro';
+---
+<section id="faq" class="relative py-24 sm:py-32">
+  <Container class="grid grid-cols-[minmax(0,1fr)] gap-12 lg:grid-cols-[.8fr_1.2fr]">
+    <SectionHeading align="left" eyebrow="Вопросы" title="Частые вопросы" lead="Не нашли ответа — загляните в документацию или в исходный код: он открыт." />
+    <div data-reveal class="flex flex-col gap-3">
+      {faq.map((f, i) => (
+        <details class="group/f rounded-2xl border border-bd bg-surf px-5 transition open:border-acb/70 open:shadow-[var(--shadow-md)]" open={i === 0}>
+          <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-[16px] font-bold text-tx [&::-webkit-details-marker]:hidden">
+            {f.q}
+            <span class="grid size-7 shrink-0 place-items-center rounded-full bg-alt text-tx2 transition duration-300 group-open/f:rotate-45 group-open/f:bg-ac group-open/f:text-white"><Plus class="size-4" /></span>
+          </summary>
+          <p class="pb-5 text-[15px] leading-relaxed text-mu">{f.a}</p>
+        </details>
+      ))}
+    </div>
+  </Container>
+</section>

@@ -1,0 +1,13 @@
+---
+/** Обёртка публичных страниц: шапка + контент + подвал (аналог LayoutWrapper из примера). */
+import MainFooter from '@/widgets/footer/MainFooter.astro';
+import MainHeader from '@/widgets/header/MainHeader.astro';
+import BaseLayout from './BaseLayout.astro';
+
+interface Props { title?: string; description?: string }
+---
+<BaseLayout {...Astro.props}>
+  <MainHeader />
+  <main id="main" class="overflow-x-clip"><slot /></main>
+  <MainFooter />
+</BaseLayout>

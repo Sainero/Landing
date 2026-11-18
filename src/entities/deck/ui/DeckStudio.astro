@@ -1,0 +1,181 @@
+---
+/**
+ * «Студия» на первом экране: слева deck.yaml, справа настоящая собранная презентация.
+ * Вкладки, автопрокрутка и сама презентация синхронизированы протоколом движка (см. lib/protocol.ts).
+ */
+import { Code } from 'astro:components';
+import { deckSize } from '@/shared/lib/config';
+import { readDeck } from '../lib/readDeck';
+
+interface Props { deck: string; class?: string }
+const { deck: name, class: cls } = Astro.props;
+const deck = await readDeck(name);
+const size = deckSize(name);
+const total = deck.slides.reduce((s, x) => s + x.lines, 0);
+---
+<div data-studio={name} class:list={['group/studio relative grid grid-cols-[minmax(0,1fr)] gap-3 lg:grid-cols-[minmax(0,.82fr)_minmax(0,1.38fr)]', cls]}>
+  <!-- Редактор: YAML текущего слайда -->
+  <div class="relative order-2 flex min-h-0 flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#0B1020] text-[#E6EDF3] shadow-[var(--shadow-lg)] lg:order-1">
+    <div class="flex items-center gap-2 border-b border-white/10 px-4 py-2.5">
+      <span class="flex gap-1.5"><i class="size-2.5 rounded-full bg-[#FF5F57]"></i><i class="size-2.5 rounded-full bg-[#FEBC2E]"></i><i class="size-2.5 rounded-full bg-[#28C840]"></i></span>
+      <span class="ml-2 truncate font-mono text-xs text-white/70"><span class="max-sm:hidden">presentations/{name}/</span><b class="font-semibold text-white">deck.yaml</b></span>
+      <span class="ml-auto whitespace-nowrap font-mono text-[11px] text-white/40">{total} строк</span>
+    </div>
+    <div class="relative h-[300px] min-h-0 overflow-hidden sm:h-[340px] lg:h-auto lg:flex-1">
+      {deck.slides.map((s, i) => (
+        <div data-slide-yaml={i} class:list={['code-lines absolute inset-0 overflow-auto px-2 py-3 font-mono text-[12.5px] leading-[1.7] opacity-0 transition-opacity duration-500 [scrollbar-color:rgba(255,255,255,.15)_transparent] [scrollbar-width:thin] data-[active]:z-10 data-[active]:opacity-100', i === 0 && 'z-10 opacity-100']} data-active={i === 0 ? '' : undefined}>
+          <Code code={s.yaml} lang="yaml" theme="github-dark-default" />
+        </div>
+      ))}
+      <div class="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-16 bg-gradient-to-t from-[#0B1020] to-transparent"></div>
+    </div>
+    <div class="flex items-center gap-2 border-t border-white/10 px-4 py-2 font-mono text-[11px] text-white/45">
+      <span class="size-1.5 rounded-full bg-[#28C840] shadow-[0_0_8px_#28C840]"></span>
+      <span>yarn dev — правки видны сразу</span>
+      <span class="ml-auto" data-studio-counter>слайд 1 / {deck.slides.length}</span>
+    </div>
+  </div>
+
+  <!-- Окно браузера с собранной презентацией -->
+  <div class="order-1 overflow-hidden rounded-2xl border border-bd2/70 bg-surf shadow-[var(--shadow-lg)] lg:order-2">
+    <div class="flex items-center gap-3 border-b border-bd px-4 py-2.5">
+      <span class="flex gap-1.5"><i class="size-2.5 rounded-full bg-bd2"></i><i class="size-2.5 rounded-full bg-bd2"></i><i class="size-2.5 rounded-full bg-bd2"></i></span>
+      <div class="mx-auto flex min-w-0 items-center gap-2 rounded-lg bg-alt px-3 py-1 font-mono text-[11.5px] text-mu">
+        <svg viewBox="0 0 24 24" class="size-3.5 shrink-0 text-ok" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12a8 8 0 1 0 16 0 8 8 0 1 0-16 0M12 8v4l3 2" /></svg>
+        <span class="truncate">file:///Отчёты/<b class="font-semibold text-tx">{name}.html</b></span>
+      </div>
+      <span class="hidden rounded-md border border-bd px-1.5 py-0.5 font-mono text-[10.5px] font-semibold text-mu sm:inline">{size} КБ</span>
+    </div>
+    <div class="[container-type:inline-size]">
+      <div class="h-[calc(56px+56.25cqw)]">
+        <iframe
+          data-deck={name}
+          src={`/demo/${name}.html#1`}
+          title={`Живая презентация: ${deck.title}`}
+          class="block h-full w-full border-0 bg-alt"
+          allow="fullscreen"
+        ></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- Вкладки слайдов с автопрокруткой -->
+  <div class="order-3 lg:col-span-2" role="tablist" aria-label="Слайды демо-презентации">
+    <div class="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:px-0">
+      {deck.slides.map((s, i) => (
+        <button
+          type="button"
+          role="tab"
+          data-slide-tab={i}
+          aria-selected={i === 0 ? 'true' : 'false'}
+          class="group/tab relative min-w-[150px] flex-1 overflow-hidden rounded-xl border border-bd bg-surf/80 px-3 py-2.5 text-left backdrop-blur transition hover:border-acb aria-selected:border-acb aria-selected:bg-acs/80"
+        >
+          <span class="flex items-center gap-2">
+            <span class="grid size-5 shrink-0 place-items-center rounded-full bg-alt font-mono text-[10.5px] font-bold text-tx2 group-aria-selected/tab:bg-ac group-aria-selected/tab:text-white">{i + 1}</span>
+            <span class="truncate text-[13px] font-semibold text-tx2 group-aria-selected/tab:text-tx">{s.label}</span>
+          </span>
+          <span class="mt-1 block font-mono text-[10.5px] text-mu">{s.template === 'content' ? `${s.lines} строк` : `template: ${s.template}`}</span>
+          <span data-tab-progress class="absolute inset-x-0 bottom-0 h-0.5 origin-left scale-x-0 bg-ac"></span>
+        </button>
+      ))}
+    </div>
+  </div>
+</div>
+
+<style>
+  [data-studio][data-autoplay] [aria-selected='true'] [data-tab-progress] {
+    animation: tab-fill var(--slide-ms, 7000ms) linear both;
+  }
+  [data-studio][data-paused] [data-tab-progress] { animation-play-state: paused !important; }
+  @keyframes tab-fill { to { transform: scaleX(1); } }
+</style>
+
+<script>
+  import { readEnvelope, send } from '../lib/protocol';
+
+  const SLIDE_MS = 7000;
+
+  document.querySelectorAll<HTMLElement>('[data-studio]').forEach((studio) => {
+    const deck = studio.dataset.studio!;
+    const frame = studio.querySelector<HTMLIFrameElement>('iframe')!;
+    const tabs = [...studio.querySelectorAll<HTMLButtonElement>('[data-slide-tab]')];
+    const panels = [...studio.querySelectorAll<HTMLElement>('[data-slide-yaml]')];
+    const counter = studio.querySelector('[data-studio-counter]');
+    const n = tabs.length;
+    let index = 0;
+    let expected = 0;
+    let autoplay = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let hovered = false;
+    let visible = false;
+    let timer = 0;
+
+    studio.style.setProperty('--slide-ms', `${SLIDE_MS}ms`);
+
+    function setActive(i: number): void {
+      if (i === index && tabs[i].getAttribute('aria-selected') === 'true') return;
+      index = i;
+      tabs.forEach((t, k) => t.setAttribute('aria-selected', String(k === i)));
+      panels.forEach((p, k) => p.toggleAttribute('data-active', k === i));
+      panels[i].scrollTop = 0;
+      if (counter) counter.textContent = `слайд ${i + 1} / ${n}`;
+      tabs[i].scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      schedule();
+    }
+
+    function goto(i: number): void {
+      expected = i;
+      send(frame.contentWindow, deck, { type: 'goto', index: i });
+      setActive(i);
+    }
+
+    function stopAutoplay(): void {
+      autoplay = false;
+      clearTimeout(timer);
+      studio.removeAttribute('data-autoplay');
+    }
+
+    function schedule(): void {
+      clearTimeout(timer);
+      if (!autoplay) return;
+      // перезапуск полоски прогресса на активной вкладке
+      studio.removeAttribute('data-autoplay');
+      void studio.offsetWidth;
+      studio.setAttribute('data-autoplay', '');
+      timer = window.setTimeout(tick, SLIDE_MS);
+    }
+
+    function tick(): void {
+      if (!autoplay) return;
+      if (hovered || !visible || document.hidden) {
+        timer = window.setTimeout(tick, 600);
+        return;
+      }
+      goto((index + 1) % n);
+    }
+
+    const syncPaused = () => studio.toggleAttribute('data-paused', hovered || !visible);
+
+    tabs.forEach((t, i) => t.addEventListener('click', () => { stopAutoplay(); goto(i); }));
+    studio.addEventListener('pointerenter', () => { hovered = true; syncPaused(); });
+    studio.addEventListener('pointerleave', () => { hovered = false; syncPaused(); });
+    // Клик внутри презентации переводит фокус во фрейм — пользователь листает сам
+    addEventListener('blur', () => { if (document.activeElement === frame) stopAutoplay(); });
+
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; syncPaused(); }, { threshold: 0.35 }).observe(studio);
+
+    addEventListener('message', (e) => {
+      if (e.source !== frame.contentWindow) return;
+      const msg = readEnvelope(e.data, deck);
+      if (msg?.type !== 'state') return;
+      if (msg.index !== expected) {
+        // листают внутри презентации: показываем нужный YAML и не мешаем
+        expected = msg.index;
+        stopAutoplay();
+      }
+      setActive(msg.index);
+    });
+
+    frame.addEventListener('load', () => send(frame.contentWindow, deck, { type: 'hello' }));
+    schedule();
+  });
+</script>

@@ -1,0 +1,13 @@
+---
+import { cn } from '../lib/cn';
+import CopyButton from './CopyButton.astro';
+
+/** Строка терминала с командой и кнопкой копирования */
+interface Props { command: string; class?: string; style?: string }
+const { command, class: cls, style } = Astro.props;
+---
+<div style={style} class={cn('flex items-center text-left gap-3 rounded-xl border border-bd bg-surf/80 py-1.5 pl-4 pr-1.5 font-mono text-[13.5px] shadow-[var(--shadow-sm)] backdrop-blur', cls)}>
+  <span class="select-none text-ac">$</span>
+  <code class="min-w-0 flex-1 overflow-x-auto whitespace-nowrap text-tx [scrollbar-width:none]">{command}</code>
+  <CopyButton text={command} label="Скопировать команду" />
+</div>

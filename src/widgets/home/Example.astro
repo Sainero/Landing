@@ -1,0 +1,16 @@
+---
+import DeckViewer from '@/entities/deck/ui/DeckViewer.astro';
+import Container from '@/shared/ui-kit/Container.astro';
+import SectionHeading from '@/shared/ui-kit/SectionHeading.astro';
+---
+<section id="example" class="relative overflow-hidden bg-alt/70 py-24 sm:py-32">
+  <div aria-hidden="true" class="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-bd2 to-transparent"></div>
+  <Container>
+    <SectionHeading
+      eyebrow="Пример из жизни"
+      title="Отчёт о комплексе контроля микроклимата"
+      lead="Девять слайдов: оборудование, схема системы, инфраструктура, прошивка и результаты эксплуатации. Весь отчёт — один deck.yaml на 290 строк."
+    />
+    <DeckViewer deck="microclimate" class="mt-14" />
+  </Container>
+</section>

@@ -1,0 +1,25 @@
+---
+import { docHref, docsNav } from './docsNav';
+
+interface Props { current: string }
+const { current } = Astro.props;
+const { groups } = await docsNav();
+---
+<nav aria-label="Разделы документации" class="flex flex-col gap-7">
+  {groups.map((g) => (
+    <div>
+      <h2 class="mb-2 px-3 text-[11.5px] font-bold uppercase tracking-[.14em] text-mu">{g.title}</h2>
+      <ul class="flex flex-col gap-0.5">
+        {g.items.map((d) => (
+          <li>
+            <a
+              href={docHref(d)}
+              aria-current={d.id === current ? 'page' : undefined}
+              class="block rounded-lg px-3 py-1.5 text-[14.5px] font-medium text-tx2 transition hover:bg-alt hover:text-tx aria-[current]:bg-acs aria-[current]:font-semibold aria-[current]:text-ach"
+            >{d.data.title}</a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  ))}
+</nav>

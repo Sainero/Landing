@@ -1,0 +1,24 @@
+---
+/**
+ * Единственная точка связи лендинга с облаком — ссылка.
+ * Адрес берётся из PUBLIC_CLOUD_URL; пока он не задан, ведём на раздел #cloud и помечаем «скоро».
+ */
+import { ArrowUpRight } from '@lucide/astro';
+import { cloudHref, isCloudLive } from '@/shared/lib/config';
+import { buttonClass, type ButtonSize, type ButtonVariant } from '@/shared/ui-kit/button';
+
+interface Props {
+  path?: string;
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  class?: string;
+  label?: string;
+}
+const { path = '/', variant = 'primary', size = 'md', class: cls, label = 'Открыть облако' } = Astro.props;
+---
+<a href={cloudHref(path)} class={buttonClass(variant, size, cls)} data-cloud-link>
+  {label}
+  {isCloudLive
+    ? <ArrowUpRight class="size-4 transition group-hover/btn:-translate-y-0.5 group-hover/btn:translate-x-0.5" />
+    : <span class="rounded-full bg-white/20 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider">скоро</span>}
+</a>

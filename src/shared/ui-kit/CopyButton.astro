@@ -1,0 +1,18 @@
+---
+import { Check, Copy } from '@lucide/astro';
+import { cn } from '../lib/cn';
+
+/** Кнопка «скопировать». Логика — в shared/lib/client/site.ts ([data-copy]). */
+interface Props { text: string; class?: string; label?: string }
+const { text, class: cls, label = 'Скопировать' } = Astro.props;
+---
+<button
+  type="button"
+  data-copy={text}
+  aria-label={label}
+  title={label}
+  class={cn('group/copy grid size-8 shrink-0 place-items-center rounded-lg text-mu transition hover:bg-alt hover:text-tx', cls)}
+>
+  <Copy class="size-4 group-data-[done]/copy:hidden" />
+  <Check class="hidden size-4 text-ok group-data-[done]/copy:block" />
+</button>
