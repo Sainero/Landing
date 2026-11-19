@@ -1,0 +1,80 @@
+---
+import { ArrowUp, Check, Eye, FileText, Paperclip, PencilLine, Undo2 } from '@lucide/astro';
+import CodeBlock from '@/shared/ui-kit/CodeBlock.astro';
+import Container from '@/shared/ui-kit/Container.astro';
+import SectionHeading from '@/shared/ui-kit/SectionHeading.astro';
+
+const services = ['Claude', 'ChatGPT', 'DeepSeek', 'Qwen', 'OpenRouter', 'Ollama'];
+const clients = ['Claude Desktop', 'Claude Code', 'ChatGPT · Codex', 'Cursor', 'VS Code'];
+const steps = [
+  { icon: FileText, text: 'Прочитал слайд 5' },
+  { icon: PencilLine, text: 'Правка объекта · слайд 5' },
+  { icon: Eye, text: 'Посмотрел слайд 5' },
+];
+const rules = [
+  ['Правки — операциями, а не перезаписью файла', 'каждая проверяется и применяется целиком или не применяется вовсе'],
+  ['Агент видит слайд картинкой', 'после правки сам поправляет вылезший текст и наложения'],
+  ['Ctrl+Z отменяет весь ответ одним шагом', 'а правки, сделанные после, остаются'],
+];
+const mcp = `claude mcp add --scope user slideria -- node /путь/к/slideria/scripts/mcp.mjs`;
+---
+<section id="agents" class="relative py-24 sm:py-32">
+  <Container class="grid grid-cols-[minmax(0,1fr)] items-center gap-12 lg:grid-cols-[1fr_1.05fr]">
+    <div>
+      <SectionHeading
+        align="left"
+        eyebrow="Агенты"
+        title="Claude правит слайды вместе с вами"
+        lead="Чат «Агент» прямо в студии — с моделью по вашему ключу. Или MCP: Claude Desktop, Claude Code и Codex подключаются в один щелчок из «Файл → Интеграции»."
+      />
+      <ul data-reveal class="mt-8 flex flex-col gap-4">
+        {rules.map(([a, b]) => (
+          <li class="flex gap-3">
+            <span class="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-acs text-ac"><Check class="size-3.5" stroke-width={3} /></span>
+            <span><b class="block text-[15px] text-tx">{a}</b><span class="text-[14px] text-mu">{b}</span></span>
+          </li>
+        ))}
+      </ul>
+      <div data-reveal class="mt-8">
+        <div class="text-[12px] font-bold uppercase tracking-[.14em] text-mu">Сервисы в чате</div>
+        <div class="mt-2 flex flex-wrap gap-1.5">{services.map((s) => <span class="rounded-full border border-bd bg-surf px-3 py-1 text-[13px] font-semibold text-tx2">{s}</span>)}</div>
+        <div class="mt-4 text-[12px] font-bold uppercase tracking-[.14em] text-mu">Клиенты MCP</div>
+        <div class="mt-2 flex flex-wrap gap-1.5">{clients.map((s) => <span class="rounded-full border border-acb/60 bg-acs/70 px-3 py-1 text-[13px] font-semibold text-ach">{s}</span>)}</div>
+      </div>
+    </div>
+
+    <div data-reveal class="relative" style="--d:.1s">
+      <div aria-hidden="true" class="absolute -inset-6 -z-10 rounded-[40px] bg-[radial-gradient(closest-side,color-mix(in_srgb,var(--vi)_20%,transparent),transparent)] blur-xl max-lg:hidden"></div>
+      <!-- панель «Агент», как в студии -->
+      <div class="overflow-hidden rounded-2xl border border-bd2/70 bg-surf shadow-[var(--shadow-lg)]">
+        <div class="flex items-center gap-2 border-b border-bd px-4 py-3">
+          <span class="grid size-7 place-items-center rounded-lg bg-[linear-gradient(135deg,var(--vi),var(--pk))] text-[13px] text-white">✦</span>
+          <b class="text-[14px] text-tx">Агент</b>
+          <span class="ml-auto rounded-md border border-bd px-2 py-0.5 text-[11.5px] text-mu">Claude · Ctrl+J</span>
+        </div>
+        <div class="flex flex-col gap-3 p-4">
+          <div class="ml-auto max-w-[85%] rounded-2xl rounded-br-md bg-ac px-3.5 py-2.5 text-[13.5px] text-white">
+            Обнови цифры на слайде по этому скриншоту и сократи подписи вдвое
+            <div class="mt-2 flex gap-1.5"><span class="rounded-md bg-white/20 px-1.5 py-0.5 text-[11px]">Слайд 5</span><span class="rounded-md bg-white/20 px-1.5 py-0.5 text-[11px]">отчёт.png</span></div>
+          </div>
+          <ul class="flex flex-col gap-1.5">
+            {steps.map((s) => <li class="flex items-center gap-2 text-[12.5px] text-mu"><s.icon class="size-3.5 text-ac" />{s.text}</li>)}
+          </ul>
+          <p class="text-[13.5px] leading-relaxed text-tx2">Цифры заменил на значения из скриншота, подписи сократил. Проверил слайд картинкой — текст помещается.</p>
+          <div class="flex items-center gap-3 rounded-xl border border-bd bg-alt/60 p-2.5">
+            <span class="grid h-11 w-[72px] shrink-0 place-items-end rounded-md border border-bd bg-surf p-1.5"><span class="flex items-end gap-0.5"><i class="h-2 w-1.5 bg-ac/60"></i><i class="h-3.5 w-1.5 bg-ac/80"></i><i class="h-2.5 w-1.5 bg-ac/70"></i><i class="h-5 w-1.5 bg-ac"></i></span></span>
+            <span class="flex-1 text-[12.5px]"><b class="block text-tx">4 правки · слайд 5</b><span class="text-mu">контрольная точка перед ответом</span></span>
+            <span class="rounded-lg border border-bd px-2 py-1 text-[12px] font-semibold text-tx2">Показать</span>
+            <span class="inline-flex items-center gap-1 rounded-lg border border-bd px-2 py-1 text-[12px] font-semibold text-tx2"><Undo2 class="size-3" />Вернуть</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 border-t border-bd px-3 py-2.5">
+          <Paperclip class="size-4 text-mu" />
+          <span class="flex-1 text-[13px] text-mu">Напишите задачу…</span>
+          <span class="grid size-7 place-items-center rounded-full bg-ac text-white"><ArrowUp class="size-4" /></span>
+        </div>
+      </div>
+      <CodeBlock code={mcp} lang="bash" file="или вручную — MCP для Claude Code" dark class="mt-4" />
+    </div>
+  </Container>
+</section>

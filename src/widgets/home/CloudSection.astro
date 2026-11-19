@@ -1,5 +1,5 @@
 ---
-import { ChartLine, Download, FileSpreadsheet, Link2, PencilRuler, Users } from '@lucide/astro';
+import { Download, Globe, Plug, Workflow } from '@lucide/astro';
 import CloudLink from '@/entities/cloud/CloudLink.astro';
 import { isCloudLive } from '@/shared/lib/config';
 import Container from '@/shared/ui-kit/Container.astro';
@@ -10,26 +10,24 @@ const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
 const stars = Array.from({ length: 90 }, () => ({ x: rnd() * 100, y: rnd() * 100, s: 0.6 + rnd() * 1.6, d: rnd() * 4 }));
 
 const features = [
-  { icon: PencilRuler, title: 'Редактор в браузере', text: 'Правка текста прямо на слайде, перетаскивание блоков, замена картинок. Всё сохраняется в deck.yaml.' },
-  { icon: Link2, title: 'Ссылка вместо файла', text: 'Показ по ссылке с любого устройства. Обновили цифры — у всех свежая версия.' },
-  { icon: Users, title: 'Совместная работа', text: 'Команда правит одну презентацию, комментарии к слайдам, история версий.' },
-  { icon: FileSpreadsheet, title: 'Данные из Excel', text: 'Графики и таблицы берут значения из таблицы — без ручного переноса цифр.' },
-  { icon: ChartLine, title: 'Статистика показов', text: 'Кто открыл, до какого слайда дошёл, сколько времени смотрел.' },
-  { icon: Download, title: 'Тот же движок', text: 'Любую презентацию можно скачать одним HTML-файлом и показать офлайн.' },
+  { icon: Globe, title: 'Студия без установки', text: 'Тот же сервер и та же студия, что в программе, — открываются по адресу в браузере.' },
+  { icon: Plug, title: 'Коннектор для Claude', text: 'MCP по HTTP со входом: адрес добавляется в claude.ai как свой коннектор, и презентации правятся прямо из окна Claude.' },
+  { icon: Workflow, title: 'Данные из сервисов', text: 'Коннекторы к другим сервисам: вход, обновление данных на слайдах и снимок в экспорт.' },
+  { icon: Download, title: 'Тот же формат', text: 'Любую презентацию можно скачать HTML-файлом, PowerPoint или PDF и показать офлайн.' },
 ];
 
 const roadmap = [
-  { stage: 'Этап 1', title: 'Движок', text: 'YAML → один HTML, 25 компонентов, докладчик, темы, PDF', state: 'Готово', done: true },
-  { stage: 'Этап 2', title: 'Правка в браузере', text: 'Перетаскивание, замена картинок, импорт из Excel, видео', state: 'Следующий' },
-  { stage: 'Этап 3', title: 'Облако', text: 'Аккаунты, хранение, ссылки на показ, команда, статистика', state: 'В планах' },
+  { stage: 'Этап 1', title: 'Формат и показ', text: 'deck.yaml, блоки, один HTML-файл, окно докладчика, пульт', state: 'Готово', done: true },
+  { stage: 'Этап 2', title: 'Студия и программа', text: 'Правка как в PowerPoint, импорт PPTX и HTML, экспорт, агенты и MCP', state: 'Готово', done: true },
+  { stage: 'Этап 3', title: 'Облако', text: 'Студия по адресу, вход, коннектор для Claude, данные из сервисов', state: 'В планах' },
 ];
 ---
 <section id="cloud" class="relative isolate overflow-hidden bg-[#05070F] py-24 text-[#E6EBF3] sm:py-32">
   <!-- космос: звёзды, туманности, луч -->
   <div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10">
-    <div class="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_20%_10%,rgba(37,99,235,.28),transparent),radial-gradient(ellipse_50%_40%_at_85%_80%,rgba(124,58,237,.25),transparent),radial-gradient(ellipse_40%_30%_at_70%_15%,rgba(14,165,233,.16),transparent)]"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_20%_10%,rgba(37,99,235,.28),transparent),radial-gradient(ellipse_50%_40%_at_85%_80%,rgba(236,72,153,.18),transparent),radial-gradient(ellipse_40%_30%_at_70%_15%,rgba(99,102,241,.22),transparent)]"></div>
     {stars.map((s) => (
-      <i class="absolute rounded-full bg-white animate-pulse" style={`left:${s.x.toFixed(1)}%;top:${s.y.toFixed(1)}%;width:${s.s.toFixed(1)}px;height:${s.s.toFixed(1)}px;opacity:${(0.3 + s.s / 3).toFixed(2)};animation-delay:${s.d.toFixed(2)}s;animation-duration:${(3 + s.d).toFixed(1)}s`}></i>
+      <i class="absolute animate-pulse rounded-full bg-white" style={`left:${s.x.toFixed(1)}%;top:${s.y.toFixed(1)}%;width:${s.s.toFixed(1)}px;height:${s.s.toFixed(1)}px;opacity:${(0.3 + s.s / 3).toFixed(2)};animation-delay:${s.d.toFixed(2)}s;animation-duration:${(3 + s.d).toFixed(1)}s`}></i>
     ))}
     <div class="beam absolute inset-y-0 left-0 w-56 bg-gradient-to-r from-transparent via-[rgba(147,197,253,.07)] to-transparent"></div>
   </div>
@@ -37,90 +35,38 @@ const roadmap = [
   <Container>
     <div data-reveal class="mx-auto flex max-w-3xl flex-col items-center text-center">
       <span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-[12px] font-bold uppercase tracking-[.16em] text-white/80 backdrop-blur">
-        <span class="size-1.5 rounded-full bg-[#6EE7B7] shadow-[0_0_10px_#6EE7B7]"></span> HTMLPPTX Cloud · {isCloudLive ? 'открыто' : 'скоро'}
+        <span class="size-1.5 rounded-full bg-[#6EE7B7] shadow-[0_0_10px_#6EE7B7]"></span> Slideria Cloud · {isCloudLive ? 'открыто' : 'скоро'}
       </span>
-      <h2 class="mt-6 text-balance text-[clamp(34px,5.4vw,64px)] font-extrabold leading-[1.04] tracking-[-.035em]">
-        Те же презентации —<br class="hidden sm:block" />
-        <span class="bg-[linear-gradient(100deg,#93C5FD,#67E8F9_45%,#C4B5FD)] bg-clip-text text-transparent">прямо в браузере</span>
+      <h2 class="font-display mt-6 text-balance text-[clamp(30px,5vw,58px)] font-bold leading-[1.06] tracking-[-.04em]">
+        Та же студия —<br class="hidden sm:block" />
+        <span class="bg-[linear-gradient(100deg,#93C5FD,#A5B4FC_45%,#F9A8D4)] bg-clip-text text-transparent">прямо в браузере</span>
       </h2>
       <p class="mt-5 max-w-2xl text-pretty text-[17px] leading-relaxed text-white/65 sm:text-lg">
-        Облачная версия — отдельное приложение на своём адресе. Лендинг остаётся витриной и документацией, а работа с презентациями переезжает в облако.
+        Облачная версия — отдельное приложение на своём адресе. Сайт остаётся витриной и документацией, программа для компьютера — сама по себе, а работать с презентациями можно будет и без установки.
       </p>
       <div class="mt-8 flex flex-wrap justify-center gap-3">
         <CloudLink variant="glow" size="lg" label={isCloudLive ? 'Открыть облако' : 'Облачная версия'} />
-        <a href="/docs/roadmap" class="inline-flex h-13 items-center rounded-xl border border-white/15 bg-white/5 px-6 font-semibold text-white/85 transition hover:border-white/30 hover:bg-white/10">План развития</a>
+        <a href="/docs/roadmap" class="inline-flex h-13 items-center rounded-xl border border-white/15 bg-white/5 px-6 font-semibold text-white/85 transition hover:border-white/30 hover:bg-white/10">Что дальше</a>
       </div>
     </div>
 
-    <!-- Набросок интерфейса облака -->
+    <!-- студия в окне браузера -->
     <div data-reveal class="relative mx-auto mt-16 max-w-5xl" style="--d:.1s">
       <div aria-hidden="true" class="absolute -inset-x-10 -top-10 bottom-0 -z-10 bg-[radial-gradient(closest-side,rgba(59,130,246,.35),transparent)] blur-2xl"></div>
-      <div class="overflow-hidden rounded-2xl border border-white/10 bg-[#0B1120]/90 shadow-[0_40px_120px_-30px_rgba(37,99,235,.55)] backdrop-blur" role="img" aria-label="Набросок интерфейса облачного редактора">
+      <figure class="overflow-hidden rounded-2xl border border-white/10 bg-[#0B1120] shadow-[0_40px_120px_-30px_rgba(37,99,235,.55)]">
         <div class="flex items-center gap-3 border-b border-white/10 px-4 py-2.5">
           <span class="flex gap-1.5"><i class="size-2.5 rounded-full bg-white/15"></i><i class="size-2.5 rounded-full bg-white/15"></i><i class="size-2.5 rounded-full bg-white/15"></i></span>
-          <span class="mx-auto rounded-lg bg-white/5 px-3 py-1 font-mono text-[11.5px] text-white/50">app.htmlpptx…/decks/<b class="text-white/80">q3-report</b></span>
+          <span class="mx-auto rounded-lg bg-white/5 px-3 py-1 font-mono text-[11.5px] text-white/50">app.slideria…/<b class="text-white/80">studio</b></span>
         </div>
-        <div class="flex items-center gap-3 border-b border-white/10 px-4 py-2.5">
-          <b class="text-[13.5px]">Итоги квартала</b>
-          <span class="rounded-md bg-white/5 px-1.5 py-0.5 text-[11px] text-white/50">сохранено</span>
-          <span class="ml-auto hidden -space-x-2 sm:flex">
-            {['#60A5FA', '#A78BFA', '#34D399'].map((c, i) => <span class="grid size-7 place-items-center rounded-full border-2 border-[#0B1120] text-[11px] font-bold text-[#0B1120]" style={`background:${c}`}>{['А', 'М', 'К'][i]}</span>)}
-          </span>
-          <span class="rounded-lg border border-white/15 px-2.5 py-1 text-[12px] font-semibold text-white/75">Скачать .html</span>
-          <span class="rounded-lg bg-[#3B82F6] px-2.5 py-1 text-[12px] font-semibold">Поделиться</span>
-        </div>
-        <div class="grid grid-cols-[92px_1fr] md:grid-cols-[120px_1fr_230px]">
-          <div class="flex flex-col gap-2 border-r border-white/10 p-3">
-            {[0, 1, 2, 3].map((k) => (
-              <div class:list={['aspect-video rounded-md border p-1.5', k === 1 ? 'border-[#3B82F6] bg-[#3B82F6]/10' : 'border-white/10 bg-white/[.03]']}>
-                <div class="h-1 w-8 rounded bg-white/40"></div>
-                <div class="mt-1 h-0.5 w-10 rounded bg-white/15"></div>
-                {k === 1 && <div class="mt-1.5 flex items-end gap-0.5"><i class="h-2 w-1 bg-[#3B82F6]/70"></i><i class="h-3 w-1 bg-[#3B82F6]"></i><i class="h-2.5 w-1 bg-[#3B82F6]/80"></i><i class="h-4 w-1 bg-[#3B82F6]"></i></div>}
-              </div>
-            ))}
-          </div>
-          <div class="p-4 sm:p-6">
-            <div class="relative aspect-video rounded-xl bg-[#F8FAFC] p-[5%] text-[#111827] shadow-xl [background-image:radial-gradient(#E5E7EB_1px,transparent_1px)] [background-size:16px_16px]">
-              <div class="flex items-center gap-2">
-                <span class="text-[clamp(13px,2.2vw,24px)] font-extrabold tracking-tight">Итоги квартала</span>
-                <span class="rounded-full border border-[#93C5FD] bg-[#EFF6FF] px-2 text-[clamp(8px,1vw,11px)] font-semibold text-[#1D4ED8]">Q3</span>
-              </div>
-              <div class="mt-[3%] flex gap-1.5">
-                <span class="rounded-full border border-[#93C5FD] bg-[#EFF6FF] px-2 text-[clamp(8px,1vw,11px)] font-semibold text-[#1D4ED8] outline-2 outline-offset-2 outline-[#3B82F6] outline-dashed">Выручка +18%</span>
-                <span class="rounded-full border border-[#D1D5DB] px-2 text-[clamp(8px,1vw,11px)]">24 клиента</span>
-              </div>
-              <div class="absolute inset-x-[5%] bottom-[8%] flex h-[48%] items-end gap-[4%]">
-                {[45, 70, 58, 95].map((h, i) => (
-                  <div class="flex h-full flex-1 flex-col items-center justify-end gap-1">
-                    <div class="w-full rounded-t-md bg-[#2563EB]" style={`height:${h}%;opacity:${0.65 + i * 0.1}`}></div>
-                    <span class="text-[clamp(7px,.9vw,10px)] text-[#6B7280]">{['Июл', 'Авг', 'Сен', 'Окт'][i]}</span>
-                  </div>
-                ))}
-              </div>
-              <span class="absolute left-[30%] top-[16%] hidden rounded-md bg-[#A78BFA] px-1.5 py-0.5 text-[10px] font-bold text-white shadow sm:block">Мария</span>
-            </div>
-          </div>
-          <div class="hidden border-l border-white/10 p-4 md:block">
-            <div class="flex gap-1 rounded-lg bg-white/5 p-1 text-[11.5px] font-semibold">
-              <span class="flex-1 rounded-md bg-white/10 py-1 text-center">Свойства</span>
-              <span class="flex-1 py-1 text-center text-white/50">YAML</span>
-            </div>
-            <div class="mt-4 flex flex-col gap-3 text-[12px]">
-              <div><div class="text-white/45">Компонент</div><div class="mt-1 rounded-md border border-white/10 bg-white/5 px-2 py-1.5 font-mono">chips</div></div>
-              <div><div class="text-white/45">Текст</div><div class="mt-1 rounded-md border border-[#3B82F6]/60 bg-white/5 px-2 py-1.5">Выручка +18%<span class="blink">|</span></div></div>
-              <div class="flex items-center justify-between"><span class="text-white/45">Выделить цветом</span><span class="h-4 w-7 rounded-full bg-[#3B82F6] p-0.5"><span class="ml-auto block size-3 rounded-full bg-white"></span></span></div>
-              <div><div class="text-white/45">Данные графика</div><div class="mt-1 flex items-center gap-2 rounded-md border border-white/10 bg-white/5 px-2 py-1.5"><FileSpreadsheet class="size-3.5 text-[#34D399]" />отчёт-q3.xlsx</div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <p class="mt-4 text-center text-[12.5px] text-white/40">Набросок интерфейса. Финальный вид появится вместе с облаком.</p>
+        <img src="/shots/studio-dark.webp" width="2200" height="1375" alt="Студия Slideria в тёмной теме" loading="lazy" decoding="async" class="block h-auto w-full" />
+      </figure>
+      <p class="mt-4 text-center text-[12.5px] text-white/40">Так студия выглядит сейчас в программе. В облаке — она же.</p>
     </div>
 
     <!-- Что будет в облаке -->
-    <div class="mt-20 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div class="mt-20 grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {features.map((f, i) => (
-        <div data-reveal class="rounded-2xl border border-white/10 bg-white/[.03] p-5 backdrop-blur transition hover:border-white/20 hover:bg-white/[.06]" style={`--d:${(i % 3) * 0.06}s`}>
+        <div data-reveal class="rounded-2xl border border-white/10 bg-white/[.03] p-5 backdrop-blur transition hover:border-white/20 hover:bg-white/[.06]" style={`--d:${(i % 4) * 0.06}s`}>
           <span class="grid size-10 place-items-center rounded-xl bg-[#3B82F6]/15 text-[#93C5FD]"><f.icon class="size-5" /></span>
           <h3 class="mt-4 text-[16px] font-bold">{f.title}</h3>
           <p class="mt-1.5 text-[14px] leading-relaxed text-white/60">{f.text}</p>
@@ -130,11 +76,11 @@ const roadmap = [
 
     <!-- План -->
     <ol data-reveal class="relative mt-16 grid gap-4 md:grid-cols-3">
-      <div aria-hidden="true" class="absolute left-0 right-0 top-[21px] hidden h-px bg-gradient-to-r from-[#3B82F6] via-white/20 to-white/5 md:block"></div>
-      {roadmap.map((r) => (
+      <div aria-hidden="true" class="absolute left-0 right-0 top-[21px] hidden h-px bg-gradient-to-r from-[#3B82F6] via-[#3B82F6] to-white/10 md:block"></div>
+      {roadmap.map((r, i) => (
         <li class="relative">
           <span class:list={['relative z-10 grid size-[42px] place-items-center rounded-full border-2 text-[13px] font-bold', r.done ? 'border-[#3B82F6] bg-[#3B82F6] text-white shadow-[0_0_24px_rgba(59,130,246,.7)]' : 'border-white/20 bg-[#05070F] text-white/60']}>
-            {r.done ? '✓' : r.stage.slice(-1)}
+            {r.done ? '✓' : i + 1}
           </span>
           <div class="mt-4 text-[12px] font-bold uppercase tracking-[.14em] text-white/45">{r.stage} · <span class={r.done ? 'text-[#6EE7B7]' : 'text-white/60'}>{r.state}</span></div>
           <h3 class="mt-1 text-lg font-bold">{r.title}</h3>

@@ -4,7 +4,7 @@
  * Вкладки, автопрокрутка и сама презентация синхронизированы протоколом движка (см. lib/protocol.ts).
  */
 import { Code } from 'astro:components';
-import { deckSize } from '@/shared/lib/config';
+import { deckSize, sizeLabel } from '@/shared/lib/config';
 import { readDeck } from '../lib/readDeck';
 
 interface Props { deck: string; class?: string }
@@ -23,7 +23,7 @@ const total = deck.slides.reduce((s, x) => s + x.lines, 0);
     </div>
     <div class="relative h-[300px] min-h-0 overflow-hidden sm:h-[340px] lg:h-auto lg:flex-1">
       {deck.slides.map((s, i) => (
-        <div data-slide-yaml={i} class:list={['code-lines absolute inset-0 overflow-auto px-2 py-3 font-mono text-[12.5px] leading-[1.7] opacity-0 transition-opacity duration-500 [scrollbar-color:rgba(255,255,255,.15)_transparent] [scrollbar-width:thin] data-[active]:z-10 data-[active]:opacity-100', i === 0 && 'z-10 opacity-100']} data-active={i === 0 ? '' : undefined}>
+        <div data-slide-yaml={i} class:list={['code-lines absolute inset-0 overflow-auto px-2 py-3 font-mono text-[12.5px] leading-[1.7] opacity-0 transition-opacity duration-500 [scrollbar-color:rgba(255,255,255,.15)_transparent] [scrollbar-width:thin] data-[active]:z-10 data-[active]:opacity-100']} data-active={i === 0 ? '' : undefined}>
           <Code code={s.yaml} lang="yaml" theme="github-dark-default" />
         </div>
       ))}
@@ -42,9 +42,9 @@ const total = deck.slides.reduce((s, x) => s + x.lines, 0);
       <span class="flex gap-1.5"><i class="size-2.5 rounded-full bg-bd2"></i><i class="size-2.5 rounded-full bg-bd2"></i><i class="size-2.5 rounded-full bg-bd2"></i></span>
       <div class="mx-auto flex min-w-0 items-center gap-2 rounded-lg bg-alt px-3 py-1 font-mono text-[11.5px] text-mu">
         <svg viewBox="0 0 24 24" class="size-3.5 shrink-0 text-ok" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12a8 8 0 1 0 16 0 8 8 0 1 0-16 0M12 8v4l3 2" /></svg>
-        <span class="truncate">file:///Отчёты/<b class="font-semibold text-tx">{name}.html</b></span>
+        <span class="truncate">file:///Загрузки/<b class="font-semibold text-tx">{name}.html</b></span>
       </div>
-      <span class="hidden rounded-md border border-bd px-1.5 py-0.5 font-mono text-[10.5px] font-semibold text-mu sm:inline">{size} КБ</span>
+      <span class="hidden rounded-md border border-bd px-1.5 py-0.5 font-mono text-[10.5px] font-semibold text-mu sm:inline">{sizeLabel(size)}</span>
     </div>
     <div class="[container-type:inline-size]">
       <div class="h-[calc(56px+56.25cqw)]">

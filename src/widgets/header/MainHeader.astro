@@ -1,9 +1,8 @@
 ---
 import { BookOpen, Menu, X } from '@lucide/astro';
+import DownloadLink from '@/entities/app/DownloadLink.astro';
 import CloudLink from '@/entities/cloud/CloudLink.astro';
-import { siteConfig } from '@/shared/lib/config';
 import { mainNavLinks } from '@/shared/lib/data/mainData';
-import GithubIcon from '@/shared/ui-kit/GithubIcon.astro';
 import Logo from '@/shared/ui-kit/Logo.astro';
 import ThemeToggle from '@/shared/ui-kit/ThemeToggle.astro';
 
@@ -15,7 +14,7 @@ const active = (href: string) => (href === '/docs' ? path.startsWith('/docs') : 
   class="group/h fixed inset-x-0 top-0 z-50 border-b border-transparent transition-[background,border-color,backdrop-filter] duration-300 data-[scrolled]:border-bd data-[scrolled]:bg-[var(--glass)] data-[scrolled]:backdrop-blur-xl"
 >
   <div class="mx-auto flex h-16 max-w-[1200px] items-center gap-6 px-4 sm:px-6">
-    <a href="/" class="shrink-0 rounded-xl" aria-label="HTMLPPTX — на главную"><Logo /></a>
+    <a href="/" class="shrink-0 rounded-xl" aria-label="Slideria — на главную"><Logo /></a>
 
     <nav class="hidden flex-1 items-center gap-1 lg:flex" aria-label="Основная навигация">
       {mainNavLinks.map((l) => (
@@ -27,13 +26,6 @@ const active = (href: string) => (href === '/docs' ? path.startsWith('/docs') : 
     </nav>
 
     <div class="ml-auto flex items-center gap-2">
-      <a
-        href={siteConfig.github}
-        target="_blank"
-        rel="noopener"
-        class="hidden size-9 place-items-center rounded-full text-tx2 transition hover:bg-alt hover:text-tx sm:grid"
-        aria-label="Исходный код на GitHub"
-      ><GithubIcon class="size-[19px]" /></a>
       <ThemeToggle />
       <CloudLink size="sm" class="max-sm:hidden" label="Облако" />
       <button type="button" data-menu-open class="grid size-9 place-items-center rounded-full border border-bd bg-surf lg:hidden" aria-label="Открыть меню">
@@ -58,8 +50,8 @@ const active = (href: string) => (href === '/docs' ? path.startsWith('/docs') : 
     </nav>
     <div class="mt-auto flex flex-col gap-3">
       <CloudLink size="lg" />
+      <DownloadLink size="lg" />
       <a href="/docs" class="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-bd2 font-semibold"><BookOpen class="size-4" />Документация</a>
-      <a href={siteConfig.github} target="_blank" rel="noopener" class="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-bd2 font-semibold"><GithubIcon class="size-4" />GitHub</a>
     </div>
   </div>
 </dialog>

@@ -1,0 +1,877 @@
+# Витрина Slideria: всё, что умеет движок, на тринадцати слайдах.
+# Каждый слайд собран из настоящих блоков — его можно открыть в студии и поправить.
+
+title: Slideria — презентации, которые живут
+lang: ru
+brand:
+  name: Slideria
+  logo: ./assets/logo.svg
+  logoDark: ./assets/logo-dark.svg
+theme:
+  accent: "#6366F1"
+  accent2: "#EC4899"
+  accentFlow: true
+
+# Стили вёрстки для композиций на холстах (орбиты на первом слайде)
+css: |
+  @keyframes sr-spin { to { transform: rotate(360deg); } }
+  @keyframes sr-float { 50% { transform: translateY(-12px); } }
+  @keyframes sr-pulse { 50% { opacity: .55; transform: scale(1.1); } }
+  .sr-orb { position: relative; width: 600px; height: 600px; }
+  .sr-glow { position: absolute; inset: 110px; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--ac) 42%, transparent), color-mix(in srgb, var(--ac2) 18%, transparent) 45%, transparent 70%); filter: blur(18px); animation: sr-pulse 5s ease-in-out infinite; }
+  .sr-ring { position: absolute; border-radius: 50%; border: 1.5px solid color-mix(in srgb, var(--ac) 38%, transparent); animation: sr-spin linear infinite; }
+  .sr-ring.r1 { inset: 175px; animation-duration: 12s; }
+  .sr-ring.r2 { inset: 100px; animation-duration: 22s; animation-direction: reverse; border-style: dashed; }
+  .sr-ring.r3 { inset: 22px; animation-duration: 36s; border-color: color-mix(in srgb, var(--ac2) 32%, transparent); }
+  .sr-ring i { position: absolute; top: -7px; left: 50%; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: var(--ac); box-shadow: 0 0 18px var(--ac); }
+  .sr-ring i.b { top: auto; bottom: -6px; width: 12px; height: 12px; margin-left: -6px; background: var(--ac2); box-shadow: 0 0 18px var(--ac2); }
+  .sr-core { position: absolute; left: 234px; top: 234px; width: 132px; height: 132px; border-radius: 36px; background: var(--ac-g); display: grid; place-items: center; color: #fff; box-shadow: 0 26px 60px -14px color-mix(in srgb, var(--ac) 70%, transparent); animation: sr-float 6s ease-in-out infinite; }
+  .sr-core svg { width: 84px; height: 84px; }
+  .sr-chip { position: absolute; display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 14px; background: color-mix(in srgb, var(--surf) 86%, transparent); border: 1px solid var(--bd); box-shadow: 0 14px 34px -12px rgba(15, 23, 42, .28); font: 700 15px/1 var(--font); color: var(--tx); backdrop-filter: blur(8px); animation: sr-float 7s ease-in-out infinite; }
+  .sr-chip b { width: 8px; height: 8px; border-radius: 50%; background: var(--ac-g); }
+  .sr-chip.c1 { left: 36px; top: 118px; }
+  .sr-chip.c2 { right: 14px; top: 196px; animation-delay: -2.2s; }
+  .sr-chip.c3 { left: 64px; bottom: 116px; animation-delay: -4.1s; }
+  .sr-chip.c4 { right: 58px; bottom: 64px; animation-delay: -1.3s; }
+
+  /* Слайд «Всё связано»: три стеклянных слоя в изометрии, по лучам вверх бегут импульсы */
+  @keyframes sr-sway { 0%, 100% { transform: rotateX(60deg) rotateZ(-38deg); } 50% { transform: rotateX(57deg) rotateZ(-50deg); } }
+  @keyframes sr-rise { 0% { transform: translateZ(0); opacity: 0; } 12%, 80% { opacity: 1; } 100% { transform: translateZ(var(--h)); opacity: 0; } }
+  @keyframes sr-hop { 0%, 60%, 100% { transform: translateZ(0); } 30% { transform: translateZ(16px); } }
+  @keyframes sr-beat { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ac) 50%, transparent), 0 0 40px color-mix(in srgb, var(--ac) 50%, transparent); } 50% { box-shadow: 0 0 0 18px color-mix(in srgb, var(--ac) 0%, transparent), 0 0 70px color-mix(in srgb, var(--ac2) 60%, transparent); } }
+  .sr-iso { width: 640px; height: 660px; perspective: 1700px; display: grid; place-items: center; }
+  .sr-stage { position: relative; width: 230px; height: 230px; margin-top: 390px; transform-style: preserve-3d; animation: sr-sway 16s ease-in-out infinite; }
+  .sr-plate { position: absolute; inset: 0; transform: translateZ(var(--z)); transform-style: preserve-3d; border-radius: 26px;
+    border: 1.5px solid color-mix(in srgb, var(--ac) 50%, transparent);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--surf) 90%, transparent), color-mix(in srgb, var(--acs) 80%, transparent)),
+      repeating-linear-gradient(0deg, transparent 0 32px, color-mix(in srgb, var(--ac) 11%, transparent) 32px 33px),
+      repeating-linear-gradient(90deg, transparent 0 32px, color-mix(in srgb, var(--ac) 11%, transparent) 32px 33px);
+    box-shadow: 0 50px 90px -40px color-mix(in srgb, var(--ac) 60%, transparent), inset 0 0 0 1px color-mix(in srgb, #fff 30%, transparent); }
+  .sr-plate > span { position: absolute; left: 18px; bottom: 12px; font: 800 20px/1 var(--font); letter-spacing: -.01em; color: var(--tx); }
+  .sr-plate > small { position: absolute; left: 19px; bottom: 36px; font: 700 12px/1 var(--font); letter-spacing: .14em; text-transform: uppercase; color: var(--ach); }
+  .sr-code { position: absolute; left: 20px; top: 20px; right: 20px; display: grid; gap: 10px; }
+  .sr-code i { display: block; height: 9px; border-radius: 5px; background: color-mix(in srgb, var(--mu) 40%, transparent); }
+  .sr-code i:nth-child(3n+1) { background: color-mix(in srgb, var(--ac) 55%, transparent); }
+  .sr-code i:nth-child(1) { width: 62%; } .sr-code i:nth-child(2) { width: 84%; margin-left: 12%; } .sr-code i:nth-child(3) { width: 48%; margin-left: 12%; }
+  .sr-code i:nth-child(4) { width: 70%; margin-left: 24%; } .sr-code i:nth-child(5) { width: 38%; margin-left: 12%; } .sr-code i:nth-child(6) { width: 56%; }
+  .sr-chipset { position: absolute; left: 126px; top: 24px; width: 82px; height: 82px; border-radius: 26px; background: var(--ac-g); animation: sr-beat 2.6s ease-in-out infinite;
+    background-image: repeating-linear-gradient(0deg, transparent 0 19px, rgba(255,255,255,.22) 19px 20px), repeating-linear-gradient(90deg, transparent 0 19px, rgba(255,255,255,.22) 19px 20px), linear-gradient(135deg, var(--ac), var(--ac2)); }
+  .sr-tiles { position: absolute; left: 18px; top: 18px; right: 18px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; transform-style: preserve-3d; }
+  .sr-tiles i { height: 44px; border-radius: 12px; background: color-mix(in srgb, var(--surf) 90%, transparent); border: 1px solid color-mix(in srgb, var(--ac) 35%, transparent);
+    box-shadow: 0 10px 20px -10px color-mix(in srgb, var(--ac) 60%, transparent); animation: sr-hop 3.6s ease-in-out infinite; position: relative; overflow: hidden; }
+  .sr-tiles i::before { content: ""; position: absolute; left: 10px; top: 12px; width: 44%; height: 7px; border-radius: 4px; background: var(--ac-g); }
+  .sr-tiles i::after { content: ""; position: absolute; left: 10px; top: 27px; right: 10px; bottom: 10px; border-radius: 6px; background: color-mix(in srgb, var(--ac) 14%, transparent); }
+  .sr-tiles i:nth-child(2) { animation-delay: .3s; } .sr-tiles i:nth-child(3) { animation-delay: .6s; } .sr-tiles i:nth-child(4) { animation-delay: .9s; } .sr-tiles i:nth-child(5) { animation-delay: 1.2s; } .sr-tiles i:nth-child(6) { animation-delay: 1.5s; }
+  .sr-dot { position: absolute; width: 4px; height: 4px; margin: -2px 0 0 -2px; border-radius: 50%; transform: translateZ(var(--z)); background: color-mix(in srgb, var(--ac) 60%, var(--ac2)); opacity: .55; }
+  .sr-pulse { position: absolute; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; --h: 380px; background: #fff; box-shadow: 0 0 12px 4px var(--ac), 0 0 26px 8px color-mix(in srgb, var(--ac2) 60%, transparent); animation: sr-rise 2.4s linear infinite; }
+
+  /* Слайд «Живой пульт»: экран, волны и спектр перекрашиваются плавно — оттенок --hue интерполируется */
+  @property --hue { syntax: "<number>"; inherits: true; initial-value: 255; }
+  @keyframes pk-scan { to { transform: translateX(952px); } }
+  .slide.static .pk-scan { display: none; }
+  @keyframes pk-eq { to { transform: scaleY(.8); } }
+  .pk-scr, .pk-wave, .pk-spec, .pk-code { transition: --hue .4s ease; }
+  .pk-scr { position: relative; height: 100%; overflow: hidden; border-radius: 22px; background: radial-gradient(120% 95% at 50% 0%, hsl(var(--hue) 65% 22%), hsl(var(--hue) 45% 8%) 72%);
+    box-shadow: 0 34px 70px -30px hsl(var(--hue) 80% 40% / .6), inset 0 0 0 1px hsl(var(--hue) 80% 72% / .18); }
+  .pk-grid { position: absolute; inset: 0; background-image: linear-gradient(hsl(var(--hue) 80% 85% / .07) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--hue) 80% 85% / .07) 1px, transparent 1px); background-size: 39px 37.25px; background-position: 16px 16px; }
+  .pk-scan { position: absolute; top: 0; bottom: 0; left: -140px; width: 140px; background: linear-gradient(90deg, transparent, hsl(var(--hue) 95% 70% / .14)); animation: pk-scan 4s linear infinite; }
+  .pk-wave { display: block; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 0 10px hsl(var(--hue) 95% 62% / .55)); }
+  .pk-s1 { stop-color: hsl(var(--hue) 95% 62%); stop-opacity: .4; }
+  .pk-s2 { stop-color: hsl(var(--hue) 95% 62%); stop-opacity: 0; }
+  .pk-line { fill: none; stroke: hsl(var(--hue) 95% 68%); stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; }
+  .pk-line2 { fill: none; stroke: hsl(calc(var(--hue) + 55) 95% 74%); stroke-width: 2; stroke-linecap: round; opacity: .75; }
+  .pk-axis { stroke: hsl(var(--hue) 80% 85% / .2); stroke-dasharray: 4 6; }
+  .pk-spec { position: relative; height: 100%; box-sizing: border-box; padding: 30px 8px 30px; }
+  .pk-bars { height: 100%; display: flex; align-items: flex-end; gap: 6px; }
+  .pk-bars i { flex: 1; border-radius: 6px 6px 3px 3px; transform-origin: bottom; transition: height .35s var(--ease);
+    background: linear-gradient(hsl(calc(var(--hue) + var(--i) * 4) 95% 70%), hsl(calc(var(--hue) + var(--i) * 4 + 40) 85% 42%));
+    box-shadow: 0 0 16px hsl(calc(var(--hue) + var(--i) * 4) 95% 60% / .4); animation: pk-eq var(--sp, 1.4s) ease-in-out infinite alternate; animation-delay: calc(var(--i) * -110ms); }
+  .pk-mk { position: absolute; top: 2px; transform: translateX(-50%); padding: 4px 9px; border-radius: 99px; font: 700 12px/1 var(--font); color: hsl(var(--hue) 90% 88%); background: hsl(var(--hue) 70% 32% / .7); transition: left .35s var(--ease); }
+  .pk-ax { position: absolute; left: 8px; right: 8px; bottom: 6px; display: flex; justify-content: space-between; font: 600 12px/1 var(--font); color: hsl(var(--hue) 40% 78% / .8); }
+  .pk-code { height: 100%; box-sizing: border-box; padding: 24px 30px; font: 500 17px/1.65 ui-monospace, "JetBrains Mono", Menlo, Consolas, monospace; color: hsl(var(--hue) 30% 88%); }
+  .pk-code pre { margin: 0; font: inherit; white-space: pre; }
+  .pk-code em { font-style: normal; color: hsl(var(--hue) 25% 64%); }
+  .pk-code b { font-weight: 600; color: hsl(calc(var(--hue) + 40) 90% 74%); }
+  .pk-code u { text-decoration: none; color: hsl(calc(var(--hue) - 30) 90% 76%); }
+  .pk-code i { font-style: normal; padding: 1px 8px; border-radius: 6px; background: hsl(var(--hue) 80% 55% / .28); color: #fff; }
+
+slides:
+
+  - id: hero
+    template: canvas
+    label: Slideria
+    bg: var(--bg)
+    backdrop: aurora
+    transition: zoom
+    free:
+      - type: html
+        html: '<div class="sr-orb"><div class="sr-glow"></div><div class="sr-ring r3"><i></i></div><div class="sr-ring r2"><i></i><i class="b"></i></div><div class="sr-ring r1"><i></i></div><div class="sr-core"><svg viewBox="0 0 24 24"><path d="M20.5 3.5H8.25a4.25 4.25 0 0 0 0 8.5" fill="none" stroke="currentColor" stroke-width="2.8"/><circle cx="20.5" cy="3.5" r="1.4" fill="currentColor"/><g opacity=".55"><path d="M8.25 12h7.5a4.25 4.25 0 0 1 0 8.5H3.5" fill="none" stroke="currentColor" stroke-width="2.8"/><circle cx="3.5" cy="20.5" r="1.4" fill="currentColor"/></g></svg></div><div class="sr-chip c1"><b></b><span data-t="0"></span></div><div class="sr-chip c2"><b></b><span data-t="1"></span></div><div class="sr-chip c3"><b></b><span data-t="2"></span></div><div class="sr-chip c4"><b></b><span data-t="3"></span></div></div>'
+        texts: [Один HTML-файл, Экспорт в PPTX, Режим докладчика, Тёмная тема]
+        place: {x: 650, y: 60, w: 600, h: 600}
+        enter: scale
+        delay: 150
+      - type: text
+        text: SLIDERIA · ДВИЖОК ПРЕЗЕНТАЦИЙ
+        styles: {text: {size: 15, weight: 700, spacing: 0.18, color: accent2}}
+        place: {x: 72, y: 150, w: 560}
+        enter: fade
+      - type: text
+        text: "Презентации,\nкоторые {g:duo|живут}"
+        styles: {text: {size: 66, weight: 800, leading: 1.04, spacing: -0.02, color: text}}
+        place: {x: 68, y: 196, w: 640}
+        enter: rise
+        delay: 220
+      - type: text
+        text: Слайды как данные, правка как в PowerPoint, показ как кино. И всё это — один HTML-файл, который открывается где угодно.
+        styles: {text: {size: 21, color: text2, leading: 1.45}}
+        place: {x: 72, y: 386, w: 540}
+        enter: rise
+        delay: 440
+      - type: shape
+        kind: pill
+        fill: gradient
+        gradient: {from: accent, to: accent2, angle: 135}
+        shadow: md
+        text: Открыть студию  →
+        styles: {text: {size: 19}}
+        place: {x: 72, y: 520, w: 260, h: 62}
+        enter: pop
+        delay: 700
+      - type: shape
+        kind: pill
+        fill: none
+        stroke: gradient
+        strokeGradient: {from: accent, to: accent2, angle: 90}
+        width: 2
+        text: 12 слайдов витрины
+        styles: {text: {size: 17, color: text}}
+        place: {x: 350, y: 520, w: 230, h: 62}
+        enter: pop
+        delay: 820
+    notes: |
+      Это Slideria. Фон — живое сияние на WebGL, орбиты справа — обычная вёрстка с CSS-анимацией.
+      Кнопка слева переливается: это градиент акцента с включённым «Переливанием» (Дизайн → Цвета).
+
+  - id: inside
+    title: Всё нужное — уже {g:duo|внутри}
+    badge: без плагинов
+    backdrop: particles
+    transition: push
+    body:
+      - type: grid
+        columns: 4
+        items:
+          - {type: stat, value: "81", label: тип блоков, note: от текста до 3D-модели}
+          - {type: stat, value: "21", label: эффект появления, note: плюс 11 исчезновений}
+          - {type: stat, value: "18", label: переходов между слайдами, note: от сдвига до морфа}
+          - {type: stat, value: "1", label: файл для показа, note: работает без интернета}
+      - type: card
+        title: Путь презентации
+        body:
+          type: pipeline
+          stepSeconds: 1.1
+          steps:
+            - {title: Идея, sub: с нуля или импорт}
+            - {title: Студия, sub: правка как в PowerPoint}
+            - {title: Анимация, sub: появление и переходы}
+            - {title: Показ, sub: окно докладчика}
+            - {title: Экспорт, sub: HTML · PPTX · PDF}
+      - type: card
+        title: А ещё
+        body:
+          type: chips
+          items: [Живые фоны*, Окно докладчика*, Импорт из Claude Design*, Экспорт в PPTX*, 3D-модели, Видео, Таблицы из Excel, Формат по образцу, Вставка слайдов из других презентаций, История отмены, Разгруппировка вёрстки, Тёмная тема]
+    notes: |
+      Цифры настоящие: столько блоков, эффектов и переходов есть в движке сейчас.
+      Конвейер внизу подсвечивает шаги по очереди — это блок pipeline.
+
+  - id: shapes
+    template: canvas
+    label: Фигуры и градиенты
+    bg: var(--bg)
+    transition: cover
+    free:
+      - type: text
+        text: Фигуры и {g:ocean|градиенты}
+        styles: {text: {size: 52, weight: 800, spacing: -0.02, color: text}}
+        place: {x: 64, y: 44, w: 900}
+        enter: rise
+      - type: text
+        text: 14 готовых градиентов, свой — в два цвета, градиентные контуры и линии. Всё на вкладке «Фигура».
+        styles: {text: {size: 19, color: text2}}
+        place: {x: 66, y: 120, w: 760}
+        enter: fade
+        delay: 150
+      - type: shape
+        kind: ellipse
+        fill: gradient
+        gradient: {from: accent, to: accent2, angle: 135}
+        shadow: md
+        text: Градиент акцента
+        styles: {text: {size: 22}}
+        place: {x: 80, y: 220, w: 300, h: 300}
+        enter: scale
+        delay: 250
+      - type: shape
+        fill: gradient
+        gradient: {from: "#F97316", to: "#DB2777", angle: 135}
+        shadow: md
+        rotate: -6
+        text: Закат
+        styles: {text: {size: 26}}
+        place: {x: 440, y: 226, w: 270, h: 160}
+        enter: pop
+        delay: 380
+      - type: shape
+        fill: surface
+        stroke: gradient
+        strokeGradient: {from: "#06B6D4", to: "#2563EB", angle: 135}
+        width: 4
+        text: Градиентный контур
+        styles: {text: {size: 20, color: text}}
+        place: {x: 440, y: 430, w: 270, h: 150}
+        enter: pop
+        delay: 520
+      - type: shape
+        kind: ellipse
+        fill: none
+        stroke: gradient
+        strokeGradient: {from: "#8B5CF6", to: "#EC4899", angle: 135}
+        width: 9
+        place: {x: 770, y: 214, w: 180, h: 180}
+        enter: scale
+        delay: 620
+      - type: shape
+        kind: rect
+        fill: gradient
+        gradient: {from: "#475569", to: "#0F172A", angle: 160}
+        rotate: 12
+        radius: 22
+        text: Графит
+        styles: {text: {size: 18}}
+        place: {x: 1000, y: 226, w: 150, h: 150}
+        enter: pop
+        delay: 700
+      - type: shape
+        kind: pill
+        fill: gradient
+        gradient: {from: "#22C55E", to: "#0D9488", angle: 135}
+        shadow: sm
+        text: Лес
+        styles: {text: {size: 24}}
+        place: {x: 770, y: 440, w: 300, h: 92}
+        enter: right
+        delay: 780
+      - type: shape
+        kind: ellipse
+        fill: gradient
+        gradient: {from: "#A7F3D0", to: "#BFDBFE", angle: 135}
+        place: {x: 1100, y: 420, w: 110, h: 110}
+        enter: pop
+        delay: 860
+      - type: shape
+        kind: arrow
+        stroke: gradient
+        strokeGradient: {from: "#FBBF24", to: "#DC2626", angle: 90}
+        width: 7
+        place: {x: 770, y: 590, w: 440, h: 30}
+        enter: left
+        delay: 940
+      - type: shape
+        kind: line
+        stroke: gradient
+        dash: dash
+        width: 5
+        place: {x: 80, y: 600, w: 300, h: 20}
+        enter: left
+        delay: 1000
+    notes: |
+      Все фигуры — обычные блоки shape. Круг слева переливается вместе с темой.
+      Контуры, стрелка и пунктир — тоже градиентом.
+
+  - id: type
+    template: canvas
+    label: Текст как графика
+    bg: var(--bg)
+    backdrop: grid
+    transition: blur
+    free:
+      - type: text
+        text: "{g:sunset|Смело.}"
+        styles: {text: {size: 128, weight: 900, leading: 1, spacing: -0.03}}
+        place: {x: 60, y: 60, w: 640}
+        enter: left
+        delay: 100
+      - type: text
+        text: "{g:ocean|Ясно.}"
+        styles: {text: {size: 128, weight: 900, leading: 1, spacing: -0.03}}
+        place: {x: 60, y: 230, w: 640}
+        enter: left
+        delay: 330
+      - type: text
+        text: "{g:duo|Живо.}"
+        styles: {text: {size: 128, weight: 900, leading: 1, spacing: -0.03}}
+        place: {x: 60, y: 400, w: 640}
+        enter: left
+        delay: 560
+      - type: quote
+        text: Текст — тоже графика. Градиент ложится на слово, фразу или весь заголовок и остаётся обычным редактируемым текстом.
+        author: Slideria
+        role: Главная → Цвет текста → Градиент
+        place: {x: 720, y: 200, w: 500}
+        enter: right
+        delay: 820
+      - type: text
+        text: Выделите слова — градиент ляжет только на них.
+        styles: {text: {size: 17, color: muted}}
+        place: {x: 66, y: 620, w: 600}
+        enter: fade
+        delay: 1100
+    notes: Три слова — три градиента. «Живо» переливается вместе с акцентом. Фон — перспективная сетка.
+
+  - id: data
+    title: Данные, которые {g:duo|двигаются}
+    badge: демо-данные
+    transition: push
+    gap: 40
+    body:
+      - type: grid
+        columns: 1.75fr 1fr
+        align: stretch
+        items:
+          - type: card
+            title: Зрители показов
+            body:
+              type: line-chart
+              values: [120, 180, 170, 260, 310, 290, 420, 480, 470, 610, 680, 760]
+              start: январь
+              end: декабрь
+              scale: 1
+          - type: card
+            title: Слайдов за квартал
+            body:
+              type: bars
+              values: [42, 58, 51, 86]
+              labels: [Q1, Q2, Q3, Q4]
+              height: 230
+      - type: grid
+        columns: 1fr 1fr 1.3fr
+        align: stretch
+        items:
+          - {type: card, body: {type: stat, value: "99,9 %", label: показов без сбоев, delta: "+0,4 %"}}
+          - {type: card, body: {type: stat, value: "2,4 с", label: сборка в один файл, delta: "−0,8 с"}}
+          - {type: card, title: Доступность, text: "14 дней · порог 99,5 %", body: {type: uptime, threshold: 99.5, values: [99.9, 99.8, 100, 99.7, 99.95, 98.9, 99.9, 100, 99.85, 99.9, 99.6, 100, 99.9, 99.95]}}
+    notes: |
+      Демо-данные, чтобы показать живую графику: линия прорисовывается, столбцы вырастают по очереди,
+      выделенный столбец — градиентом акцента.
+
+  - id: compare
+    title: Презентация как {g:duo|данные}
+    transition: fade
+    gap: 56
+    body:
+      - type: table
+        variant: accent
+        density: roomy
+        header: [Возможность, Slideria, Обычный PPTX]
+        widths: [2.2, 1, 1.2]
+        align: [left, center, center]
+        rows:
+          - [Показ в любом браузере, "{#16A34A|✓} один HTML-файл", нужен PowerPoint]
+          - [Тёмная тема, "{#16A34A|✓} одной кнопкой", перекраска вручную]
+          - ["Живые схемы и WebGL-фоны", "{#16A34A|✓} встроены", видео-вставки]
+          - [Пульт, "{#16A34A|✓} по QR-коду", нужен кликер]
+          - [Правка в PowerPoint, "{#16A34A|✓} экспорт в PPTX", "{#16A34A|✓} родной формат"]
+      - type: timeline
+        items:
+          - {date: Движок, title: Компоненты, text: слайды из данных, done: true}
+          - {date: Студия, title: Правка, text: как в PowerPoint, done: true}
+          - {date: Импорт, title: HTML и Claude Design, done: true}
+          - {date: Экспорт, title: PPTX и PDF, done: true}
+          - {date: Дизайн, title: Градиенты, text: и переливание, done: true}
+          - {date: Дальше, title: Облако, text: Vercel + Supabase}
+    notes: |
+      Честное сравнение: PowerPoint по-прежнему нужен тем, кто правит в нём, — для этого есть экспорт в PPTX.
+      Хронология — путь самой Slideria; облако — следующий шаг.
+
+  - id: hub
+    template: canvas
+    label: Всё связано
+    bg: "radial-gradient(ellipse 70% 80% at 72% 55%, color-mix(in srgb, var(--acs) 80%, var(--bg)), var(--bg) 70%)"
+    transition: zoom
+    free:
+      - type: html
+        html: '<div class="sr-iso"><div class="sr-stage"><div class="sr-plate" style="--z:0px"><div class="sr-code"><i></i><i></i><i></i><i></i><i></i><i></i></div><small data-t="0"></small><span data-t="1"></span></div><div class="sr-dot" style="left:25px;top:25px;--z:19px"></div><div class="sr-dot" style="left:25px;top:25px;--z:38px"></div><div class="sr-dot" style="left:25px;top:25px;--z:57px"></div><div class="sr-dot" style="left:25px;top:25px;--z:76px"></div><div class="sr-dot" style="left:25px;top:25px;--z:95px"></div><div class="sr-dot" style="left:25px;top:25px;--z:114px"></div><div class="sr-dot" style="left:25px;top:25px;--z:133px"></div><div class="sr-dot" style="left:25px;top:25px;--z:152px"></div><div class="sr-dot" style="left:25px;top:25px;--z:171px"></div><div class="sr-dot" style="left:25px;top:25px;--z:209px"></div><div class="sr-dot" style="left:25px;top:25px;--z:228px"></div><div class="sr-dot" style="left:25px;top:25px;--z:247px"></div><div class="sr-dot" style="left:25px;top:25px;--z:266px"></div><div class="sr-dot" style="left:25px;top:25px;--z:285px"></div><div class="sr-dot" style="left:25px;top:25px;--z:304px"></div><div class="sr-dot" style="left:25px;top:25px;--z:323px"></div><div class="sr-dot" style="left:25px;top:25px;--z:342px"></div><div class="sr-dot" style="left:25px;top:25px;--z:361px"></div><div class="sr-pulse" style="left:25px;top:25px;animation-delay:0s"></div><div class="sr-pulse" style="left:25px;top:25px;animation-delay:1.2s"></div><div class="sr-dot" style="left:205px;top:25px;--z:19px"></div><div class="sr-dot" style="left:205px;top:25px;--z:38px"></div><div class="sr-dot" style="left:205px;top:25px;--z:57px"></div><div class="sr-dot" style="left:205px;top:25px;--z:76px"></div><div class="sr-dot" style="left:205px;top:25px;--z:95px"></div><div class="sr-dot" style="left:205px;top:25px;--z:114px"></div><div class="sr-dot" style="left:205px;top:25px;--z:133px"></div><div class="sr-dot" style="left:205px;top:25px;--z:152px"></div><div class="sr-dot" style="left:205px;top:25px;--z:171px"></div><div class="sr-dot" style="left:205px;top:25px;--z:209px"></div><div class="sr-dot" style="left:205px;top:25px;--z:228px"></div><div class="sr-dot" style="left:205px;top:25px;--z:247px"></div><div class="sr-dot" style="left:205px;top:25px;--z:266px"></div><div class="sr-dot" style="left:205px;top:25px;--z:285px"></div><div class="sr-dot" style="left:205px;top:25px;--z:304px"></div><div class="sr-dot" style="left:205px;top:25px;--z:323px"></div><div class="sr-dot" style="left:205px;top:25px;--z:342px"></div><div class="sr-dot" style="left:205px;top:25px;--z:361px"></div><div class="sr-pulse" style="left:205px;top:25px;animation-delay:0.6s"></div><div class="sr-pulse" style="left:205px;top:25px;animation-delay:1.7999999999999998s"></div><div class="sr-dot" style="left:25px;top:205px;--z:19px"></div><div class="sr-dot" style="left:25px;top:205px;--z:38px"></div><div class="sr-dot" style="left:25px;top:205px;--z:57px"></div><div class="sr-dot" style="left:25px;top:205px;--z:76px"></div><div class="sr-dot" style="left:25px;top:205px;--z:95px"></div><div class="sr-dot" style="left:25px;top:205px;--z:114px"></div><div class="sr-dot" style="left:25px;top:205px;--z:133px"></div><div class="sr-dot" style="left:25px;top:205px;--z:152px"></div><div class="sr-dot" style="left:25px;top:205px;--z:171px"></div><div class="sr-dot" style="left:25px;top:205px;--z:209px"></div><div class="sr-dot" style="left:25px;top:205px;--z:228px"></div><div class="sr-dot" style="left:25px;top:205px;--z:247px"></div><div class="sr-dot" style="left:25px;top:205px;--z:266px"></div><div class="sr-dot" style="left:25px;top:205px;--z:285px"></div><div class="sr-dot" style="left:25px;top:205px;--z:304px"></div><div class="sr-dot" style="left:25px;top:205px;--z:323px"></div><div class="sr-dot" style="left:25px;top:205px;--z:342px"></div><div class="sr-dot" style="left:25px;top:205px;--z:361px"></div><div class="sr-pulse" style="left:25px;top:205px;animation-delay:1.2s"></div><div class="sr-pulse" style="left:25px;top:205px;animation-delay:2.4s"></div><div class="sr-dot" style="left:205px;top:205px;--z:19px"></div><div class="sr-dot" style="left:205px;top:205px;--z:38px"></div><div class="sr-dot" style="left:205px;top:205px;--z:57px"></div><div class="sr-dot" style="left:205px;top:205px;--z:76px"></div><div class="sr-dot" style="left:205px;top:205px;--z:95px"></div><div class="sr-dot" style="left:205px;top:205px;--z:114px"></div><div class="sr-dot" style="left:205px;top:205px;--z:133px"></div><div class="sr-dot" style="left:205px;top:205px;--z:152px"></div><div class="sr-dot" style="left:205px;top:205px;--z:171px"></div><div class="sr-dot" style="left:205px;top:205px;--z:209px"></div><div class="sr-dot" style="left:205px;top:205px;--z:228px"></div><div class="sr-dot" style="left:205px;top:205px;--z:247px"></div><div class="sr-dot" style="left:205px;top:205px;--z:266px"></div><div class="sr-dot" style="left:205px;top:205px;--z:285px"></div><div class="sr-dot" style="left:205px;top:205px;--z:304px"></div><div class="sr-dot" style="left:205px;top:205px;--z:323px"></div><div class="sr-dot" style="left:205px;top:205px;--z:342px"></div><div class="sr-dot" style="left:205px;top:205px;--z:361px"></div><div class="sr-pulse" style="left:205px;top:205px;animation-delay:1.8s"></div><div class="sr-pulse" style="left:205px;top:205px;animation-delay:3.0s"></div><div class="sr-plate" style="--z:190px"><div class="sr-chipset"></div><small data-t="2"></small><span data-t="3"></span></div><div class="sr-plate" style="--z:380px"><div class="sr-tiles"><i></i><i></i><i></i><i></i><i></i><i></i></div><small data-t="4"></small><span data-t="5"></span></div></div></div>'
+        texts: [Слой 1, Смысл, Слой 2, Стиль, Слой 3, Показ]
+        place: {x: 610, y: 30, w: 640, h: 660}
+        enter: rise
+        delay: 200
+      - type: text
+        text: Всё {g:duo|связано}
+        styles: {text: {size: 56, weight: 800, spacing: -0.02, color: text}}
+        place: {x: 64, y: 110, w: 560}
+        enter: rise
+      - type: text
+        text: Одна правка — везде сразу. Поменяли цифру в студии, и она уже на экране, у докладчика, на пульте и в экспортированном файле.
+        styles: {text: {size: 19, color: text2, leading: 1.5}}
+        place: {x: 66, y: 196, w: 500}
+        enter: fade
+        delay: 200
+      - type: text
+        text: "**3 · Показ**\nсцена, окно докладчика, пульт и экспорт"
+        styles: {text: {size: 19, color: text2, leading: 1.45}}
+        place: {x: 66, y: 330, w: 480}
+        enter: left
+        delay: 500
+      - type: text
+        text: "**2 · Стиль**\n81 тип блоков, темы и анимации — дизайн уже готов"
+        styles: {text: {size: 19, color: text2, leading: 1.45}}
+        place: {x: 66, y: 420, w: 480}
+        enter: left
+        delay: 650
+      - type: text
+        text: "**1 · Смысл**\nтексты и цифры отдельно от дизайна: сменили тему — слайды не переделываете"
+        styles: {text: {size: 19, color: text2, leading: 1.45}}
+        place: {x: 66, y: 510, w: 480}
+        enter: left
+        delay: 800
+    notes: |
+      Сцена справа — обычная вёрстка с CSS 3D: три слоя висят в пространстве и покачиваются,
+      по световым лучам снизу вверх бегут импульсы, мини-слайды наверху подпрыгивают по очереди.
+      Подписи на слоях правятся прямо на слайде.
+
+  - id: images
+    template: canvas
+    label: Картинки с характером
+    bg: var(--bg)
+    transition: cover
+    free:
+      - type: text
+        text: Картинки с {g:sunset|характером}
+        styles: {text: {size: 52, weight: 800, spacing: -0.02, color: text}}
+        place: {x: 64, y: 44, w: 900}
+        enter: rise
+      - type: image
+        src: ./assets/art-dusk.svg
+        mat: 12
+        radius: 6
+        shadow: md
+        place: {x: 64, y: 150, w: 400, h: 300}
+        enter: rise
+        delay: 200
+      - type: image
+        src: ./assets/art-bloom.svg
+        radius: circle
+        shadow: lg
+        place: {x: 520, y: 150, w: 280, h: 280}
+        enter: scale
+        delay: 380
+      - type: image
+        src: ./assets/art-waves.svg
+        radius: 28
+        stroke: accent
+        width: 3
+        shadow: sm
+        place: {x: 856, y: 150, w: 360, h: 270}
+        enter: rise
+        delay: 560
+      - type: image
+        src: ./assets/art-grid.svg
+        radius: 18
+        filter: gray
+        place: {x: 856, y: 460, w: 360, h: 200}
+        enter: pop
+        delay: 740
+      - type: text
+        text: "**Фотография** — паспарту и тень"
+        styles: {text: {size: 17, color: text2}}
+        place: {x: 64, y: 474, w: 400}
+        enter: fade
+        delay: 900
+      - type: text
+        text: "**Круг** — и глубокая тень"
+        styles: {text: {size: 17, color: text2, align: center}}
+        place: {x: 520, y: 450, w: 280}
+        enter: fade
+        delay: 950
+      - type: text
+        text: "Выделите картинку — появится вкладка «Рисунок»: стили, контур, паспарту, тень, скругление, цвет и прозрачность.\n\nСправа внизу — тот же рисунок, но **чёрно-белый**."
+        styles: {text: {size: 18, color: muted, leading: 1.5}}
+        place: {x: 64, y: 540, w: 740}
+        enter: fade
+        delay: 1000
+    notes: Иллюстрации нарисованы в SVG. Оформление — обычные поля картинки, в PowerPoint оно тоже переносится.
+
+  - id: formats
+    template: canvas
+    label: Форматы файлов
+    bg: var(--bg)
+    transition: push
+    free:
+      - type: text
+        text: Принесите {g:sunset|что угодно}
+        styles: {text: {size: 48, weight: 800, spacing: -0.02, color: text}}
+        place: {x: 64, y: 36, w: 900}
+        enter: rise
+      - type: text
+        text: Здесь настоящие файлы каждого формата. Перетащите свой на слайд в студии — он встанет так же.
+        styles: {text: {size: 18, color: text2}}
+        place: {x: 66, y: 104, w: 1000}
+        enter: fade
+        delay: 120
+      - type: image
+        src: ./assets/rocket.gif
+        radius: 16
+        shadow: md
+        place: {x: 64, y: 156, w: 360, h: 196}
+        enter: pop
+        delay: 250
+      - type: video
+        src: ./assets/film.webm
+        poster: ./assets/film-poster.png
+        loop: true
+        fit: cover
+        place: {x: 460, y: 156, w: 360, h: 196}
+        enter: pop
+        delay: 380
+      - type: model
+        src: ./assets/slideria-3d.glb
+        poster: ./assets/slideria-3d.png
+        orbit: -28deg 68deg
+        place: {x: 856, y: 156, w: 360, h: 196}
+        enter: pop
+        delay: 510
+      - type: image
+        src: ./assets/sticker.svg
+        fit: contain
+        radius: 16
+        stroke: line
+        width: 1
+        place: {x: 64, y: 412, w: 360, h: 196}
+        enter: pop
+        delay: 640
+      - type: image
+        src: ./assets/studio.webp
+        mat: 8
+        radius: 10
+        shadow: md
+        place: {x: 460, y: 412, w: 360, h: 196}
+        enter: pop
+        delay: 770
+      - type: table
+        variant: plan
+        density: compact
+        size: 13
+        badge: 2
+        widths: [0.45, 2.1, 1.15]
+        header: [№, Файл, Роль]
+        rows:
+          - ["01", "**Шрифты**\nWOFF2 · TTF · OTF", "{#CA8A04|свои}"]
+          - ["02", "**Excel**\nтаблица в ячейку", "{#EC4899|вставка}"]
+          - ["03", "**HTML**\nClaude Design и др.", "{#6366F1|импорт}"]
+          - ["04", "**PPTX · PDF**\nодной кнопкой", "{#16A34A|экспорт}"]
+        footer: "**Таблицы** — вставкой из Excel"
+        footnote: "{rows} формата"
+        place: {x: 856, y: 412, w: 360}
+        enter: pop
+        delay: 900
+      - {type: text, text: "**GIF** · при каждом заходе — с начала", styles: {text: {size: 15, color: text2}}, place: {x: 66, y: 362, w: 360}, enter: fade, delay: 1000}
+      - {type: text, text: "**MP4 · WebM** · и ссылки YouTube, Vimeo", styles: {text: {size: 15, color: text2}}, place: {x: 462, y: 362, w: 360}, enter: fade, delay: 1050}
+      - {type: text, text: "**GLB** · 3D: покрутите мышью при показе", styles: {text: {size: 15, color: text2}}, place: {x: 858, y: 362, w: 360}, enter: fade, delay: 1100}
+      - {type: text, text: "**SVG** · чёткий в любом размере", styles: {text: {size: 15, color: text2}}, place: {x: 66, y: 618, w: 360}, enter: fade, delay: 1150}
+      - {type: text, text: "**PNG · JPG · WebP · AVIF** · фото ужмутся сами", styles: {text: {size: 15, color: text2}}, place: {x: 462, y: 618, w: 380}, enter: fade, delay: 1200}
+    notes: |
+      Всё на слайде — настоящие файлы: пиксельная ракета в GIF, ролик WebM, записанный прямо в браузере,
+      гранёный кристалл в GLB, наклейка в SVG и скриншот студии в WebP. Кристалл можно крутить мышью.
+
+  - id: live
+    template: canvas
+    label: Живой расчёт
+    bg: var(--bg)
+    transition: fade
+    free:
+      - type: text
+        text: Слайд, который {g:duo|считает}
+        styles: {text: {size: 48, weight: 800, spacing: -0.02, color: text}}
+        place: {x: 64, y: 36, w: 900}
+        enter: rise
+      - type: text
+        text: Двигайте ползунки при показе — столбцы, числа и подписи пересчитываются сразу.
+        styles: {text: {size: 18, color: text2}}
+        place: {x: 66, y: 104, w: 1000}
+        enter: fade
+        delay: 120
+      - {type: control, name: v, label: Зрителей в день, min: 200, max: 3000, step: 100, value: 1500, place: {x: 64, y: 176, w: 420}, enter: rise, delay: 250}
+      - {type: control, name: c, label: Оставляют заявку, min: 1, max: 12, step: 0.5, value: 6, unit: " %", place: {x: 64, y: 290, w: 420}, enter: rise, delay: 350}
+      - {type: text, text: "{{round(v*c/100)}}", styles: {text: {size: 88, weight: 800, spacing: -0.03, color: accent}}, place: {x: 64, y: 396, w: 420}, enter: pop, delay: 500}
+      - {type: text, text: "заявок в день · за полгода — **{{v*c*2.475}}**", styles: {text: {size: 18, color: text2}}, place: {x: 66, y: 530, w: 420}, enter: fade, delay: 600}
+      - type: bars
+        values: ["=v*c*0.3", "=v*c*0.345", "=v*c*0.39", "=v*c*0.435", "=v*c*0.48", "=v*c*0.525"]
+        labels: [январь, февраль, март, апрель, май, июнь]
+        max: 12000
+        height: 330
+        place: {x: 560, y: 196, w: 656}
+        enter: rise
+        delay: 400
+      - {type: text, text: "Заявок в месяц при росте 15 % — формула **=v\\*c\\*0.3** и дальше", styles: {text: {size: 15, color: muted}}, place: {x: 562, y: 560, w: 656}, enter: fade, delay: 700}
+      - {type: shape, kind: pill, fill: soft, stroke: accent, width: 1, text: "← Форматы", action: "slide:formats", styles: {text: {size: 18}}, place: {x: 64, y: 612, w: 200, h: 56}, enter: pop, delay: 800}
+      - {type: shape, kind: pill, fill: gradient, shadow: sm, text: "Дальше →", action: next, styles: {text: {size: 18}}, place: {x: 284, y: 612, w: 200, h: 56}, enter: pop, delay: 880}
+      - {type: text, text: "Кнопка — любая фигура: «По щелчку» в «Свойствах»", styles: {text: {size: 15, color: muted}}, place: {x: 562, y: 626, w: 656}, enter: fade, delay: 950}
+    notes: |
+      Ползунки задают переменные v и c. Число, подпись и столбцы — обычные блоки с формулами:
+      «{{round(v*c/100)}}» в тексте, «=v*c*0.3» в значениях графика. Кнопки внизу — фигуры с переходом по щелчку.
+
+  - id: peak
+    template: canvas
+    label: Живой пульт
+    bg: "radial-gradient(ellipse 60% 70% at 70% 58%, color-mix(in srgb, var(--acs) 70%, var(--bg)), var(--bg) 72%)"
+    transition: zoom
+    vars:
+      lam: "=780/f"
+      amp: "=a*1.25"
+      dur: "=lam/(70*s)"
+    free:
+      - type: text
+        text: Всё вместе — {g:duo|живой пульт}
+        styles: {text: {size: 44, weight: 800, spacing: -0.02, color: text}}
+        place: {x: 48, y: 32, w: 900}
+        enter: rise
+      - type: text
+        text: Крутите регуляторы, переключайте вкладки — экран пересчитывается формулами на лету.
+        styles: {text: {size: 17, color: text2}}
+        place: {x: 50, y: 92, w: 1000}
+        enter: fade
+        delay: 120
+
+      - {type: control, name: f, label: Частота, min: 1, max: 6, step: 0.5, value: 2.5, unit: " Гц", place: {x: 48, y: 146, w: 340}, enter: left, delay: 200}
+      - {type: control, name: a, label: Амплитуда, min: 10, max: 100, step: 1, value: 70, unit: " %", place: {x: 48, y: 244, w: 340}, enter: left, delay: 280}
+      - {type: control, name: s, label: Скорость, steps: [0.5, 1, 2, 3], labels: ["×0,5", "×1", "×2", "×3"], value: 1, place: {x: 48, y: 342, w: 340}, enter: left, delay: 360}
+      - {type: control, name: h, label: Оттенок, min: 0, max: 360, step: 1, value: 255, unit: "°", place: {x: 48, y: 440, w: 340}, enter: left, delay: 440}
+      - {type: text, text: "Четыре регулятора — четыре переменные. Всё справа посчитано от них.", styles: {text: {size: 14, color: muted}}, place: {x: 50, y: 548, w: 336}, enter: fade, delay: 600}
+
+      - type: html
+        html: |
+          <div class="pk-scr" style="--hue:{{h}}"><i class="pk-grid"></i><i class="pk-scan" style="animation-duration:{{4/s}}s"></i></div>
+        place: {x: 420, y: 206, w: 812, h: 330}
+        enter: scale
+        delay: 250
+      - id: wave
+        type: html
+        html: |
+          <svg class="pk-wave" viewBox="0 0 780 298" style="--hue:{{h}}" aria-hidden="true">
+            <defs>
+              <linearGradient id="pk-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="pk-s1"/><stop offset="1" class="pk-s2"/></linearGradient>
+              <pattern id="pk-p1" width="{{lam}}" height="298" patternUnits="userSpaceOnUse"><path class="pk-area" d="M0 149 L{{lam*0.04167}} {{149-amp*0.2588}} L{{lam*0.08333}} {{149-amp*0.5}} L{{lam*0.12500}} {{149-amp*0.7071}} L{{lam*0.16667}} {{149-amp*0.866}} L{{lam*0.20833}} {{149-amp*0.9659}} L{{lam*0.25000}} {{149-amp*1.0}} L{{lam*0.29167}} {{149-amp*0.9659}} L{{lam*0.33333}} {{149-amp*0.866}} L{{lam*0.37500}} {{149-amp*0.7071}} L{{lam*0.41667}} {{149-amp*0.5}} L{{lam*0.45833}} {{149-amp*0.2588}} L{{lam*0.50000}} 149 L{{lam*0.54167}} {{149+amp*0.2588}} L{{lam*0.58333}} {{149+amp*0.5}} L{{lam*0.62500}} {{149+amp*0.7071}} L{{lam*0.66667}} {{149+amp*0.866}} L{{lam*0.70833}} {{149+amp*0.9659}} L{{lam*0.75000}} {{149+amp*1.0}} L{{lam*0.79167}} {{149+amp*0.9659}} L{{lam*0.83333}} {{149+amp*0.866}} L{{lam*0.87500}} {{149+amp*0.7071}} L{{lam*0.91667}} {{149+amp*0.5}} L{{lam*0.95833}} {{149+amp*0.2588}} L{{lam}} 149 L{{lam}} 298 L0 298Z" fill="url(#pk-fill)"/><animateTransform attributeName="patternTransform" type="translate" from="0 0" to="{{lam}} 0" dur="{{dur*1.7}}s" repeatCount="indefinite"/></pattern>
+              <pattern id="pk-p3" width="{{lam}}" height="298" patternUnits="userSpaceOnUse"><path class="pk-line2" d="M0 {{149-amp*0.55}} L{{lam*0.04167}} {{149-amp*0.5313}} L{{lam*0.08333}} {{149-amp*0.4763}} L{{lam*0.12500}} {{149-amp*0.3889}} L{{lam*0.16667}} {{149-amp*0.275}} L{{lam*0.20833}} {{149-amp*0.1424}} L{{lam*0.25000}} 149 L{{lam*0.29167}} {{149+amp*0.1424}} L{{lam*0.33333}} {{149+amp*0.275}} L{{lam*0.37500}} {{149+amp*0.3889}} L{{lam*0.41667}} {{149+amp*0.4763}} L{{lam*0.45833}} {{149+amp*0.5313}} L{{lam*0.50000}} {{149+amp*0.55}} L{{lam*0.54167}} {{149+amp*0.5313}} L{{lam*0.58333}} {{149+amp*0.4763}} L{{lam*0.62500}} {{149+amp*0.3889}} L{{lam*0.66667}} {{149+amp*0.275}} L{{lam*0.70833}} {{149+amp*0.1424}} L{{lam*0.75000}} 149 L{{lam*0.79167}} {{149-amp*0.1424}} L{{lam*0.83333}} {{149-amp*0.275}} L{{lam*0.87500}} {{149-amp*0.3889}} L{{lam*0.91667}} {{149-amp*0.4763}} L{{lam*0.95833}} {{149-amp*0.5313}} L{{lam}} {{149-amp*0.55}}"/><animateTransform attributeName="patternTransform" type="translate" from="{{lam}} 0" to="0 0" dur="{{dur*1.3}}s" repeatCount="indefinite"/></pattern>
+              <pattern id="pk-p2" width="{{lam}}" height="298" patternUnits="userSpaceOnUse"><path class="pk-line" d="M0 149 L{{lam*0.04167}} {{149-amp*0.2588}} L{{lam*0.08333}} {{149-amp*0.5}} L{{lam*0.12500}} {{149-amp*0.7071}} L{{lam*0.16667}} {{149-amp*0.866}} L{{lam*0.20833}} {{149-amp*0.9659}} L{{lam*0.25000}} {{149-amp*1.0}} L{{lam*0.29167}} {{149-amp*0.9659}} L{{lam*0.33333}} {{149-amp*0.866}} L{{lam*0.37500}} {{149-amp*0.7071}} L{{lam*0.41667}} {{149-amp*0.5}} L{{lam*0.45833}} {{149-amp*0.2588}} L{{lam*0.50000}} 149 L{{lam*0.54167}} {{149+amp*0.2588}} L{{lam*0.58333}} {{149+amp*0.5}} L{{lam*0.62500}} {{149+amp*0.7071}} L{{lam*0.66667}} {{149+amp*0.866}} L{{lam*0.70833}} {{149+amp*0.9659}} L{{lam*0.75000}} {{149+amp*1.0}} L{{lam*0.79167}} {{149+amp*0.9659}} L{{lam*0.83333}} {{149+amp*0.866}} L{{lam*0.87500}} {{149+amp*0.7071}} L{{lam*0.91667}} {{149+amp*0.5}} L{{lam*0.95833}} {{149+amp*0.2588}} L{{lam}} 149"/><animateTransform attributeName="patternTransform" type="translate" from="0 0" to="{{lam}} 0" dur="{{dur}}s" repeatCount="indefinite"/></pattern>
+            </defs>
+            <line class="pk-axis" x1="0" y1="149" x2="780" y2="149"/>
+            <rect width="780" height="298" fill="url(#pk-p1)"/>
+            <rect width="780" height="298" fill="url(#pk-p3)"/>
+            <rect width="780" height="298" fill="url(#pk-p2)"/>
+          </svg>
+        place: {x: 436, y: 222, w: 780, h: 298}
+        enter: fade
+        delay: 450
+      - id: spec
+        hidden: true
+        type: html
+        html: |
+          <div class="pk-spec" style="--hue:{{h}};--sp:{{1.4/s}}s">
+            <div class="pk-bars">
+              <i style="height:{{min(100, 3 + a*(0.9*exp(-(0.1094-f)^2*7) + 0.45*exp(-(0.1094-2*f)^2*7) + 0.2*exp(-(0.1094-3*f)^2*7)))}}%;--i:0"></i>
+              <i style="height:{{min(100, 3 + a*(0.9*exp(-(0.3281-f)^2*7) + 0.45*exp(-(0.3281-2*f)^2*7) + 0.2*exp(-(0.3281-3*f)^2*7)))}}%;--i:1"></i>
+              <i style="height:{{min(100, 3 + a*(0.9*exp(-(0.5469-f)^2*7) + 0.45*exp(-(0.5469-2*f)^2*7) + 0.2*exp(-(0.5469-3*f)^2*7)))}}%;--i:2"></i>
+              <i style="height:{{min(100, 3 + a*(0.9*exp(-(0.7656-f)^2*7) + 0.45*exp(-(0.7656-2*f)^2*7) + 0.2*exp(-(0.7656-3*f)^2*7)))}}%;--i:3"></i>
+              <i style="height:{{min(100, 3 + a*(0.9*exp(-(0.9844-f)^2*7) + 0.45*exp(-(0.9844-2*f)^2*7) + 0.2*exp(-(0.9844-3*f)^2*7)))}}%;--i:4"></i>
+              <i style="height:{{min(100, 3 + a*(0.9*exp(-(1.2031-f)^2*7) + 0.45*exp(-(1.2031-2*f)^2*7) + 0.2*exp(-(1.2031-3*f)^2*7)))}}%;--i:5"></i>
+              <i style="height:{{min(100, 3 + a*(0.9*exp(-(1.4219-f)^2*7) + 0.45*exp(-(1.4219-2*f)^2*7) + 0.2*exp(-(1.4219-3*f)^2*7)))}}%;--i:6"></i>
+              <i style="height:{{min(100, 3 + a*(0.9*exp(-(1.6406-f)^2*7) + 0.45*exp(-(1.6406-2*f)^2*7) + 0.2*exp(-(1.6406-3*f)^2*7)))}}%;--i:7"></i>
+              <i style="height:{{min(100, 3 + a*(0.9*exp(-(1.8594-f)^2*7) + 0.45*exp(-(1.8594-2*f)^2*7) + 0.2*exp(-(1.8594-3*f)^2*7)))}}%;--i:8"></i>
+              <i style="height:{{min(100, 3 + a*(0.9*exp(-(2.0781-f)^2*7) + 0.45*exp(-(2.0781-2*f)^2*7) + 0.2*exp(-(2.0781-3*f)^2*7)))}}%;--i:9"></i>
+              <i style="height:{{min(100, 3 + a*(0.9*exp(-(2.2969-f)^2*7) + 0.45*exp(-(2.2969-2*f)^2*7) + 0.2*exp(-(2.2969-3*f)^2*7)))}}%;--i:10"></i>
+              <i style="height:{{min(100, 3 + a*(0.9*exp(-(2.5156-f)^2*7) + 0.45*exp(-(2.5156-2*f)^2*7) + 0.2*exp(-(2.5156-3*f)^2*7)))}}%;--i:11"></i>
+              <i style="height:{{min(100, 3 + a*(0.9*exp(-(2.7344-f)^2*7) + 0.45*exp(-(2.7344-2*f)^2*7) + 0.2*exp(-(2.7344-3*f)^2*7)))}}%;--i:12"></i>
+              <i style="height:{{min(100, 3 + a*(0.9*exp(-(2.9531-f)^2*7) + 0.45*exp(-(2.9531-2*f)^2*7) + 0.2*exp(-(2.9531-3*f)^2*7)))}}%;--i:13"></i>
+              <i style="height:{{min(100, 3 + a*(0.9*exp(-(3.1719-f)^2*7) + 0.45*exp(-(3.1719-2*f)^2*7) + 0.2*exp(-(3.1719-3*f)^2*7)))}}%;--i:14"></i>
+              <i style="height:{{min(100, 3 + a*(0.9*exp(-(3.3906-f)^2*7) + 0.45*exp(-(3.3906-2*f)^2*7) + 0.2*exp(-(3.3906-3*f)^2*7)))}}%;--i:15"></i>
+              <i style="height:{{min(100, 3 + a*(0.9*exp(-(3.6094-f)^2*7) + 0.45*exp(-(3.6094-2*f)^2*7) + 0.2*exp(-(3.6094-3*f)^2*7)))}}%;--i:16"></i>
+              <i style="height:{{min(100, 3 + a*(0.9*exp(-(3.8281-f)^2*7) + 0.45*exp(-(3.8281-2*f)^2*7) + 0.2*exp(-(3.8281-3*f)^2*7)))}}%;--i:17"></i>
+              <i style="height:{{min(100, 3 + a*(0.9*exp(-(4.0469-f)^2*7) + 0.45*exp(-(4.0469-2*f)^2*7) + 0.2*exp(-(4.0469-3*f)^2*7)))}}%;--i:18"></i>
+              <i style="height:{{min(100, 3 + a*(0.9*exp(-(4.2656-f)^2*7) + 0.45*exp(-(4.2656-2*f)^2*7) + 0.2*exp(-(4.2656-3*f)^2*7)))}}%;--i:19"></i>
+              <i style="height:{{min(100, 3 + a*(0.9*exp(-(4.4844-f)^2*7) + 0.45*exp(-(4.4844-2*f)^2*7) + 0.2*exp(-(4.4844-3*f)^2*7)))}}%;--i:20"></i>
+              <i style="height:{{min(100, 3 + a*(0.9*exp(-(4.7031-f)^2*7) + 0.45*exp(-(4.7031-2*f)^2*7) + 0.2*exp(-(4.7031-3*f)^2*7)))}}%;--i:21"></i>
+              <i style="height:{{min(100, 3 + a*(0.9*exp(-(4.9219-f)^2*7) + 0.45*exp(-(4.9219-2*f)^2*7) + 0.2*exp(-(4.9219-3*f)^2*7)))}}%;--i:22"></i>
+              <i style="height:{{min(100, 3 + a*(0.9*exp(-(5.1406-f)^2*7) + 0.45*exp(-(5.1406-2*f)^2*7) + 0.2*exp(-(5.1406-3*f)^2*7)))}}%;--i:23"></i>
+              <i style="height:{{min(100, 3 + a*(0.9*exp(-(5.3594-f)^2*7) + 0.45*exp(-(5.3594-2*f)^2*7) + 0.2*exp(-(5.3594-3*f)^2*7)))}}%;--i:24"></i>
+              <i style="height:{{min(100, 3 + a*(0.9*exp(-(5.5781-f)^2*7) + 0.45*exp(-(5.5781-2*f)^2*7) + 0.2*exp(-(5.5781-3*f)^2*7)))}}%;--i:25"></i>
+              <i style="height:{{min(100, 3 + a*(0.9*exp(-(5.7969-f)^2*7) + 0.45*exp(-(5.7969-2*f)^2*7) + 0.2*exp(-(5.7969-3*f)^2*7)))}}%;--i:26"></i>
+              <i style="height:{{min(100, 3 + a*(0.9*exp(-(6.0156-f)^2*7) + 0.45*exp(-(6.0156-2*f)^2*7) + 0.2*exp(-(6.0156-3*f)^2*7)))}}%;--i:27"></i>
+              <i style="height:{{min(100, 3 + a*(0.9*exp(-(6.2344-f)^2*7) + 0.45*exp(-(6.2344-2*f)^2*7) + 0.2*exp(-(6.2344-3*f)^2*7)))}}%;--i:28"></i>
+              <i style="height:{{min(100, 3 + a*(0.9*exp(-(6.4531-f)^2*7) + 0.45*exp(-(6.4531-2*f)^2*7) + 0.2*exp(-(6.4531-3*f)^2*7)))}}%;--i:29"></i>
+              <i style="height:{{min(100, 3 + a*(0.9*exp(-(6.6719-f)^2*7) + 0.45*exp(-(6.6719-2*f)^2*7) + 0.2*exp(-(6.6719-3*f)^2*7)))}}%;--i:30"></i>
+              <i style="height:{{min(100, 3 + a*(0.9*exp(-(6.8906-f)^2*7) + 0.45*exp(-(6.8906-2*f)^2*7) + 0.2*exp(-(6.8906-3*f)^2*7)))}}%;--i:31"></i>
+            </div>
+            <b class="pk-mk" style="left:{{f/7*100}}%">f</b><b class="pk-mk" style="left:{{2*f/7*100}}%">2f</b><b class="pk-mk" style="left:{{3*f/7*100}}%">3f</b>
+            <div class="pk-ax"><span>0 Гц</span><span>3,5</span><span>7 Гц</span></div>
+          </div>
+        place: {x: 436, y: 222, w: 780, h: 298}
+        enter: fade
+      - id: code
+        hidden: true
+        type: html
+        html: |
+          <div class="pk-code" style="--hue:{{h}}"><pre><em># Экран — три обычных блока. Значения живые:</em>
+          <b>- type:</b> control
+          <b>  name:</b> f                <em># сейчас</em> <i>{{f}} Гц</i>
+          <b>- type:</b> html
+          <b>  html:</b> <u>&lt;pattern width="&#123;&#123;780/f&#125;&#125;"&gt;</u>  <em>#</em> <i>{{round(lam)}} px</i>
+          <b>- type:</b> shape
+          <b>  text:</b> Спектр
+          <b>  action:</b> <u>show:spec;hide:wave,code</u></pre></div>
+        place: {x: 436, y: 222, w: 780, h: 298}
+        enter: fade
+
+      - {type: shape, kind: pill, fill: surface, stroke: line, width: 1, shadow: sm, place: {x: 420, y: 142, w: 480, h: 50}, enter: fade, delay: 200}
+      - {id: t1, type: shape, kind: pill, fill: soft, stroke: accent, width: 1.5, place: {x: 425, y: 147, w: 156, h: 40}, enter: scale, delay: 320}
+      - {id: t2, hidden: true, type: shape, kind: pill, fill: soft, stroke: accent, width: 1.5, place: {x: 581, y: 147, w: 156, h: 40}, enter: scale}
+      - {id: t3, hidden: true, type: shape, kind: pill, fill: soft, stroke: accent, width: 1.5, place: {x: 737, y: 147, w: 156, h: 40}, enter: scale}
+      - {type: shape, fill: none, text: Волна, action: "show:wave,t1;hide:spec,code,t2,t3", styles: {text: {size: 15, color: accent}}, place: {x: 425, y: 147, w: 156, h: 40}, enter: fade, delay: 320}
+      - {type: shape, fill: none, text: Спектр, action: "show:spec,t2;hide:wave,code,t1,t3", styles: {text: {size: 15, color: accent}}, place: {x: 581, y: 147, w: 156, h: 40}, enter: fade, delay: 360}
+      - {type: shape, fill: none, text: Как устроено, action: "show:code,t3;hide:wave,spec,t1,t2", styles: {text: {size: 15, color: accent}}, place: {x: 737, y: 147, w: 156, h: 40}, enter: fade, delay: 400}
+      - {type: text, text: "Период **{{round(1000/f)}} мс** · длина волны **{{round(lam)}} px** · оттенок **{{h}}°** · скорость **×{{s}}**", styles: {text: {size: 16, color: text2}}, place: {x: 422, y: 554, w: 810}, enter: fade, delay: 650}
+
+      - {type: text, text: "Регуляторы, вкладки (кнопки «показать / скрыть») и экран (вёрстка с формулами) — обычные блоки: откройте слайд в студии и поменяйте что угодно.", styles: {text: {size: 14, color: muted}}, place: {x: 50, y: 640, w: 1180}, enter: fade, delay: 750}
+    notes: |
+      Пик интерактива: четыре регулятора задают частоту, амплитуду, скорость и оттенок.
+      «Волна» — три слоя SVG-узоров, которые бегут с разной скоростью; «Спектр» — 32 полосы с гармониками f, 2f, 3f;
+      «Как устроено» — фрагмент данных этого слайда с живыми значениями. Вкладки — кнопки «показать / скрыть».
+
+  - id: code
+    template: canvas
+    label: Код на слайде
+    bg: var(--bg)
+    transition: fade
+    free:
+      - type: text
+        text: Код прямо {g:duo|на слайде}
+        styles: {text: {size: 44, weight: 800, spacing: -0.02, color: text}}
+        place: {x: 48, y: 32, w: 900}
+        enter: rise
+      - type: text
+        text: "Правьте при показе — результат обновляется на лету. Попробуйте поменять **petals** на 12."
+        styles: {text: {size: 17, color: text2}}
+        place: {x: 50, y: 92, w: 1100}
+        enter: fade
+        delay: 120
+      - type: sandbox
+        title: rose.html
+        theme: true
+        code: |
+          <canvas id="c"></canvas>
+          <style>body { margin: 0 } canvas { width: 100vw; height: 100vh; display: block }</style>
+          <script>
+            const petals = 7;   // лепестки — поменяйте на 4, 12 или 30
+            const speed = 1;    // скорость
+            const css = getComputedStyle(document.documentElement);
+            const g = c.getContext('2d');
+            c.width = innerWidth * 2; c.height = innerHeight * 2;
+            g.scale(2, 2);
+
+            function draw(t) {
+              const W = innerWidth, H = innerHeight, r = Math.min(W, H) * 0.44;
+              g.clearRect(0, 0, W, H);
+              g.beginPath();
+              for (let a = 0; a <= Math.PI * 2 + 0.01; a += 0.005) {
+                const k = r * Math.cos(petals * a + t / 900 * speed);
+                g.lineTo(W / 2 + k * Math.cos(a), H / 2 + k * Math.sin(a));
+              }
+              const grad = g.createLinearGradient(0, 0, W, H);
+              grad.addColorStop(0, css.getPropertyValue('--ac'));
+              grad.addColorStop(1, css.getPropertyValue('--ac2'));
+              g.fillStyle = g.strokeStyle = grad;
+              g.globalAlpha = 0.14; g.fill();
+              g.globalAlpha = 1; g.lineWidth = 2.5; g.stroke();
+              requestAnimationFrame(draw);
+            }
+            requestAnimationFrame(draw);
+            console.log('Лепестков:', petals);
+          </script>
+        place: {x: 48, y: 140, w: 1184, h: 500}
+        enter: rise
+        delay: 220
+      - type: text
+        text: "Esc — обратно к слайдам · Ctrl+Enter — запустить · ↺ — исходный код · правку видят и зал, и докладчик"
+        styles: {text: {size: 14, color: muted}}
+        place: {x: 50, y: 660, w: 1180}
+        enter: fade
+        delay: 500
+    notes: |
+      Песочница: щёлкните в код и меняйте числа — результат обновится через долю секунды, console.log — в консоли справа.
+      Правки показа не сохраняются в презентацию; «↺» возвращает исходный код. Esc — снова листать слайды стрелками.
+
+  - id: motion
+    template: canvas
+    label: Движение без границ
+    bg: "radial-gradient(ellipse 70% 70% at 50% 58%, color-mix(in srgb, var(--acs) 70%, var(--bg)), var(--bg) 72%)"
+    transition: zoom
+    free:
+      - type: text
+        text: Движение {g:duo|без границ}
+        styles: {text: {size: 44, weight: 800, spacing: -0.02, color: text}}
+        place: {x: 48, y: 32, w: 900}
+        enter: rise
+      - type: text
+        text: "Кинетическая типографика, маски, свет и 3D-камера — как в After Effects, а это один HTML-файл."
+        styles: {text: {size: 17, color: text2}}
+        place: {x: 50, y: 92, w: 1100}
+        enter: fade
+        delay: 120
+      - type: embed
+        src: ./assets/embed-motion.htm
+        poster: ./assets/embed-motion.webp
+        theme: true
+        interactive: true
+        dark: true
+        place: {x: 36, y: 128, w: 1208, h: 548}
+        enter: rise
+        delay: 220
+      - type: text
+        text: "Потяните плейхед — кадр за кадром · код — «Код» → «Анимации · HTML/JS» · правый щелчок → «Сохранить как шаблон» — и эффект ваш"
+        styles: {text: {size: 14, color: muted}}
+        place: {x: 50, y: 672, w: 1180}
+        enter: fade
+        delay: 500
+    notes: |
+      Моушн-дизайн, как в After Effects, — но это обычный HTML-файл в презентации: пружина и размытие в движении, рисование линией (Trim Paths),
+      трек-маска с пролётом камеры сквозь «О», 3D-кольцо с глубиной резкости, глитч и маска строки.
+      Плейхед тянется в обе стороны — каждый кадр считается от времени; «Размытие в движении» включается и выключается. Мышь над 3D-сценой поворачивает камеру.
+      Код — «Код» → «Анимации · HTML/JS»; правый щелчок по объекту → «Сохранить как шаблон» — эффект появится в «Моих шаблонах».
+
+  - id: thanks
+    template: canvas
+    label: Спасибо
+    bg: "radial-gradient(ellipse 65% 60% at 50% 42%, color-mix(in srgb, var(--acs) 75%, var(--bg)), var(--bg) 72%)"
+    transition: blur
+    free:
+      - type: embed
+        src: ./assets/embed-particles.htm
+        poster: ./assets/embed-particles.png
+        theme: true
+        interactive: true
+        place: {x: 0, y: 0, w: 1280, h: 720}
+      - type: text
+        text: Слайды как данные. Показ как {g:duo|кино}.
+        styles: {text: {size: 26, weight: 600, color: text2, align: center}}
+        place: {x: 240, y: 480, w: 800}
+        enter: rise
+        delay: 1400
+      - type: text
+        text: Проведите мышью по буквам · щелчок — взрыв и новая сборка
+        styles: {text: {size: 15, color: muted, align: center, spacing: 0.04}}
+        place: {x: 240, y: 560, w: 800}
+        enter: fade
+        delay: 2200
+    notes: |
+      Слово собрано из нескольких тысяч частиц в цветах акцента. Частицы разбегаются от курсора и возвращаются,
+      щелчок взрывает слово — и оно собирается снова. По буквам пробегает волна света.

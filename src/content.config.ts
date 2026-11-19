@@ -4,7 +4,7 @@ import { z } from 'astro/zod';
 
 /**
  * Документация. Файлы content/docs/*.md создаёт yarn sync:engine из README и
- * справочника компонентов движка — источник правды остаётся в репозитории HTMLPPTX.
+ * справочника компонентов Slideria — источник правды остаётся в репозитории программы.
  */
 const docs = defineCollection({
   loader: glob({ pattern: '*.md', base: './content/docs' }),

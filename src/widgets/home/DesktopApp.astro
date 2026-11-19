@@ -1,0 +1,40 @@
+---
+import { Check } from '@lucide/astro';
+import DownloadLink from '@/entities/app/DownloadLink.astro';
+import Container from '@/shared/ui-kit/Container.astro';
+import SectionHeading from '@/shared/ui-kit/SectionHeading.astro';
+
+const points = [
+  ['Без терминала и браузера', 'внутри та же студия и тот же показ, только отдельной программой'],
+  ['Презентации — в «Документы/Slideria»', 'по папке на презентацию; при первом запуске там уже путеводитель по возможностям'],
+  ['Импорт и экспорт с диска', 'PowerPoint и HTML перетаскиваются в окно, PDF сохраняется сразу файлом'],
+  ['Пульт в локальной сети', 'вход открывается только на время показа и только к этой презентации'],
+];
+---
+<section id="app" class="relative overflow-hidden py-24 sm:py-32">
+  <Container class="grid grid-cols-[minmax(0,1fr)] items-center gap-12 lg:grid-cols-[1.15fr_.85fr]">
+    <div data-reveal class="relative order-2 lg:order-1">
+      <div aria-hidden="true" class="absolute -inset-8 -z-10 bg-[radial-gradient(closest-side,color-mix(in_srgb,var(--ac)_20%,transparent),transparent)] blur-2xl max-lg:hidden"></div>
+      <figure class="overflow-hidden rounded-2xl border border-bd2/70 bg-surf shadow-[var(--shadow-lg)]">
+        <div class="flex items-center gap-2 border-b border-bd px-4 py-2.5">
+          <span class="flex gap-1.5"><i class="size-2.5 rounded-full bg-bd2"></i><i class="size-2.5 rounded-full bg-bd2"></i><i class="size-2.5 rounded-full bg-bd2"></i></span>
+          <span class="mx-auto text-[12px] font-semibold text-mu">Slideria</span>
+        </div>
+        <img src="/shots/picker-light.webp" width="2200" height="1375" alt="Программа Slideria: «Продолжить работу» и библиотека презентаций" loading="lazy" decoding="async" class="block h-auto w-full dark:hidden" />
+        <img src="/shots/picker-dark.webp" width="2200" height="1375" alt="" aria-hidden="true" loading="lazy" decoding="async" class="hidden h-auto w-full dark:block" />
+      </figure>
+    </div>
+    <div class="order-1 lg:order-2">
+      <SectionHeading align="left" eyebrow="Программа для компьютера" title="Всё то же — отдельной программой" lead="Установщик для Windows. Открывается быстро: студия собрана заранее, сервер — одним файлом." />
+      <ul data-reveal class="mt-8 flex flex-col gap-4">
+        {points.map(([a, b]) => (
+          <li class="flex gap-3">
+            <span class="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-acs text-ac"><Check class="size-3.5" stroke-width={3} /></span>
+            <span><b class="block text-[15px] text-tx">{a}</b><span class="text-[14px] text-mu">{b}</span></span>
+          </li>
+        ))}
+      </ul>
+      <div data-reveal class="mt-8"><DownloadLink variant="primary" size="lg" /></div>
+    </div>
+  </Container>
+</section>

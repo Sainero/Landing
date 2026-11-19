@@ -3,16 +3,17 @@
  * Просмотр готовой презентации: список слайдов слева, сама презентация справа.
  * Фрейм грузится лениво, когда секция доходит до экрана.
  */
-import { deckSize } from '@/shared/lib/config';
+import { deckSize, sizeLabel } from '@/shared/lib/config';
 import { readDeck } from '../lib/readDeck';
 
 interface Props { deck: string; class?: string }
 const { deck: name, class: cls } = Astro.props;
 const deck = await readDeck(name);
 const size = deckSize(name);
+const TEMPLATE: Record<string, string> = { canvas: 'холст', content: 'обычный слайд', cover: 'титульный', finale: 'финальный', space: 'космический финал' };
 ---
 <div data-viewer={name} class:list={['grid grid-cols-[minmax(0,1fr)] items-start gap-4 lg:grid-cols-[300px_minmax(0,1fr)]', cls]}>
-  <ol class="order-2 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] lg:order-1 lg:flex-col lg:overflow-visible">
+  <ol class="order-2 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] lg:order-1 lg:max-h-[620px] lg:flex-col lg:overflow-y-auto lg:overflow-x-visible lg:pr-1 lg:[scrollbar-width:thin]">
     {deck.slides.map((s, i) => (
       <li class="shrink-0 lg:shrink">
         <button
@@ -24,7 +25,7 @@ const size = deckSize(name);
           <span class="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-alt font-mono text-[11px] font-bold text-tx2 group-aria-[current]/v:bg-ac group-aria-[current]/v:text-white">{i + 1}</span>
           <span class="min-w-0">
             <span class="block truncate text-[14px] font-semibold text-tx">{s.label}</span>
-            <span class="mt-0.5 line-clamp-2 text-[12.5px] leading-snug text-mu">{s.notes?.split('\n')[0] ?? s.template}</span>
+            <span class="mt-0.5 line-clamp-2 text-[12.5px] leading-snug text-mu">{s.notes?.split('\n')[0] ?? TEMPLATE[s.template] ?? 'слайд'}</span>
           </span>
         </button>
       </li>
@@ -33,7 +34,7 @@ const size = deckSize(name);
   <div class="order-1 overflow-hidden rounded-2xl border border-bd2/70 bg-surf shadow-[var(--shadow-lg)] lg:order-2">
     <div class="flex items-center gap-3 border-b border-bd px-4 py-2.5">
       <span class="flex gap-1.5"><i class="size-2.5 rounded-full bg-bd2"></i><i class="size-2.5 rounded-full bg-bd2"></i><i class="size-2.5 rounded-full bg-bd2"></i></span>
-      <span class="truncate font-mono text-[11.5px] text-mu">{name}.html · {deck.slides.length} слайдов · {size} КБ</span>
+      <span class="truncate font-mono text-[11.5px] text-mu">{name}.html · {deck.slides.length} слайдов · {sizeLabel(size)}</span>
       <a href={`/demo/${name}.html`} target="_blank" rel="noopener" class="ml-auto shrink-0 rounded-md px-2 py-1 text-[12px] font-semibold text-ac hover:bg-acs">Открыть отдельно ↗</a>
     </div>
     <div class="[container-type:inline-size]">

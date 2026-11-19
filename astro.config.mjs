@@ -6,7 +6,7 @@ import { defineConfig } from 'astro/config';
 
 /**
  * Якоря для справочника компонентов: заголовок «### `grid` — сетка» получает id="grid",
- * чтобы каталог на главной мог ссылаться на /docs/components#grid.
+ * «### Диаграммы: `donut`, …» — id="donut": каталог на главной ссылается на /docs/components#<блок>.
  */
 function rehypeComponentAnchors() {
   /** @param {any} tree */
@@ -14,9 +14,9 @@ function rehypeComponentAnchors() {
     /** @param {any} node */
     const walk = (node) => {
       if (node.type === 'element' && /^h[2-4]$/.test(node.tagName)) {
-        const first = node.children?.[0];
-        if (first?.type === 'element' && first.tagName === 'code') {
-          const text = first.children?.map((/** @type {any} */ c) => c.value ?? '').join('');
+        const code = node.children?.find((/** @type {any} */ c) => c.type === 'element' && c.tagName === 'code');
+        if (code) {
+          const text = code.children?.map((/** @type {any} */ c) => c.value ?? '').join('');
           if (text && /^[a-z0-9-]+$/.test(text)) node.properties.id = text;
         }
       }
@@ -28,7 +28,7 @@ function rehypeComponentAnchors() {
 
 export default defineConfig({
   // Публичный адрес лендинга (sitemap, canonical, Open Graph)
-  site: process.env.SITE_URL || 'https://htmlpptx.example',
+  site: process.env.SITE_URL || 'https://slideria.example',
   trailingSlash: 'ignore',
   integrations: [sitemap()],
   markdown: {

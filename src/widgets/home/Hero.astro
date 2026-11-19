@@ -1,51 +1,56 @@
 ---
 import { ArrowDown } from '@lucide/astro';
-import CloudLink from '@/entities/cloud/CloudLink.astro';
+import DownloadLink from '@/entities/app/DownloadLink.astro';
 import DeckStudio from '@/entities/deck/ui/DeckStudio.astro';
-import { siteConfig } from '@/shared/lib/config';
+import { deckSize, sizeLabel, siteConfig } from '@/shared/lib/config';
 import Button from '@/shared/ui-kit/Button.astro';
-import CommandLine from '@/shared/ui-kit/CommandLine.astro';
 import Container from '@/shared/ui-kit/Container.astro';
 import Kbd from '@/shared/ui-kit/Kbd.astro';
 
-const line1 = ['Презентации'];
-const line2 = ['как', 'данные'];
 const w = (k: number) => `--w:${(0.15 + k * 0.22).toFixed(2)}s`;
+const size = sizeLabel(deckSize('slideria'));
+const chips = ['Импорт PowerPoint', 'Окно докладчика', 'Пульт с телефона', 'Экспорт в PPTX и PDF', 'MCP для Claude'];
 ---
 <section data-hero class="relative isolate overflow-hidden pb-16 pt-28 sm:pb-24 sm:pt-36">
   <!-- фон: сетка точек, свечение, прожектор за курсором -->
   <div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10">
     <div class="dot-grid absolute inset-0 [mask-image:radial-gradient(ellipse_75%_60%_at_50%_30%,#000_35%,transparent_100%)]"></div>
     <div class="absolute left-1/2 top-[-260px] h-[620px] w-[1100px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,color-mix(in_srgb,var(--ac)_30%,transparent),transparent)] blur-2xl"></div>
-    <div class="absolute right-[-160px] top-[260px] h-[460px] w-[460px] rounded-full bg-[radial-gradient(closest-side,color-mix(in_srgb,var(--vi)_22%,transparent),transparent)] blur-2xl"></div>
-    <div class="absolute left-[-180px] top-[420px] h-[420px] w-[420px] rounded-full bg-[radial-gradient(closest-side,color-mix(in_srgb,var(--cy)_22%,transparent),transparent)] blur-2xl"></div>
+    <div class="absolute right-[-160px] top-[260px] h-[460px] w-[460px] rounded-full bg-[radial-gradient(closest-side,color-mix(in_srgb,var(--pk)_20%,transparent),transparent)] blur-2xl"></div>
+    <div class="absolute left-[-180px] top-[420px] h-[420px] w-[420px] rounded-full bg-[radial-gradient(closest-side,color-mix(in_srgb,var(--vi)_22%,transparent),transparent)] blur-2xl"></div>
     <div data-spotlight class="absolute inset-0 opacity-0 transition-opacity duration-500 [background:radial-gradient(500px_circle_at_var(--mx,50%)_var(--my,30%),color-mix(in_srgb,var(--ac)_10%,transparent),transparent_70%)]"></div>
   </div>
 
   <Container class="relative flex flex-col items-center text-center">
-    <a href={siteConfig.github} target="_blank" rel="noopener" class="fade-up group mb-7 inline-flex items-center gap-2 rounded-full border border-bd bg-surf/70 py-1 pl-1 pr-3 text-[13px] font-semibold text-tx2 shadow-[var(--shadow-sm)] backdrop-blur transition hover:border-acb" style="--d:.05s">
-      <span class="rounded-full bg-ac px-2 py-0.5 text-[11px] font-bold text-white">v{siteConfig.engine.version}</span>
-      Открытый движок · {siteConfig.license}
+    <a href="#app" class="fade-up group mb-7 inline-flex items-center gap-2 rounded-full border border-bd bg-surf/70 py-1 pl-1 pr-3 text-[13px] font-semibold text-tx2 shadow-[var(--shadow-sm)] backdrop-blur transition hover:border-acb" style="--d:.05s">
+      <span class="whitespace-nowrap rounded-full bg-ac px-2 py-0.5 text-[11px] font-bold text-white">{siteConfig.name} {siteConfig.engine.version.replace(/\.0$/, '')}</span>
+      <span class="sm:hidden">Программа для Windows</span>
+      <span class="max-sm:hidden">Программа для компьютера и MCP для Claude</span>
       <span class="text-mu transition group-hover:translate-x-0.5">→</span>
     </a>
 
-    <h1 class="text-[clamp(46px,9.2vw,112px)] font-extrabold leading-[.95] tracking-[-.045em] text-tx" aria-label="Презентации как данные">
-      <span class="flex justify-center gap-x-[.24em]">{line1.map((x, k) => <span class="word" style={w(k)}>{x}</span>)}</span>
-      <span class="flex justify-center gap-x-[.24em] pb-2">{line2.map((x, k) => <span class="word text-gradient" style={w(k + 1)}>{x}</span>)}</span>
+    <h1 class="font-display text-[clamp(36px,7.2vw,88px)] font-bold leading-[1.02] tracking-[-.045em] text-tx" aria-label="Презентации, которые живут">
+      <span class="flex justify-center"><span class="word" style={w(0)}>Презентации,</span></span>
+      <span class="flex justify-center gap-x-[.26em] pb-2">
+        <span class="word" style={w(1)}>которые</span>
+        <span class="word text-gradient" style={w(2)}>живут</span>
+      </span>
     </h1>
 
     <p class="fade-up mt-6 max-w-2xl text-pretty text-[17px] leading-relaxed text-tx2 sm:text-xl" style="--d:.75s">
-      Пишете слайды в YAML — получаете <b class="text-tx">один HTML-файл</b> с анимациями, темами и режимом докладчика.
-      Открывается без интернета, отправляется по почте, печатается в PDF.
+      Слайды как данные, правка как в PowerPoint, показ как кино.
+      И всё это — <b class="text-tx">один HTML-файл</b>, который открывается где угодно. Нужен PowerPoint или PDF — тоже в два щелчка.
     </p>
 
     <div class="fade-up mt-9 flex flex-wrap items-center justify-center gap-3" style="--d:.9s">
       <Button href="#demo" variant="glow" size="lg">
         Смотреть живое демо <ArrowDown class="size-4 transition group-hover/btn:translate-y-0.5" />
       </Button>
-      <CloudLink variant="secondary" size="lg" />
+      <DownloadLink size="lg" />
     </div>
-    <CommandLine command={'yarn new q3-report "Итоги квартала"'} class="fade-up mt-5 w-full max-w-md" style="--d:1s" />
+    <ul class="fade-up mt-6 flex flex-wrap justify-center gap-x-4 gap-y-2 text-[13.5px] font-semibold text-mu" style="--d:1s">
+      {chips.map((c) => <li class="inline-flex items-center gap-2"><span class="size-1.5 rounded-full bg-[linear-gradient(135deg,var(--ac),var(--pk))]"></span>{c}</li>)}
+    </ul>
   </Container>
 
   <Container class="relative mt-16 sm:mt-20">
@@ -57,16 +62,16 @@ const w = (k: number) => `--w:${(0.15 + k * 0.22).toFixed(2)}s`;
 
       <!-- плавающие метки -->
       <div aria-hidden="true" class="float-y absolute -left-3 -top-11 z-30 hidden items-center gap-2 rounded-xl border border-bd bg-surf/90 px-3 py-2 text-[12.5px] font-semibold text-tx shadow-[var(--shadow-md)] backdrop-blur md:flex">
-        <span class="grid size-6 place-items-center rounded-md bg-acs text-ac">⌘</span> YAML → слайды за 0,6 с
+        <span class="grid size-6 place-items-center rounded-md bg-acs font-mono text-[11px] text-ac">{'{}'}</span> Слева — deck.yaml, справа — то, что из него собрано
       </div>
       <div aria-hidden="true" class="float-y absolute -right-3 -top-11 z-30 hidden items-center gap-2 rounded-xl border border-bd bg-surf/90 px-3 py-2 text-[12.5px] font-semibold text-tx shadow-[var(--shadow-md)] backdrop-blur md:flex" style="--d:-3s">
-        <span class="size-2 rounded-full bg-ok shadow-[0_0_10px_var(--ok)]"></span> Работает офлайн
+        <span class="size-2 rounded-full bg-ok shadow-[0_0_10px_var(--ok)]"></span> Один файл · {size} · офлайн
       </div>
 
-      <DeckStudio deck="tour" />
+      <DeckStudio deck="slideria" />
     </div>
     <p class="mt-5 flex flex-wrap items-center justify-center gap-x-2 gap-y-2 text-center text-[13.5px] text-mu">
-      Это не видео — настоящая собранная презентация. Щёлкните по ней и листайте
+      Это не видео — настоящая витрина Slideria, собранная в один файл. Щёлкните по ней и листайте
       <Kbd>←</Kbd><Kbd>→</Kbd>, <Kbd>O</Kbd> — обзор, <Kbd>P</Kbd> — окно докладчика, <Kbd>T</Kbd> — тема.
     </p>
   </Container>

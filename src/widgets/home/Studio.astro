@@ -1,0 +1,51 @@
+---
+import { Bot, Code, SquareFunction, Palette, Search, Shapes } from '@lucide/astro';
+import Container from '@/shared/ui-kit/Container.astro';
+import SectionHeading from '@/shared/ui-kit/SectionHeading.astro';
+
+const callouts = [
+  { label: 'Лента как в PowerPoint', cls: 'left-[34%] top-[5.5%]' },
+  { label: 'Миниатюры: порядок, дубли, скрытые', cls: 'left-[2%] top-[38%]' },
+  { label: 'Свойства слайда и объекта', cls: 'right-[2%] top-[30%]' },
+  { label: 'Заметки докладчика', cls: 'left-[17%] bottom-[16%]' },
+];
+const more = [
+  { icon: Palette, title: 'Темы и свои шрифты', text: 'Оформление всей презентации одним щелчком, светлая и тёмная версии строятся сами.' },
+  { icon: Shapes, title: '187 фигур и «Цвет+»', text: 'Фигуры PowerPoint, стили рисунка и цветокоррекция фото — как в DaVinci Resolve.' },
+  { icon: SquareFunction, title: 'Формулы, 3D, схемы из текста', text: 'Уравнения как в PowerPoint, 3D-модели, диаграммы из строк «Клиент -> Сервер».' },
+  { icon: Code, title: 'Код слайда рядом', text: 'Вкладка «Код»: YAML слайда и стили. Правки применяются сразу, ошибка — с номером строки.' },
+  { icon: Search, title: 'Найти, заменить, Ctrl+K', text: 'Поиск по всем слайдам и заметкам, палитра команд понимает и другую раскладку.' },
+  { icon: Bot, title: 'Агент в той же панели', text: 'Ctrl+J — чат справа: модель правит открытую презентацию и проверяет, как вышло.' },
+];
+---
+<section id="studio" class="relative overflow-hidden py-24 sm:py-32">
+  <Container>
+    <SectionHeading
+      eyebrow="Студия"
+      title="Правка как в PowerPoint"
+      lead="Лента, миниатюры, свойства и заметки — на привычных местах. Каждая правка сразу записывается в deck.yaml: меняются только тронутые строки, комментарии остаются."
+    />
+
+    <div data-reveal class="relative mx-auto mt-14 max-w-[1100px]">
+      <div aria-hidden="true" class="absolute -inset-x-16 -top-10 bottom-10 -z-10 bg-[radial-gradient(closest-side,color-mix(in_srgb,var(--vi)_22%,transparent),transparent)] blur-2xl"></div>
+      <figure class="overflow-hidden rounded-2xl border border-bd2/70 bg-surf shadow-[var(--shadow-lg)]">
+        <img src="/shots/studio-light.webp" width="2200" height="1375" alt="Студия Slideria: лента, миниатюры слайдов, слайд, свойства и заметки докладчика" loading="lazy" decoding="async" class="block h-auto w-full dark:hidden" />
+        <img src="/shots/studio-dark.webp" width="2200" height="1375" alt="" aria-hidden="true" loading="lazy" decoding="async" class="hidden h-auto w-full dark:block" />
+      </figure>
+      {callouts.map((c, i) => (
+        <span class:list={['float-y absolute hidden items-center gap-2 rounded-full border border-bd bg-surf/95 px-3 py-1.5 text-[12.5px] font-semibold text-tx shadow-[var(--shadow-md)] backdrop-blur lg:inline-flex', c.cls]} style={`--d:${-i * 1.7}s`}>
+          <span class="grid size-5 place-items-center rounded-full bg-ac font-mono text-[10.5px] text-white">{i + 1}</span>{c.label}
+        </span>
+      ))}
+    </div>
+
+    <div class="mt-14 grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {more.map((m, i) => (
+        <div data-reveal class="flex gap-4 rounded-2xl border border-bd bg-surf p-5 shadow-[var(--shadow-sm)]" style={`--d:${(i % 3) * 0.06}s`}>
+          <span class="grid size-10 shrink-0 place-items-center rounded-xl bg-acs text-ac"><m.icon class="size-5" /></span>
+          <span><b class="block text-[15.5px] text-tx">{m.title}</b><span class="mt-1 block text-[14px] leading-relaxed text-mu">{m.text}</span></span>
+        </div>
+      ))}
+    </div>
+  </Container>
+</section>

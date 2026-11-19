@@ -1,31 +1,24 @@
 ---
-import {
-  ChartColumn, ChartNoAxesGantt, ChartSpline, Image, ImagePlus, LayoutGrid, LayoutPanelTop, List, ListTree, Loader,
-  Network, Orbit, PanelsTopLeft, RectangleHorizontal, Rocket, Rows3, Share2, SlidersHorizontal, Space, Sparkles,
-  SquareStack, StickyNote, Tags, Type, Workflow,
-} from '@lucide/astro';
-import { catalog, componentGroups } from '@/shared/lib/data/components';
+import { Activity, Code, LayoutGrid, PanelsTopLeft, SquareStack } from '@lucide/astro';
+import { catalogGroups, readCatalog, type CatalogGroup } from '@/entities/catalog/readCatalog';
 import Container from '@/shared/ui-kit/Container.astro';
 import SectionHeading from '@/shared/ui-kit/SectionHeading.astro';
 
-const icons: Record<string, typeof Share2> = {
-  ChartColumn, ChartNoAxesGantt, ChartSpline, Image, ImagePlus, LayoutGrid, LayoutPanelTop, List, ListTree, Loader,
-  Network, Orbit, PanelsTopLeft, RectangleHorizontal, Rocket, Rows3, Share2, SlidersHorizontal, Space, Sparkles,
-  SquareStack, StickyNote, Tags, Type, Workflow,
-};
-const groups = [{ id: 'all', label: 'Все' }, ...componentGroups];
+const catalog = await readCatalog();
+const icons: Record<CatalogGroup, typeof Activity> = { live: Activity, data: SquareStack, layout: LayoutGrid, templates: PanelsTopLeft, html: Code };
+const groups = [{ id: 'all', label: 'Все' }, ...catalogGroups];
 const count = (id: string) => (id === 'all' ? catalog.length : catalog.filter((c) => c.group === id).length);
 ---
 <section id="components" class="relative py-24 sm:py-32">
   <Container>
     <SectionHeading
-      eyebrow="Компоненты"
-      title={`${catalog.length} кирпичиков для слайдов`}
-      lead="Каждый подключается одной строкой type в deck.yaml. Цвета берутся из темы, анимации запускаются при открытии слайда."
+      eyebrow="Блоки"
+      title="Блок на любой слайд"
+      lead="Диаграммы, Гант, матрица рисков, тест для зала, 3D-модель, формула. В студии — вкладка «Блоки» с живыми превью, в deck.yaml — одна строка type."
     />
 
     <div data-catalog class="mt-12">
-      <div role="tablist" aria-label="Группы компонентов" class="mx-auto flex w-fit max-w-full gap-1 overflow-x-auto rounded-2xl border border-bd bg-surf p-1 shadow-[var(--shadow-sm)] [scrollbar-width:none]">
+      <div role="tablist" aria-label="Группы блоков" class="mx-auto flex w-fit max-w-full gap-1 overflow-x-auto rounded-2xl border border-bd bg-surf p-1 shadow-[var(--shadow-sm)] [scrollbar-width:none]">
         {groups.map((g, i) => (
           <button
             type="button"
@@ -37,40 +30,54 @@ const count = (id: string) => (id === 'all' ? catalog.length : catalog.filter((c
         ))}
       </div>
 
-      <ul class="mt-8 grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
-        {catalog.map((c) => {
-          const Icon = icons[c.icon] ?? Share2;
+      <ul data-catalog-list class="mt-8 grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {catalog.map((c, i) => {
+          const Icon = icons[c.group];
           return (
-            <li data-group={c.group} class="data-[hidden]:hidden">
+            <li data-group={c.group} data-extra={i >= 16 ? '' : undefined} class="data-[hidden]:hidden">
               <a
-                href={`/docs/components#${c.type}`}
+                href={`/docs/components#${c.anchor}`}
                 class="group/c flex h-full flex-col rounded-2xl border border-bd bg-surf p-4 transition duration-300 hover:-translate-y-0.5 hover:border-acb hover:shadow-[var(--shadow-md)]"
               >
-                <span class="flex items-center justify-between">
-                  <span class="grid size-9 place-items-center rounded-xl bg-acs text-ac transition group-hover/c:bg-ac group-hover/c:text-white"><Icon class="size-[18px]" /></span>
-                  <code class="rounded-md border border-bd bg-alt px-1.5 py-0.5 font-mono text-[11.5px] text-tx2">{c.group === 'templates' ? 'template' : 'type'}: {c.type}</code>
+                <span class="flex items-start justify-between gap-2">
+                  <span class="grid size-9 shrink-0 place-items-center rounded-xl bg-acs text-ac transition group-hover/c:bg-ac group-hover/c:text-white"><Icon class="size-[18px]" /></span>
+                  <span class="flex flex-wrap justify-end gap-1">
+                    {c.types.slice(0, 3).map((t) => <code class="rounded-md border border-bd bg-alt px-1.5 py-0.5 font-mono text-[11px] text-tx2">{t}</code>)}
+                    {c.types.length > 3 && <code class="rounded-md border border-bd bg-alt px-1.5 py-0.5 font-mono text-[11px] text-mu">+{c.types.length - 3}</code>}
+                  </span>
                 </span>
-                <b class="mt-3 text-[15px] text-tx">{c.title}</b>
+                <b class="mt-3 text-[15px] leading-snug text-tx">{c.title}</b>
                 <span class="mt-1 text-[13.5px] leading-snug text-mu">{c.text}</span>
               </a>
             </li>
           );
         })}
       </ul>
-      <p class="mt-8 text-center text-[14.5px] text-mu">
-        Не хватает своего? <a href="/docs/custom-components" class="font-semibold text-ac hover:underline">Компонент пишется за 20 строк TypeScript →</a>
-      </p>
+      <div class="mt-8 flex flex-col items-center gap-3">
+        <button type="button" data-catalog-more class="rounded-xl border border-bd2 bg-surf px-5 py-2.5 text-[14.5px] font-semibold text-tx shadow-[var(--shadow-sm)] transition hover:border-acb">Показать все {catalog.length}</button>
+        <p class="text-center text-[14.5px] text-mu">
+          Не хватает своего? <a href="/docs/custom-components" class="font-semibold text-ac hover:underline">Блок пишется на TypeScript за 20 строк →</a>
+        </p>
+      </div>
     </div>
   </Container>
 </section>
+
+<style>
+  /* Сначала 16 карточек, остальные — по кнопке или при выборе группы */
+  [data-catalog]:not([data-open]) [data-extra] { display: none; }
+  [data-catalog][data-open] [data-catalog-more] { display: none; }
+</style>
 
 <script>
   document.querySelectorAll<HTMLElement>('[data-catalog]').forEach((root) => {
     const tabs = [...root.querySelectorAll<HTMLButtonElement>('[data-filter]')];
     const items = [...root.querySelectorAll<HTMLElement>('[data-group]')];
+    root.querySelector('[data-catalog-more]')?.addEventListener('click', () => root.setAttribute('data-open', ''));
     tabs.forEach((t) => t.addEventListener('click', () => {
       const f = t.dataset.filter;
       tabs.forEach((x) => x.setAttribute('aria-selected', String(x === t)));
+      if (f !== 'all') root.setAttribute('data-open', '');
       items.forEach((it) => it.toggleAttribute('data-hidden', f !== 'all' && it.dataset.group !== f));
     }));
   });

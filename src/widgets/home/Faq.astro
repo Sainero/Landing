@@ -6,7 +6,7 @@ import SectionHeading from '@/shared/ui-kit/SectionHeading.astro';
 ---
 <section id="faq" class="relative py-24 sm:py-32">
   <Container class="grid grid-cols-[minmax(0,1fr)] gap-12 lg:grid-cols-[.8fr_1.2fr]">
-    <SectionHeading align="left" eyebrow="Вопросы" title="Частые вопросы" lead="Не нашли ответа — загляните в документацию или в исходный код: он открыт." />
+    <SectionHeading align="left" eyebrow="Вопросы" title="Частые вопросы" lead="Не нашли ответа — загляните в документацию: там каждая кнопка студии и каждый блок с примером." />
     <div data-reveal class="flex flex-col gap-3">
       {faq.map((f, i) => (
         <details class="group/f rounded-2xl border border-bd bg-surf px-5 transition open:border-acb/70 open:shadow-[var(--shadow-md)]" open={i === 0}>

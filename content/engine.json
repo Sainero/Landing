@@ -1,15 +1,15 @@
 {
-  "version": "0.1.0",
-  "commit": "9a132a6",
-  "syncedAt": "2026-11-18",
+  "version": "1.0.0",
+  "commit": "99a4ed5",
+  "syncedAt": "2026-11-19",
   "decks": [
     {
-      "name": "tour",
-      "sizeKb": 97
+      "name": "slideria",
+      "sizeKb": 2799
     },
     {
       "name": "microclimate",
-      "sizeKb": 100
+      "sizeKb": 1237
     }
   ]
 }

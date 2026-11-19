@@ -1,9 +1,9 @@
 {
-  "name": "htmlpptx-landing",
+  "name": "slideria-site",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Лендинг и документация HTMLPPTX. Облачная версия — отдельное приложение, отсюда только ссылка",
+  "description": "Сайт и документация Slideria. Облачная версия — отдельное приложение, отсюда только ссылка",
   "packageManager": "yarn@1.22.22",
   "engines": {
     "node": ">=22.23.4"
@@ -19,7 +19,8 @@
     "@astrojs/markdown-remark": "^7.3.9",
     "@astrojs/sitemap": "^3.7.5",
     "@fontsource-variable/jetbrains-mono": "^5.3.0",
-    "@fontsource-variable/manrope": "^5.3.0",
+    "@fontsource-variable/onest": "^5.3.1",
+    "@fontsource-variable/unbounded": "^5.3.0",
     "@lucide/astro": "^1.75.0",
     "@tailwindcss/vite": "^4.3.5",
     "astro": "^7.4.12",
