@@ -1,19 +1,7 @@
 ---
-import { FileCode, FileUp, Sparkles } from '@lucide/astro';
-import CodeBlock from '@/shared/ui-kit/CodeBlock.astro';
+import { Bot, FileUp, Sparkles } from '@lucide/astro';
 import Container from '@/shared/ui-kit/Container.astro';
 import SectionHeading from '@/shared/ui-kit/SectionHeading.astro';
-
-const slide = `- title: Итоги квартала
-  badge: Q3
-  body:
-    - type: stat
-      value: 3,4 млн
-      label: выручка за квартал
-      delta: +18 %
-    - type: bars
-      values: [3, 5, 4, 7]
-      labels: [Июл, Авг, Сен, Окт]`;
 
 const path = [
   { title: 'Идея', sub: 'с нуля или импорт' },
@@ -26,7 +14,7 @@ const card = 'relative flex flex-col rounded-3xl border border-bd bg-surf p-6 sh
 ---
 <section id="how" data-anim class="relative py-24 sm:py-32">
   <Container>
-    <SectionHeading eyebrow="С чего начать" lead="Принесите готовую презентацию, соберите в студии или попросите Claude написать deck.yaml. Дальше всё одинаково: правка, показ, экспорт.">
+    <SectionHeading eyebrow="С чего начать" lead="Принесите готовую презентацию, соберите её в студии или попросите Claude. Дальше всё одинаково: правка, показ, экспорт.">
       <Fragment slot="title">Три способа сделать презентацию</Fragment>
     </SectionHeading>
 
@@ -56,11 +44,12 @@ const card = 'relative flex flex-col rounded-3xl border border-bd bg-surf p-6 sh
       </article>
 
       <article data-reveal class={card} style="--d:.2s">
-        <span class="grid size-12 place-items-center rounded-2xl bg-[linear-gradient(135deg,var(--ac),var(--cy))] text-white shadow-[0_10px_30px_-8px_var(--cy)]"><FileCode class="size-6" /></span>
-        <h3 class="mt-5 text-xl font-bold text-tx">Сразу в deck.yaml</h3>
-        <p class="mt-2 text-[15px] leading-relaxed text-mu">Для презентаций, которые долго живут: схемы, графики, таблицы — родными блоками. Claude пишет такой файл сам по навыку slideria-deck.</p>
-        <div class="mt-auto pt-6">
-          <CodeBlock code={slide} dark class="text-[12px] [&_div.p-4]:py-3" />
+        <span class="grid size-12 place-items-center rounded-2xl bg-[linear-gradient(135deg,var(--ac),var(--cy))] text-white shadow-[0_10px_30px_-8px_var(--cy)]"><Bot class="size-6" /></span>
+        <h3 class="mt-5 text-xl font-bold text-tx">Попросите агента</h3>
+        <p class="mt-2 text-[15px] leading-relaxed text-mu">Опишите, что нужно, — Claude соберёт слайды родными блоками: схемы, графики, таблицы. Прямо в студии или из Claude Desktop и Claude Code.</p>
+        <div class="mt-auto flex flex-col gap-2 pt-6 text-[13px]">
+          <div class="ml-auto max-w-[90%] rounded-2xl rounded-br-md bg-ac px-3.5 py-2.5 text-white">Сделай 10 слайдов по итогам квартала: выручка, клиенты, планы</div>
+          <div class="max-w-[90%] rounded-2xl rounded-bl-md border border-bd bg-alt/60 px-3.5 py-2.5 text-tx2">Готово: титул, 3 графика, Гант и финал. Проверил каждый слайд картинкой.</div>
         </div>
       </article>
     </div>

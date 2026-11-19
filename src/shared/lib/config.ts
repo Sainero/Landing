@@ -6,7 +6,7 @@ const downloadUrl = import.meta.env.PUBLIC_DOWNLOAD_URL?.trim() || null;
 /**
  * Настройки сайта. Облако — отдельное приложение: лендинг знает только его адрес.
  * Пока PUBLIC_CLOUD_URL не задан, ссылки «Облако» ведут на раздел #cloud с пометкой «скоро».
- * Пока не задан PUBLIC_DOWNLOAD_URL, кнопка программы ведёт на её описание в документации.
+ * Пока не задан PUBLIC_DOWNLOAD_URL, кнопка программы ведёт на «Установку» в документации.
  */
 export const siteConfig = {
   name: 'Slideria',

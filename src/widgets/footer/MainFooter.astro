@@ -12,14 +12,14 @@ import Logo from '@/shared/ui-kit/Logo.astro';
     </div>
     {footerColumns.map((col) => (
       <div>
-        <h3 class="mb-3 text-xs font-bold uppercase tracking-[.14em] text-mu">{col.title}</h3>
+        <h2 class="mb-3 text-xs font-bold uppercase tracking-[.14em] text-mu">{col.title}</h2>
         <ul class="flex flex-col gap-2">
           {col.links.map((l) => <li><a href={l.href} class="text-[15px] text-tx2 transition hover:text-ac">{l.label}</a></li>)}
         </ul>
       </div>
     ))}
     <div>
-      <h3 class="mb-3 text-xs font-bold uppercase tracking-[.14em] text-mu">Облако</h3>
+      <h2 class="mb-3 text-xs font-bold uppercase tracking-[.14em] text-mu">Облако</h2>
       <p class="text-[15px] leading-relaxed text-tx2">Та же студия в браузере — отдельным приложением, без установки.</p>
       <a href="/#cloud" class="mt-2 inline-block text-[15px] font-semibold text-ac hover:underline">Что будет в облаке →</a>
     </div>

@@ -1,7 +1,7 @@
 ---
 /**
  * Кнопка программы для компьютера. Ссылка на установщик — PUBLIC_DOWNLOAD_URL;
- * пока её нет, кнопка ведёт на описание программы в документации.
+ * пока её нет, кнопка ведёт на «Установку» в документации.
  */
 import { ArrowRight, Download } from '@lucide/astro';
 import { isDownloadLive, siteConfig } from '@/shared/lib/config';
@@ -12,4 +12,4 @@ const { variant = 'secondary', size = 'md', class: cls } = Astro.props;
 ---
 {isDownloadLive
   ? <a href={siteConfig.downloadUrl} class={buttonClass(variant, size, cls)} download><Download class="size-4" />Скачать для Windows</a>
-  : <a href="/docs/app" class={buttonClass(variant, size, cls)}>Программа для Windows<ArrowRight class="size-4 transition group-hover/btn:translate-x-0.5" /></a>}
+  : <a href="/docs#установка" class={buttonClass(variant, size, cls)}>Программа для Windows<ArrowRight class="size-4 transition group-hover/btn:translate-x-0.5" /></a>}

@@ -14,7 +14,7 @@ const count = (id: string) => (id === 'all' ? catalog.length : catalog.filter((c
     <SectionHeading
       eyebrow="Блоки"
       title="Блок на любой слайд"
-      lead="Диаграммы, Гант, матрица рисков, тест для зала, 3D-модель, формула. В студии — вкладка «Блоки» с живыми превью, в deck.yaml — одна строка type."
+      lead="Диаграммы, Гант, матрица рисков, тест для зала, 3D-модель, формула. В студии они на вкладке «Вставка» → «Блоки» — с живыми превью, в цветах вашей темы."
     />
 
     <div data-catalog class="mt-12">
@@ -35,29 +35,17 @@ const count = (id: string) => (id === 'all' ? catalog.length : catalog.filter((c
           const Icon = icons[c.group];
           return (
             <li data-group={c.group} data-extra={i >= 16 ? '' : undefined} class="data-[hidden]:hidden">
-              <a
-                href={`/docs/components#${c.anchor}`}
-                class="group/c flex h-full flex-col rounded-2xl border border-bd bg-surf p-4 transition duration-300 hover:-translate-y-0.5 hover:border-acb hover:shadow-[var(--shadow-md)]"
-              >
-                <span class="flex items-start justify-between gap-2">
-                  <span class="grid size-9 shrink-0 place-items-center rounded-xl bg-acs text-ac transition group-hover/c:bg-ac group-hover/c:text-white"><Icon class="size-[18px]" /></span>
-                  <span class="flex flex-wrap justify-end gap-1">
-                    {c.types.slice(0, 3).map((t) => <code class="rounded-md border border-bd bg-alt px-1.5 py-0.5 font-mono text-[11px] text-tx2">{t}</code>)}
-                    {c.types.length > 3 && <code class="rounded-md border border-bd bg-alt px-1.5 py-0.5 font-mono text-[11px] text-mu">+{c.types.length - 3}</code>}
-                  </span>
-                </span>
+              <div class="flex h-full flex-col rounded-2xl border border-bd bg-surf p-4">
+                <span class="grid size-9 shrink-0 place-items-center rounded-xl bg-acs text-ac"><Icon class="size-[18px]" /></span>
                 <b class="mt-3 text-[15px] leading-snug text-tx">{c.title}</b>
                 <span class="mt-1 text-[13.5px] leading-snug text-mu">{c.text}</span>
-              </a>
+              </div>
             </li>
           );
         })}
       </ul>
       <div class="mt-8 flex flex-col items-center gap-3">
         <button type="button" data-catalog-more class="rounded-xl border border-bd2 bg-surf px-5 py-2.5 text-[14.5px] font-semibold text-tx shadow-[var(--shadow-sm)] transition hover:border-acb">Показать все {catalog.length}</button>
-        <p class="text-center text-[14.5px] text-mu">
-          Не хватает своего? <a href="/docs/custom-components" class="font-semibold text-ac hover:underline">Блок пишется на TypeScript за 20 строк →</a>
-        </p>
       </div>
     </div>
   </Container>

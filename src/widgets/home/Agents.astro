@@ -1,6 +1,5 @@
 ---
 import { ArrowUp, Check, Eye, FileText, Paperclip, PencilLine, Undo2 } from '@lucide/astro';
-import CodeBlock from '@/shared/ui-kit/CodeBlock.astro';
 import Container from '@/shared/ui-kit/Container.astro';
 import SectionHeading from '@/shared/ui-kit/SectionHeading.astro';
 
@@ -16,7 +15,7 @@ const rules = [
   ['Агент видит слайд картинкой', 'после правки сам поправляет вылезший текст и наложения'],
   ['Ctrl+Z отменяет весь ответ одним шагом', 'а правки, сделанные после, остаются'],
 ];
-const mcp = `claude mcp add --scope user slideria -- node /путь/к/slideria/scripts/mcp.mjs`;
+const connect = ['Файл', 'Интеграции', 'Агенты', 'Подключить агента'];
 ---
 <section id="agents" class="relative py-24 sm:py-32">
   <Container class="grid grid-cols-[minmax(0,1fr)] items-center gap-12 lg:grid-cols-[1fr_1.05fr]">
@@ -74,7 +73,12 @@ const mcp = `claude mcp add --scope user slideria -- node /путь/к/slideria/
           <span class="grid size-7 place-items-center rounded-full bg-ac text-white"><ArrowUp class="size-4" /></span>
         </div>
       </div>
-      <CodeBlock code={mcp} lang="bash" file="или вручную — MCP для Claude Code" dark class="mt-4" />
+      <!-- подключение MCP — в программе, без терминала -->
+      <a href="/docs/mcp" class="mt-4 flex flex-wrap items-center gap-x-2 gap-y-1.5 rounded-2xl border border-bd bg-surf px-4 py-3 text-[13.5px] shadow-[var(--shadow-sm)] transition hover:border-acb">
+        <span class="font-semibold text-tx">Подключить Claude:</span>
+        {connect.map((c, i) => <><span class="rounded-md border border-bd bg-alt px-2 py-0.5 font-semibold text-tx2">{c}</span>{i < connect.length - 1 && <span class="text-mu">→</span>}</>)}
+        <span class="ml-auto font-semibold text-ac">Подробнее →</span>
+      </a>
     </div>
   </Container>
 </section>

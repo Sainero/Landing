@@ -1,7 +1,8 @@
 // Забирает из репозитория Slideria всё, что показывает лендинг:
 //   - собранные демо-презентации (для показа, компактные) → public/demo/<имя>.html
 //   - их deck.yaml (для показа кода)                    → content/decks/<имя>/deck.yaml
-//   - README, справочник компонентов и MCP              → content/docs/*.md (раздел /docs)
+//   - разделы README и docs/ о работе в программе        → content/docs/*.md (раздел /docs)
+//   - справочник компонентов (данные каталога блоков)    → content/catalog/components.md
 //   - кадры слайдов и окна докладчика (светлые и тёмные)  → public/demo/posters/<имя>/*.webp
 //   - версия программы                                  → content/engine.json
 //
@@ -22,6 +23,7 @@ import { createRequire } from 'node:module';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import sharp from 'sharp';
+import { dropDeadAnchors, fixLinks, forUsers, keepSections, section } from './lib/docs-transform.mjs';
 
 const root = process.cwd();
 const engine = path.resolve(process.env.SLIDERIA_DIR ?? path.join(root, '..', 'HTMLPPTX'));
@@ -135,74 +137,58 @@ async function shootPosters() {
 }
 
 // ---------- документация ----------
-// README делится на страницы по заголовкам второго уровня; разделы для разработчиков движка
-// (тесты, замеры, структура репозитория) на сайт не попадают
-const PAGES = {
-  'Быстрый старт': { slug: 'index', title: 'Быстрый старт', group: 'Начало работы', order: 1, intro: true },
-  'Приложение для компьютера': { slug: 'app', title: 'Программа для компьютера', group: 'Начало работы', order: 2 },
-  'Во время показа': { slug: 'show', title: 'Во время показа', group: 'Начало работы', order: 3 },
-  'Редактор (студия)': { slug: 'studio', title: 'Студия', group: 'Работа с презентацией', order: 4 },
-  'Режим правки': { slug: 'edit', title: 'Режим правки', group: 'Работа с презентацией', order: 5 },
-  'Три способа сделать презентацию': { slug: 'ways', title: 'Три способа сделать презентацию', group: 'Работа с презентацией', order: 6 },
-  'Импорт правок из HTML-файла': { slug: 'merge', title: 'Импорт правок из HTML-файла', group: 'Работа с презентацией', order: 7 },
-  'Как править презентацию в deck.yaml': { slug: 'editing', title: 'Как править deck.yaml', group: 'Формат deck.yaml', order: 8 },
-  'Как добавить свой компонент': { slug: 'custom-components', title: 'Свой компонент', group: 'Формат deck.yaml', order: 10 },
-  'Что дальше': { slug: 'roadmap', title: 'Что дальше', group: 'О проекте', order: 20 },
-};
-const SKIP = new Set(['Автотесты', 'Замеры скорости', 'Структура']);
-// Документы из docs/, у которых есть своя страница на сайте
-const DOC_PAGES = { 'COMPONENTS.md': '/docs/components', 'MCP.md': '/docs/mcp', 'AGENT.md': '/docs/agent' };
-
-/** Ссылки на страницы сайта сохраняются, на файлы репозитория — превращаются в обычный текст */
-function fixLinks(md) {
-  return md
-    .replace(/<img[^>]*>\s*/g, '')
-    // старое рабочее имя папки проекта
-    .replace(/HTMLPPTX/g, 'slideria')
-    .replace(/(!?)\[([^\]]*)\]\(([^)\s]+)\)/g, (all, bang, text, href) => {
-      if (bang) return '';
-      // Репозитории на GitHub на сайте не упоминаются ссылками
-      if (/^https?:\/\/(www\.)?github\.com\//.test(href)) return text;
-      if (/^https?:|^mailto:|^#/.test(href)) return all;
-      const [file, hash] = href.split('#');
-      const page = DOC_PAGES[path.basename(file)];
-      if (page) return `[${text}](${page}${hash ? '#' + hash : ''})`;
-      if (file === 'README.md' || file === '../README.md') return `[${text}](/docs${hash ? '#' + hash : ''})`;
-      return text.replace(/^`(.*)`$/, '`$1`');
-    });
-}
-
-const front = (o) => `---\n${Object.entries(o).map(([k, v]) => `${k}: ${JSON.stringify(v)}`).join('\n')}\n---\n\n`;
+// Сайт говорит с пользователем программы, а не с разработчиком: из README и docs/ Slideria берутся только
+// разделы о работе в программе, а команды, пути и устройство кода вычищаются (scripts/lib/docs-transform.mjs).
+// «Начало работы» и «Подключить агента» написаны для сайта отдельно — content/guide/.
 const docsDir = path.join(root, 'content', 'docs');
 fs.rmSync(docsDir, { recursive: true, force: true });
 
 const readme = fs.readFileSync(path.join(engine, 'README.md'), 'utf8');
-const [head, ...sections] = readme.split(/^## /m);
-const intro = head.replace(/<img[^>]*>\s*/g, '').replace(/^# .*\n/m, '').trim();
-for (const sec of sections) {
-  const nl = sec.indexOf('\n');
-  const heading = sec.slice(0, nl).trim();
-  const body = sec.slice(nl + 1).trim();
-  if (SKIP.has(heading)) continue;
-  const page = PAGES[heading];
-  if (!page) {
-    console.warn(`! раздел README «${heading}» не привязан к странице — добавьте его в PAGES или SKIP в scripts/sync-engine.mjs`);
-    continue;
+const doc = (name) => fs.readFileSync(path.join(engine, 'docs', name), 'utf8').replace(/^# .*\n/, '');
+const front = (o) => `---\n${Object.entries(o).map(([k, v]) => `${k}: ${JSON.stringify(v)}`).join('\n')}\n---\n\n`;
+// Ссылки на документы программы, у которых есть страница на сайте
+const LINKED = { 'AGENT.md': '/docs/agent', 'MCP.md': '/docs/mcp' };
+const page = (slug, meta, md, replace = []) => {
+  let text = dropDeadAnchors(fixLinks(forUsers(md), LINKED));
+  for (const [a, b] of replace) text = text.replace(a, b);
+  write(path.join(docsDir, `${slug}.md`), front(meta) + text + '\n');
+};
+
+// Разделы README: какие публикуются, а какие — для разработчиков программы
+const USED = ['Во время показа', 'Редактор (студия)', 'Режим правки', 'Три способа сделать презентацию', 'Импорт правок из HTML-файла', 'Что дальше'];
+const DEV_ONLY = ['Быстрый старт', 'Приложение для компьютера', 'Автотесты', 'Замеры скорости', 'Как править презентацию в deck.yaml', 'Как добавить свой компонент', 'Структура'];
+for (const m of readme.matchAll(/^## (.+)$/gm)) {
+  const title = m[1].trim();
+  if (!USED.includes(title) && !DEV_ONLY.includes(title)) {
+    console.warn(`! новый раздел README «${title}»: решите, нужен ли он на сайте (USED или DEV_ONLY в scripts/sync-engine.mjs)`);
   }
-  const { slug, intro: withIntro, ...meta } = page;
-  const text = withIntro ? `${intro}\n\n## Установка и запуск\n\n${body}` : body;
-  write(path.join(docsDir, `${slug}.md`), front(meta) + fixLinks(text) + '\n');
 }
 
-const extra = [
-  { file: 'COMPONENTS.md', slug: 'components', meta: { title: 'Справочник компонентов', group: 'Формат deck.yaml', order: 9, description: 'Шаблоны слайдов и блоки: поля и примеры YAML' } },
-  { file: 'AGENT.md', slug: 'agent', meta: { title: 'Агент в студии', group: 'Агенты', order: 11 } },
-  { file: 'MCP.md', slug: 'mcp', meta: { title: 'MCP: Claude правит презентации', group: 'Агенты', order: 12 } },
-];
-for (const x of extra) {
-  const md = fs.readFileSync(path.join(engine, 'docs', x.file), 'utf8').replace(/^# .*\n/, '').trim();
-  write(path.join(docsDir, `${x.slug}.md`), front(x.meta) + fixLinks(md) + '\n');
-}
+page('show', { title: 'Во время показа', group: 'Начало работы', order: 2 }, section(readme, 'Во время показа'));
+page('studio', { title: 'Студия', group: 'Работа с презентацией', order: 3 }, section(readme, 'Редактор (студия)'));
+page('edit', { title: 'Режим правки', group: 'Работа с презентацией', order: 4, description: 'Правка прямо в показе и в присланном HTML-файле' },
+  section(readme, 'Режим правки'),
+  [['можно вернуть в проект — см. следующий раздел', 'переносятся обратно в презентацию — см. [«Импорт» → «Правки из присланного файла»](/docs/import#правки-из-присланного-файла)']]);
+
+const ways = section(readme, 'Три способа сделать презентацию');
+page('import', { title: 'Импорт', group: 'Работа с презентацией', order: 5, description: 'PowerPoint, HTML и Claude Design — в редактируемые слайды' }, [
+  'Готовую презентацию не нужно переделывать: перетащите файл на страницу «Все презентации» или нажмите «Импорт». Окно покажет, что получится и что стоит проверить, — и ничего не запишет, пока вы не нажмёте «Импортировать».',
+  '## Из PowerPoint',
+  section(ways, 'Из PowerPoint', 3),
+  '## Из HTML и Claude Design',
+  'Каркас нарисовали мышью в Claude Design или презентацию сверстал Claude в чате — импорт превратит её в слайды Slideria. Окно предложит привязать цвета к теме, чтобы работали тёмная тема и смена акцента.',
+  section(ways, 'Живые слайды: любой HTML как есть', 3),
+  '## Правки из присланного файла',
+  'Отправили презентацию HTML-файлом с правкой, коллега поправил текст и картинки прямо в браузере и прислал файл обратно — перетащите его на страницу «Все презентации». Окно покажет, какие слайды изменены, добавлены и удалены и какие появятся картинки: «Импортировать» — записать, «Отмена» — ничего не трогать.',
+  section(readme, 'Импорт правок из HTML-файла').replace(/^[\s\S]*?Как это работает:\s*/, ''),
+].join('\n\n'));
+
+page('agent', { title: 'Агент в студии', group: 'Агенты', order: 6, description: 'Чат с моделью, которая правит открытую презентацию' },
+  keepSections(doc('AGENT.md'), ['Где', 'Сервисы', 'Голос', 'Дальше']));
+page('roadmap', { title: 'Что дальше', group: 'О проекте', order: 9 }, section(readme, 'Что дальше'));
+
+// Справочник компонентов — не страница, а данные для каталога блоков на главной
+write(path.join(root, 'content', 'catalog', 'components.md'), doc('COMPONENTS.md'));
 
 // ---------- версия ----------
 let commit = null;

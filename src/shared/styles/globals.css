@@ -208,6 +208,12 @@
 .prose-doc th { text-align: left; color: var(--tx); font-weight: 700; background: var(--alt); }
 .prose-doc th, .prose-doc td { border: 1px solid var(--bd); padding: .55rem .8rem; vertical-align: top; }
 .prose-doc h2 a.anchor, .prose-doc h3 a.anchor { text-decoration: none; color: inherit; }
+/* Список «что — как» вместо таблицы с длинными ячейками (rehypeFeatureLists в astro.config.mjs) */
+.prose-doc dl.features { margin: 1.2rem 0; border-top: 1px solid var(--bd); }
+.prose-doc dl.features > div { display: grid; grid-template-columns: minmax(0, 190px) minmax(0, 1fr); gap: .35rem 1.5rem; padding: .95rem 0; border-bottom: 1px solid var(--bd); }
+.prose-doc dl.features dt { color: var(--tx); font-weight: 700; line-height: 1.5; }
+.prose-doc dl.features dd { margin: 0; }
+@media (max-width: 640px) { .prose-doc dl.features > div { grid-template-columns: minmax(0, 1fr); } }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }

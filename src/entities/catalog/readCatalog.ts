@@ -4,7 +4,7 @@ import path from 'node:path';
 export type CatalogGroup = 'templates' | 'layout' | 'data' | 'live' | 'html';
 
 export interface CatalogItem {
-  /** Типы блоков из заголовка: `donut`, `hbars`… */
+  /** Типы блоков из заголовка: `donut`, `hbars`… (на сайте не показываются — это имена в данных) */
   types: string[];
   title: string;
   text: string;
@@ -57,22 +57,29 @@ const OVERRIDES: Record<string, { title?: string; text: string }> = {
   timeline: { text: 'Этапы по порядку, линия прорисовывается до последнего пройденного.' },
   orbit: { text: 'Метки на орбитах вокруг центра.' },
   html: { title: 'Фрагмент вёрстки', text: 'Готовая вёрстка, тексты и картинки которой правятся на месте; скрипты из разметки убираются.' },
+  plot: { text: 'Кривая функции с осями и делениями прорисовывается при открытии слайда, ползунки слайда меняют её на лету.' },
+  gears: { text: 'Шестерёнки, колонны, слои, ромбы, дуга, карта мыслей, айсберг — у каждой своё появление и подсветка под мышью.' },
 };
+
+/** Не для пользователей программы: стили презентации пишутся кодом */
+const EXCLUDE = new Set(['css']);
 
 const plain = (s: string) => s
   .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
   .replace(/\*\*([^*]+)\*\*/g, '$1')
   .replace(/`([^`]+)`/g, '$1')
+  // внутренние имена полей в скобках: «(points)», «(id)», «(accent2)»; «f(x)» остаётся
+  .replace(/\s?\([a-z][\w ,;]+\)/g, '')
   .replace(/\s+/g, ' ')
   .trim();
 
 /**
- * Каталог для главной из справочника компонентов (content/docs/components.md, кладёт yarn sync:engine):
+ * Каталог для главной из справочника компонентов (content/catalog/components.md, кладёт yarn sync:engine):
  * каждый заголовок «### `тип` — название» — карточка, первый абзац под ним — описание.
  * Новые блоки в Slideria появляются на лендинге сами после синхронизации.
  */
 export async function readCatalog(): Promise<CatalogItem[]> {
-  const md = await fs.readFile(path.join(process.cwd(), 'content', 'docs', 'components.md'), 'utf8');
+  const md = await fs.readFile(path.join(process.cwd(), 'content', 'catalog', 'components.md'), 'utf8');
   const lines = md.split('\n');
   const items: CatalogItem[] = [];
   let group: CatalogGroup | null = null;
@@ -85,7 +92,7 @@ export async function readCatalog(): Promise<CatalogItem[]> {
     if (!group || !line.startsWith('### ')) continue;
     const heading = line.slice(4).trim();
     const types = [...heading.matchAll(/`([a-z0-9-]+)`/g)].map((m) => m[1]);
-    if (!types.length) continue;
+    if (!types.length || EXCLUDE.has(types[0])) continue;
     const dash = heading.split(/\s+—\s+/);
     let title = dash.length > 1 ? dash.slice(1).join(' — ') : heading.includes(':') ? heading.split(':')[0] : '';
     title = plain(title) || types.join(', ');
@@ -104,7 +111,7 @@ export async function readCatalog(): Promise<CatalogItem[]> {
     if (text.length > 140) text = text.slice(0, text.lastIndexOf(' ', 136)) + '…';
     const o = OVERRIDES[types[0]];
     if (o) { title = o.title ?? title; text = o.text; }
-    if (!text) text = 'Поля и пример YAML — в справочнике компонентов.';
+    if (!text) text = 'В студии — «Вставка» → «Блоки».';
     items.push({ types, title, text, group, anchor: types[0] });
   }
   // Сначала самое наглядное: живая графика, данные, раскладка, шаблоны, вёрстка

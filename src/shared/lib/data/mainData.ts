@@ -27,8 +27,8 @@ export const footerColumns: { title: string; links: NavLink[] }[] = [
     links: [
       { label: 'Быстрый старт', href: '/docs' },
       { label: 'Студия', href: '/docs/studio' },
-      { label: 'Справочник компонентов', href: '/docs/components' },
-      { label: 'MCP для Claude', href: '/docs/mcp' },
+      { label: 'Импорт', href: '/docs/import' },
+      { label: 'Подключить агента', href: '/docs/mcp' },
     ],
   },
 ];
@@ -48,11 +48,11 @@ export const faq: { q: string; a: string }[] = [
   },
   {
     q: 'Зачем «презентация как данные»?',
-    a: 'Внутри каждой презентации — обычный текстовый файл deck.yaml. Его удобно хранить в git, сравнивать версии и править вместе с агентом: студия пишет в него только то, что поменялось, комментарии остаются на месте.',
+    a: 'Каждая презентация хранится как данные: тексты, цифры и раскладка отдельно от оформления. Поэтому тема меняет вид всех слайдов сразу, а вы и агент правите одну презентацию одновременно — правки не затирают друг друга, и любую можно вернуть.',
   },
   {
     q: 'Можно делать слайды с Claude?',
-    a: 'Да, тремя способами: чат «Агент» в студии (Claude, ChatGPT, DeepSeek, Qwen, OpenRouter или Ollama), MCP для Claude Desktop, Claude Code и Codex — в один щелчок, и навык slideria-deck, по которому Claude сам пишет deck.yaml.',
+    a: 'Да. В студии — чат «Агент» (Claude, ChatGPT, DeepSeek, Qwen, OpenRouter или Ollama на этом компьютере). А Claude Desktop, Claude Code и Codex подключаются в один щелчок: «Файл» → «Интеграции» → «Агенты».',
   },
   {
     q: 'Чем будет отличаться облачная версия?',

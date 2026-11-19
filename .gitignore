@@ -18,3 +18,6 @@ yarn-error.log*
 # системное
 .DS_Store
 .idea/
+
+# тесты и замеры
+.tmp/

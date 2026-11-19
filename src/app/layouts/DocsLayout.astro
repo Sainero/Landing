@@ -18,10 +18,12 @@ interface Props {
 }
 const { title, description, current, group, headings, prev, next } = Astro.props;
 const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
+// Без оглавления справа не остаётся пустой колонки: статья занимает её место, но не шире удобной строки
+const hasToc = toc.length > 1;
 ---
 <SiteLayout title={title} description={description}>
   <Container class="pt-24 sm:pt-28">
-    <div class="grid grid-cols-[minmax(0,1fr)] gap-10 pb-24 lg:grid-cols-[230px_minmax(0,1fr)] xl:grid-cols-[230px_minmax(0,1fr)_220px]">
+    <div class:list={['grid grid-cols-[minmax(0,1fr)] gap-10 pb-24 lg:grid-cols-[230px_minmax(0,1fr)]', hasToc && 'xl:grid-cols-[230px_minmax(0,1fr)_220px]']}>
       <aside class="hidden lg:block">
         <div class="sticky top-24 max-h-[calc(100dvh-7rem)] overflow-y-auto pb-6"><DocsSidebar current={current} /></div>
       </aside>
@@ -34,7 +36,7 @@ const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
         <div class="border-t border-bd p-3"><DocsSidebar current={current} /></div>
       </details>
 
-      <article class="min-w-0">
+      <article class="min-w-0 max-w-[800px]">
         <div class="mb-8">
           <div class="text-[13px] font-semibold text-ac">{group}</div>
           <h1 class="mt-2 text-[clamp(32px,4.5vw,44px)] font-extrabold leading-[1.1] tracking-[-.03em] text-tx">{title}</h1>
@@ -49,7 +51,7 @@ const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
         </nav>
       </article>
 
-      {toc.length > 1 && (
+      {hasToc && (
         <aside class="hidden xl:block">
           <div class="sticky top-24 max-h-[calc(100dvh-7rem)] overflow-y-auto">
             <h2 class="mb-3 text-[11.5px] font-bold uppercase tracking-[.14em] text-mu">На этой странице</h2>

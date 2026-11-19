@@ -5,25 +5,41 @@ import tailwindcss from '@tailwindcss/vite';
 import { defineConfig, fontProviders } from 'astro/config';
 
 /**
- * Якоря для справочника компонентов: заголовок «### `grid` — сетка» получает id="grid",
- * «### Диаграммы: `donut`, …» — id="donut": каталог на главной ссылается на /docs/components#<блок>.
+ * Таблица «что | как» с длинными описаниями (разделы студии, режим правки) — список определений:
+ * на телефоне таблица с абзацами в ячейках прокручивается вбок и не читается. Короткие таблицы
+ * (клавиши показа) остаются таблицами.
  */
-function rehypeComponentAnchors() {
-  /** @param {any} tree */
-  return (tree) => {
-    /** @param {any} node */
-    const walk = (node) => {
-      if (node.type === 'element' && /^h[2-4]$/.test(node.tagName)) {
-        const code = node.children?.find((/** @type {any} */ c) => c.type === 'element' && c.tagName === 'code');
-        if (code) {
-          const text = code.children?.map((/** @type {any} */ c) => c.value ?? '').join('');
-          if (text && /^[a-z0-9-]+$/.test(text)) node.properties.id = text;
+function rehypeFeatureLists() {
+  /** @param {any} n @returns {string} */
+  const text = (n) => (n.type === 'text' ? n.value : (n.children ?? []).map(text).join(''));
+  /** @param {any} node */
+  const walk = (node) => {
+    if (!node.children) return;
+    node.children = node.children.map((/** @type {any} */ child) => {
+      if (child.type === 'element' && child.tagName === 'table') {
+        const body = child.children.find((/** @type {any} */ c) => c.tagName === 'tbody');
+        const rows = (body?.children ?? []).filter((/** @type {any} */ r) => r.tagName === 'tr')
+          .map((/** @type {any} */ r) => r.children.filter((/** @type {any} */ c) => c.tagName === 'td'));
+        const long = rows.length && rows.every((/** @type {any[]} */ r) => r.length === 2)
+          && rows.reduce((/** @type {number} */ s, /** @type {any[]} */ r) => s + text(r[1]).length, 0) / rows.length > 90;
+        if (long) {
+          return {
+            type: 'element', tagName: 'dl', properties: { className: ['features'] },
+            children: rows.map((/** @type {any[]} */ [dt, dd]) => ({
+              type: 'element', tagName: 'div', properties: {},
+              children: [
+                { type: 'element', tagName: 'dt', properties: {}, children: dt.children },
+                { type: 'element', tagName: 'dd', properties: {}, children: dd.children },
+              ],
+            })),
+          };
         }
       }
-      node.children?.forEach(walk);
-    };
-    walk(tree);
+      walk(child);
+      return child;
+    });
   };
+  return walk;
 }
 
 const CYRILLIC = ['U+0301', 'U+0400-045F', 'U+0490-0491', 'U+04B0-04B1', 'U+2116'];
@@ -63,7 +79,7 @@ export default defineConfig({
       themes: { light: 'github-light', dark: 'github-dark' },
       defaultColor: 'light',
     },
-    processor: unified({ rehypePlugins: [rehypeComponentAnchors] }),
+    processor: unified({ rehypePlugins: [rehypeFeatureLists] }),
   },
   vite: {
     plugins: [tailwindcss()],
