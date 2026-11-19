@@ -22,6 +22,18 @@ test('вкладки листают кадры витрины', async ({ page })
   await expect(showcase.locator('[data-poster-count]')).toHaveText('4 из 14');
 });
 
+test('кадр витрины виден: сразу и после смены вкладки под курсором', async ({ page }) => {
+  const showcase = page.locator('[data-showcase]');
+  const poster = showcase.locator('[data-poster] img:visible');
+  const opacity = () => poster.evaluate((img) => Number(getComputedStyle(img).opacity));
+  await expect(poster).toHaveJSProperty('complete', true);
+  await expect.poll(opacity).toBe(1);
+  // щелчок по вкладке — курсор остаётся на витрине, автопрокрутка ждёт, а кадр всё равно появляется
+  await showcase.locator('[data-slide-tab="2"]').click();
+  await expect(poster).toHaveAttribute('src', /-3\.webp$/);
+  await expect.poll(opacity).toBe(1);
+});
+
 test('на первом экране нет кода: ни YAML, ни имён файлов данных', async ({ page }) => {
   const hero = page.locator('[data-hero]');
   await expect(hero.locator('pre, code')).toHaveCount(0);
@@ -65,14 +77,6 @@ test('окно докладчика запускается по щелчку и 
 
   await page.locator('[data-presenter-live]').click();
   await expect(page.frameLocator('[data-presenter-preview] iframe').locator('#ct')).toHaveText('5 / 14', { timeout: 15_000 });
-});
-
-test('пример: пункт оглавления запускает показ на этом слайде', async ({ page }) => {
-  const viewer = page.locator('[data-viewer]');
-  await viewer.scrollIntoViewIfNeeded();
-  await viewer.locator('[data-viewer-tab="4"]').click();
-  await expect(deckCounter(page, '[data-viewer] iframe')).toHaveText(/^5 из \d+$/);
-  await expect(viewer.locator('[data-viewer-tab="4"]')).toHaveAttribute('aria-current', 'true');
 });
 
 test('каталог блоков: группы и «Показать все»', async ({ page }) => {

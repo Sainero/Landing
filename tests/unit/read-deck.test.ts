@@ -1,4 +1,4 @@
-// Названия и заметки слайдов демо-презентаций: вкладки витрины и оглавление примера
+// Названия слайдов демо-презентаций: вкладки витрины
 import { describe, expect, it } from 'vitest';
 import engine from '../../content/engine.json';
 import { readDeck } from '@/entities/deck/lib/readDeck';
@@ -19,8 +19,4 @@ describe('readDeck', () => {
     }
   });
 
-  it('заметки докладчика берутся для оглавления примера', async () => {
-    const deck = await readDeck('microclimate');
-    expect(deck.slides.filter((s) => s.notes).length).toBeGreaterThan(3);
-  });
 });

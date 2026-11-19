@@ -7,8 +7,6 @@ export interface DeckSlideInfo {
   /** Название слайда: label, title или «Слайд N» */
   label: string;
   template: string;
-  /** Заметки докладчика */
-  notes?: string;
 }
 
 export interface DeckInfo {
@@ -18,8 +16,8 @@ export interface DeckInfo {
 }
 
 /**
- * Названия и заметки слайдов демо-презентации из content/decks/<имя>/deck.yaml (кладёт yarn sync:engine):
- * для вкладок витрины и оглавления примера. Сам YAML на сайте не показывается.
+ * Названия слайдов демо-презентации из content/decks/<имя>/deck.yaml (кладёт yarn sync:engine) — для вкладок
+ * витрины. Сам YAML на сайте не показывается.
  */
 export async function readDeck(name: string): Promise<DeckInfo> {
   const file = path.join(process.cwd(), 'content', 'decks', name, 'deck.yaml');
@@ -30,7 +28,6 @@ export async function readDeck(name: string): Promise<DeckInfo> {
     id: typeof data.id === 'string' ? data.id : undefined,
     label: String(data.label ?? data.title ?? `Слайд ${i + 1}`),
     template: String(data.template ?? 'content'),
-    notes: typeof data.notes === 'string' ? data.notes.trim() : undefined,
   }));
   return { name, title: String(doc.get('title') ?? name), slides };
 }

@@ -12,7 +12,7 @@ export const siteConfig = {
   name: 'Slideria',
   tagline: 'Презентации, которые живут',
   description:
-    'Slideria — презентации как данные: студия как PowerPoint, показ с окном докладчика и пультом на телефоне, экспорт в один HTML-файл, PowerPoint и PDF. Программа для компьютера и MCP для Claude.',
+    'Slideria — презентации как данные: студия как PowerPoint, показ с окном докладчика и пультом на телефоне, экспорт в один HTML-файл, PowerPoint и PDF. Программа для компьютера и MCP для ИИ-агентов.',
   cloudUrl,
   downloadUrl,
   engine,

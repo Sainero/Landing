@@ -123,12 +123,6 @@
 
 /* ---------- фирменные приёмы, общие с движком ---------- */
 
-/* Сетка из точек, как фон слайда 1280×720 */
-.dot-grid {
-  background-image: radial-gradient(var(--dot) 1px, transparent 1px);
-  background-size: 26px 26px;
-}
-
 .text-gradient {
   background: linear-gradient(100deg, var(--ac) 0%, var(--vi) 45%, var(--pk) 100%);
   -webkit-background-clip: text;
@@ -148,16 +142,67 @@
 .js [data-reveal] { opacity: 0; transform: translateY(22px); transition: opacity .8s var(--ease), transform .8s var(--ease); transition-delay: var(--d, 0s); }
 .js [data-reveal].in { opacity: 1; transform: none; }
 
-/* Расходящиеся кольца (как в шаблоне finale): HTML-круги, анимация только transform и opacity */
-.ring { position: absolute; inset: 0; border: 1.5px solid var(--ac); border-radius: 9999px; opacity: 0; will-change: transform, opacity; animation: ring 6s ease-out infinite; animation-delay: var(--d, 0s); }
-@keyframes ring { 0% { transform: scale(.25); opacity: .55; } 100% { transform: scale(1.6); opacity: 0; } }
-
-/* Импульс по линии */
-.pulse-x { animation: pulse-x 2.4s var(--ease) infinite; animation-delay: var(--d, 0s); }
-@keyframes pulse-x { from { left: 0; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } to { left: 100%; opacity: 0; } }
+/* Импульс по линии: дорожка во всю ширину линии сдвигается transform (проценты — от ширины дорожки) */
+.pulse-x { position: absolute; inset: 0; animation: pulse-x 2.4s var(--ease) infinite; animation-delay: var(--d, 0s); will-change: transform, opacity; }
+@keyframes pulse-x { from { transform: translateX(0); opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
 
 .marquee { animation: marquee 38s linear infinite; will-change: transform; }
 @keyframes marquee { to { transform: translateX(-50%); } }
+
+/* ---------- сцена: фон первого и финального экранов (StageBackdrop) ---------- */
+.stage {
+  --aurora-a: 30%; --aurora-b: 24%; --beam: 16%; --beam-core: 30%; --floor-line: color-mix(in srgb, var(--ac) 20%, transparent); --grain: .05;
+  position: absolute; inset: 0; z-index: -10; overflow: hidden; pointer-events: none;
+}
+:root[data-theme="dark"] .stage { --aurora-a: 46%; --aurora-b: 34%; --beam: 26%; --beam-core: 24%; --floor-line: color-mix(in srgb, var(--acb) 42%, transparent); --grain: .1; }
+/* Телефон: пол почти не виден, а слоёв на медленном процессоре лучше меньше; сияние стоит */
+@media (max-width: 767px) {
+  .stage-floor { display: none; }
+  .stage-aurora i { animation: none; }
+}
+.stage-aurora i { position: absolute; border-radius: 50%; will-change: transform; animation: drift-a 24s ease-in-out infinite alternate; }
+.stage-aurora i:nth-child(1) { width: 1100px; height: 720px; left: calc(50% - 1040px); top: -300px; background: radial-gradient(closest-side, color-mix(in srgb, var(--ac) var(--aurora-a), transparent), transparent); }
+.stage-aurora i:nth-child(2) { width: 960px; height: 640px; left: calc(50% + 20px); top: -260px; background: radial-gradient(closest-side, color-mix(in srgb, var(--pk) var(--aurora-b), transparent), transparent); animation-name: drift-b; animation-duration: 28s; }
+.stage-aurora i:nth-child(3) { width: 1300px; height: 600px; left: calc(50% - 650px); top: 180px; background: radial-gradient(closest-side, color-mix(in srgb, var(--vi) var(--aurora-b), transparent), transparent); animation-name: drift-c; animation-duration: 32s; }
+@keyframes drift-a { to { transform: translate3d(160px, 70px, 0) scale(1.12); } }
+@keyframes drift-b { to { transform: translate3d(-140px, 90px, 0) scale(1.18); } }
+@keyframes drift-c { to { transform: translate3d(60px, -60px, 0) scale(.9); } }
+/* Луч прожектора сверху: конус ±20° вниз, сердцевина светлее, края — в цвета бренда */
+.stage-beam {
+  position: absolute; left: 50%; top: -140px; width: 1800px; height: 1300px; margin-left: -900px;
+  background:
+    conic-gradient(from 172deg at 50% 0%, transparent 0deg, color-mix(in srgb, #fff var(--beam-core), transparent) 8deg, transparent 16deg),
+    conic-gradient(from 156deg at 50% 0%, transparent 0deg, color-mix(in srgb, var(--ac) var(--beam), transparent) 14deg, color-mix(in srgb, var(--vi) var(--beam), transparent) 24deg, color-mix(in srgb, var(--pk) var(--beam), transparent) 34deg, transparent 48deg);
+  mask-image: radial-gradient(ellipse 55% 75% at 50% 0%, #000 25%, transparent 78%);
+  animation: beam-breathe 9s ease-in-out infinite alternate; will-change: opacity;
+}
+@keyframes beam-breathe { from { opacity: .7; } to { opacity: 1; } }
+/* Пол-сетка: плоскость повёрнута к горизонту, тает вдали и по краям */
+.stage-floor {
+  position: absolute; left: 50%; bottom: 0; width: 2600px; height: 620px; margin-left: -1300px;
+  perspective: 560px; perspective-origin: 50% 0%;
+  mask-image: radial-gradient(ellipse 42% 100% at 50% 100%, #000 30%, transparent 78%);
+}
+.stage-floor > div {
+  position: absolute; inset: -120% 0 0 0; transform-origin: 50% 100%; transform: rotateX(72deg);
+  background-image: linear-gradient(to right, var(--floor-line) 1px, transparent 1px), linear-gradient(to bottom, var(--floor-line) 1px, transparent 1px);
+  background-size: 76px 76px; background-position: center bottom;
+}
+/* Плёночное зерно: готовая плитка шума 128 × 128 (не SVG-фильтр — тот рисуется на основном потоке) */
+.stage-grain { position: absolute; inset: 0; opacity: var(--grain); background: url('/textures/grain.png') repeat; background-size: 128px; }
+
+/* Окно витрины: по кромке бежит свет — под окном вращается конический градиент, видна только полоска в 1 px */
+.showcase-frame { position: relative; isolation: isolate; overflow: hidden; border-radius: 18px; padding: 1px; background: color-mix(in srgb, var(--bd2) 75%, transparent); box-shadow: var(--shadow-lg); }
+.showcase-edge {
+  position: absolute; left: 50%; top: 50%; z-index: -1; width: 130%; aspect-ratio: 1; translate: -50% -50%;
+  background: conic-gradient(from 0deg, transparent 0 60%, color-mix(in srgb, var(--ac) 85%, transparent) 72%, var(--pk) 80%, transparent 92%);
+  animation: edge-spin 10s linear infinite; will-change: transform;
+}
+:root[data-theme="dark"] .showcase-edge { background: conic-gradient(from 0deg, transparent 0 58%, var(--ac) 70%, #fff 76%, var(--pk) 82%, transparent 94%); }
+@keyframes edge-spin { to { transform: rotate(1turn); } }
+/* Отсвет под окном — как от экрана на сцене */
+.showcase-glow { position: absolute; inset: -8% -10% -16%; z-index: -1; background: radial-gradient(closest-side, color-mix(in srgb, var(--ac) 22%, transparent), color-mix(in srgb, var(--pk) 8%, transparent) 62%, transparent); }
+:root[data-theme="dark"] .showcase-glow { background: radial-gradient(closest-side, color-mix(in srgb, var(--ac) 42%, transparent), color-mix(in srgb, var(--pk) 20%, transparent) 62%, transparent); }
 
 /* Смена кадра витрины */
 .poster-in { animation: poster-in .35s ease both; }

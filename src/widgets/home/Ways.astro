@@ -14,7 +14,7 @@ const card = 'relative flex flex-col rounded-3xl border border-bd bg-surf p-6 sh
 ---
 <section id="how" data-anim class="relative py-24 sm:py-32">
   <Container>
-    <SectionHeading eyebrow="С чего начать" lead="Принесите готовую презентацию, соберите её в студии или попросите Claude. Дальше всё одинаково: правка, показ, экспорт.">
+    <SectionHeading eyebrow="С чего начать" lead="Принесите готовую презентацию, соберите её в студии или поручите агенту. Дальше всё одинаково: правка, показ, экспорт.">
       <Fragment slot="title">Три способа сделать презентацию</Fragment>
     </SectionHeading>
 
@@ -36,7 +36,7 @@ const card = 'relative flex flex-col rounded-3xl border border-bd bg-surf p-6 sh
       <article data-reveal class={card} style="--d:.1s">
         <span class="grid size-12 place-items-center rounded-2xl bg-[linear-gradient(135deg,var(--vi),var(--pk))] text-white shadow-[0_10px_30px_-8px_var(--pk)]"><Sparkles class="size-6" /></span>
         <h3 class="mt-5 text-xl font-bold text-tx">Из Claude Design и HTML</h3>
-        <p class="mt-2 text-[15px] leading-relaxed text-mu">Каркас нарисовали мышью или Claude сверстал в чате — импорт превратит слайды в редактируемые или оставит живыми, со скриптами как есть.</p>
+        <p class="mt-2 text-[15px] leading-relaxed text-mu">Каркас нарисовали мышью или ИИ сверстал презентацию в чате — импорт превратит слайды в редактируемые или оставит живыми, со скриптами как есть.</p>
         <div class="mt-auto grid grid-cols-2 gap-2 pt-6 text-[12.5px]">
           <div class="rounded-xl border border-bd bg-alt/60 p-3"><b class="block text-tx">Редактируемые</b><span class="text-mu">почти 1:1, тексты правятся на месте</span></div>
           <div class="rounded-xl border border-bd bg-alt/60 p-3"><b class="block text-tx">Живые</b><span class="text-mu">1:1, скрипты файла работают</span></div>
@@ -46,7 +46,7 @@ const card = 'relative flex flex-col rounded-3xl border border-bd bg-surf p-6 sh
       <article data-reveal class={card} style="--d:.2s">
         <span class="grid size-12 place-items-center rounded-2xl bg-[linear-gradient(135deg,var(--ac),var(--cy))] text-white shadow-[0_10px_30px_-8px_var(--cy)]"><Bot class="size-6" /></span>
         <h3 class="mt-5 text-xl font-bold text-tx">Попросите агента</h3>
-        <p class="mt-2 text-[15px] leading-relaxed text-mu">Опишите, что нужно, — Claude соберёт слайды родными блоками: схемы, графики, таблицы. Прямо в студии или из Claude Desktop и Claude Code.</p>
+        <p class="mt-2 text-[15px] leading-relaxed text-mu">Опишите, что нужно, — агент соберёт слайды родными блоками: схемы, графики, таблицы. Прямо в студии или из вашего агента по MCP: Claude, Codex, Cursor и других.</p>
         <div class="mt-auto flex flex-col gap-2 pt-6 text-[13px]">
           <div class="ml-auto max-w-[90%] rounded-2xl rounded-br-md bg-ac px-3.5 py-2.5 text-white">Сделай 10 слайдов по итогам квартала: выручка, клиенты, планы</div>
           <div class="max-w-[90%] rounded-2xl rounded-bl-md border border-bd bg-alt/60 px-3.5 py-2.5 text-tx2">Готово: титул, 3 графика, Гант и финал. Проверил каждый слайд картинкой.</div>
@@ -57,8 +57,8 @@ const card = 'relative flex flex-col rounded-3xl border border-bd bg-surf p-6 sh
     <!-- путь презентации, как на втором слайде витрины -->
     <ol data-reveal class="relative mx-auto mt-16 grid max-w-4xl grid-cols-5 gap-2">
       <div aria-hidden="true" class="absolute left-[10%] right-[10%] top-[15px] h-px bg-gradient-to-r from-ac via-vi to-pk opacity-50">
-        <span class="pulse-x absolute -top-[3px] size-[7px] rounded-full bg-ac shadow-[0_0_12px_var(--ac)]"></span>
-        <span class="pulse-x absolute -top-[3px] size-[7px] rounded-full bg-pk shadow-[0_0_12px_var(--pk)]" style="--d:1.2s"></span>
+        <span class="pulse-x"><i class="absolute -left-[3px] -top-[3px] size-[7px] rounded-full bg-ac shadow-[0_0_12px_var(--ac)]"></i></span>
+        <span class="pulse-x" style="--d:1.2s"><i class="absolute -left-[3px] -top-[3px] size-[7px] rounded-full bg-pk shadow-[0_0_12px_var(--pk)]"></i></span>
       </div>
       {path.map((p, i) => (
         <li class="relative flex flex-col items-center text-center">

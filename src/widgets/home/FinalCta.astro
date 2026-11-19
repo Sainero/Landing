@@ -5,14 +5,12 @@ import CloudLink from '@/entities/cloud/CloudLink.astro';
 import Button from '@/shared/ui-kit/Button.astro';
 import Container from '@/shared/ui-kit/Container.astro';
 import LogoMark from '@/shared/ui-kit/LogoMark.astro';
+import StageBackdrop from '@/shared/ui-kit/StageBackdrop.astro';
 
 const title = ['Презентации,', 'которые', 'живут'];
 ---
 <section data-anim class="relative isolate overflow-hidden py-28 sm:py-36">
-  <div aria-hidden="true" class="pointer-events-none absolute left-1/2 top-[calc(28%+80px)] -z-10 size-[620px] -translate-x-1/2 -translate-y-1/2">
-    {[0, 1.5, 3, 4.5].map((d) => <span class="ring" style={`--d:${d}s`}></span>)}
-  </div>
-  <div aria-hidden="true" class="dot-grid pointer-events-none absolute inset-0 -z-20 [mask-image:radial-gradient(ellipse_50%_60%_at_50%_45%,#000,transparent)]"></div>
+  <StageBackdrop />
 
   <Container class="flex flex-col items-center text-center">
     <div data-reveal class="rounded-[26px] shadow-[0_0_0_12px_color-mix(in_srgb,var(--ac)_8%,transparent),0_14px_40px_-8px_rgba(37,99,235,.5)]">

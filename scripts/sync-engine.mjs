@@ -27,9 +27,9 @@ import { dropDeadAnchors, fixLinks, forUsers, keepSections, section } from './li
 
 const root = process.cwd();
 const engine = path.resolve(process.env.SLIDERIA_DIR ?? path.join(root, '..', 'HTMLPPTX'));
-const DECKS = (process.env.DECKS ?? 'slideria,microclimate').split(',').map((s) => s.trim()).filter(Boolean);
+const DECKS = (process.env.DECKS ?? 'slideria').split(',').map((s) => s.trim()).filter(Boolean);
 /** Чьи кадры нужны: all — каждого слайда (витрина на первом экране), first — только первого */
-const POSTERS = { slideria: { slides: 'all', presenter: true }, microclimate: { slides: 'first' } };
+const POSTERS = { slideria: { slides: 'all', presenter: true } };
 const args = new Set(process.argv.slice(2));
 
 if (!fs.existsSync(path.join(engine, 'package.json'))) {

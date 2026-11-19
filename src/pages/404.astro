@@ -1,10 +1,11 @@
 ---
 import SiteLayout from '@/app/layouts/SiteLayout.astro';
 import Button from '@/shared/ui-kit/Button.astro';
+import StageBackdrop from '@/shared/ui-kit/StageBackdrop.astro';
 ---
 <SiteLayout title="Страница не найдена">
-  <section class="relative grid min-h-[80dvh] place-items-center overflow-hidden px-4 pt-24 text-center">
-    <div aria-hidden="true" class="dot-grid absolute inset-0 -z-10 [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000,transparent)]"></div>
+  <section data-anim class="relative isolate grid min-h-[80dvh] place-items-center overflow-hidden px-4 pt-24 text-center">
+    <StageBackdrop />
     <div class="flex flex-col items-center">
       <div class="font-mono text-sm text-mu">слайд не найден</div>
       <h1 class="mt-3 text-[clamp(80px,18vw,180px)] font-extrabold leading-none tracking-[-.06em] text-gradient">404</h1>
