@@ -1,7 +1,7 @@
 ---
 /**
- * Просмотр готовой презентации: список слайдов слева, сама презентация справа.
- * Фрейм грузится лениво, когда секция доходит до экрана.
+ * Просмотр готовой презентации: список слайдов слева, справа — кадр первого слайда,
+ * а по щелчку (на кадр, кнопку или пункт списка) — сама презентация.
  */
 import { deckSize, sizeLabel } from '@/shared/lib/config';
 import { readDeck } from '../lib/readDeck';
@@ -9,10 +9,10 @@ import { readDeck } from '../lib/readDeck';
 interface Props { deck: string; class?: string }
 const { deck: name, class: cls } = Astro.props;
 const deck = await readDeck(name);
-const size = deckSize(name);
+const size = sizeLabel(deckSize(name));
 const TEMPLATE: Record<string, string> = { canvas: 'холст', content: 'обычный слайд', cover: 'титульный', finale: 'финальный', space: 'космический финал' };
 ---
-<div data-viewer={name} class:list={['grid grid-cols-[minmax(0,1fr)] items-start gap-4 lg:grid-cols-[300px_minmax(0,1fr)]', cls]}>
+<div data-viewer={name} data-title={deck.title} class:list={['grid grid-cols-[minmax(0,1fr)] items-start gap-4 lg:grid-cols-[300px_minmax(0,1fr)]', cls]}>
   <ol class="order-2 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] lg:order-1 lg:max-h-[620px] lg:flex-col lg:overflow-y-auto lg:overflow-x-visible lg:pr-1 lg:[scrollbar-width:thin]">
     {deck.slides.map((s, i) => (
       <li class="shrink-0 lg:shrink">
@@ -33,35 +33,63 @@ const TEMPLATE: Record<string, string> = { canvas: 'холст', content: 'об�
   </ol>
   <div class="order-1 overflow-hidden rounded-2xl border border-bd2/70 bg-surf shadow-[var(--shadow-lg)] lg:order-2">
     <div class="flex items-center gap-3 border-b border-bd px-4 py-2.5">
-      <span class="flex gap-1.5"><i class="size-2.5 rounded-full bg-bd2"></i><i class="size-2.5 rounded-full bg-bd2"></i><i class="size-2.5 rounded-full bg-bd2"></i></span>
-      <span class="truncate font-mono text-[11.5px] text-mu">{name}.html · {deck.slides.length} слайдов · {sizeLabel(size)}</span>
+      <span class="flex gap-1.5" aria-hidden="true"><i class="size-2.5 rounded-full bg-bd2"></i><i class="size-2.5 rounded-full bg-bd2"></i><i class="size-2.5 rounded-full bg-bd2"></i></span>
+      <span class="truncate font-mono text-[11.5px] text-mu">{name}.html · {deck.slides.length} слайдов · {size}</span>
       <a href={`/demo/${name}.html`} target="_blank" rel="noopener" class="ml-auto shrink-0 rounded-md px-2 py-1 text-[12px] font-semibold text-ac hover:bg-acs">Открыть отдельно ↗</a>
     </div>
     <div class="[container-type:inline-size]">
-      <div class="h-[calc(56px+56.25cqw)]">
-        <iframe data-deck={name} src={`/demo/${name}.html#1`} title={`Презентация: ${deck.title}`} loading="lazy" class="block h-full w-full border-0 bg-alt" allow="fullscreen"></iframe>
+      <div data-stage class="relative h-[calc(56px+56.25cqw)] bg-alt">
+        <button type="button" data-poster class="absolute inset-x-0 top-0 block aspect-video w-full cursor-pointer overflow-hidden" aria-label={`Запустить показ: ${deck.title}`}>
+          <img src={`/demo/posters/${name}/light-1.webp`} width="1280" height="720" alt="" loading="lazy" decoding="async" class="block size-full object-cover dark:hidden" />
+          <img src={`/demo/posters/${name}/dark-1.webp`} width="1280" height="720" alt="" loading="lazy" decoding="async" class="hidden size-full object-cover dark:block" />
+        </button>
+        <div data-poster-bar class="absolute inset-x-0 bottom-0 flex h-14 items-center gap-3 border-t border-bd bg-surf px-4">
+          <span class="font-mono text-[12px] text-mu">1 из {deck.slides.length}</span>
+          <button type="button" data-live-start class="mx-auto inline-flex h-9 items-center gap-2 rounded-xl bg-ac px-4 text-[14px] font-semibold text-white transition hover:bg-ach disabled:opacity-70">
+            <svg viewBox="0 0 24 24" class="size-4" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>
+            <span data-live-label>Запустить показ</span>
+          </button>
+          <span class="font-mono text-[11px] text-mu max-sm:hidden">{size}</span>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
 <script>
+  import { createDeckFrame } from '../lib/live';
   import { readEnvelope, send } from '../lib/protocol';
 
   document.querySelectorAll<HTMLElement>('[data-viewer]').forEach((viewer) => {
     const deck = viewer.dataset.viewer!;
-    const frame = viewer.querySelector<HTMLIFrameElement>('iframe')!;
+    const stage = viewer.querySelector<HTMLElement>('[data-stage]')!;
     const tabs = [...viewer.querySelectorAll<HTMLButtonElement>('[data-viewer-tab]')];
+    let frame: HTMLIFrameElement | null = null;
     const mark = (i: number) => tabs.forEach((t, k) => (k === i ? t.setAttribute('aria-current', 'true') : t.removeAttribute('aria-current')));
+
+    const goLive = (i: number) => {
+      if (frame) return;
+      const btn = viewer.querySelector<HTMLButtonElement>('[data-live-start]')!;
+      btn.disabled = true;
+      viewer.querySelector('[data-live-label]')!.textContent = 'Загрузка…';
+      frame = createDeckFrame(deck, i, `Презентация: ${viewer.dataset.title}`, () => {
+        viewer.querySelector('[data-poster]')?.remove();
+        viewer.querySelector('[data-poster-bar]')?.remove();
+      });
+      stage.append(frame);
+    };
+
+    viewer.querySelector('[data-live-start]')!.addEventListener('click', () => goLive(0));
+    viewer.querySelector('[data-poster]')!.addEventListener('click', () => goLive(0));
     tabs.forEach((t, i) => t.addEventListener('click', () => {
-      send(frame.contentWindow, deck, { type: 'goto', index: i });
       mark(i);
+      if (frame) send(frame.contentWindow, deck, { type: 'goto', index: i });
+      else goLive(i);
     }));
     addEventListener('message', (e) => {
-      if (e.source !== frame.contentWindow) return;
+      if (!frame || e.source !== frame.contentWindow) return;
       const msg = readEnvelope(e.data, deck);
       if (msg?.type === 'state') mark(msg.index);
     });
-    frame.addEventListener('load', () => send(frame.contentWindow, deck, { type: 'hello' }));
   });
 </script>

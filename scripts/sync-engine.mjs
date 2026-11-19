@@ -2,7 +2,14 @@
 //   - собранные демо-презентации (для показа, компактные) → public/demo/<имя>.html
 //   - их deck.yaml (для показа кода)                    → content/decks/<имя>/deck.yaml
 //   - README, справочник компонентов и MCP              → content/docs/*.md (раздел /docs)
+//   - кадры слайдов и окна докладчика (светлые и тёмные)  → public/demo/posters/<имя>/*.webp
 //   - версия программы                                  → content/engine.json
+//
+// Кадры нужны, чтобы страница не запускала тяжёлые презентации сразу: до щелчка «Запустить показ»
+// вместо них — картинки. Снимаются в режиме снимка проигрывателя (?shot=…, как для агента в Slideria)
+// через Playwright из репозитория Slideria; на Windows — установленный Microsoft Edge, как в его тестах.
+// Другой браузер: SLIDERIA_CHROME=/путь/к/chrome. Флаги: --skip-build — не пересобирать презентации,
+// --no-posters — не снимать кадры (останутся прежние).
 //
 // Лендинг не зависит от кода Slideria: в репозиторий кладутся только результаты.
 // Ссылки на файлы репозитория из документации убираются: на сайте остаётся только текст.
@@ -11,11 +18,17 @@
 //         SLIDERIA_DIR=/path/to/repo yarn sync:engine
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
+import { createRequire } from 'node:module';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
+import sharp from 'sharp';
 
 const root = process.cwd();
 const engine = path.resolve(process.env.SLIDERIA_DIR ?? path.join(root, '..', 'HTMLPPTX'));
 const DECKS = (process.env.DECKS ?? 'slideria,microclimate').split(',').map((s) => s.trim()).filter(Boolean);
+/** Чьи кадры нужны: all — каждого слайда (витрина на первом экране), first — только первого */
+const POSTERS = { slideria: { slides: 'all', presenter: true }, microclimate: { slides: 'first' } };
+const args = new Set(process.argv.slice(2));
 
 if (!fs.existsSync(path.join(engine, 'package.json'))) {
   console.error(`Не найден репозиторий Slideria: ${engine}\nУкажите путь: SLIDERIA_DIR=/path/to/repo yarn sync:engine`);
@@ -37,16 +50,88 @@ if (!fs.existsSync(path.join(engine, 'node_modules'))) {
   console.log('… устанавливаю зависимости Slideria (без загрузки Electron)');
   run('yarn', ['install', '--frozen-lockfile'], { ELECTRON_SKIP_BINARY_DOWNLOAD: '1' });
 }
-console.log(`… собираю презентации: ${DECKS.join(', ')}`);
-// --clean — без режима правки (файл легче), --compact — картинки в WebP
-run('node', ['scripts/build.mjs', ...DECKS, '--clean', '--compact']);
+if (!args.has('--skip-build')) {
+  console.log(`… собираю презентации: ${DECKS.join(', ')}`);
+  // --clean — без режима правки (файл легче), --compact — картинки в WebP
+  run('node', ['scripts/build.mjs', ...DECKS, '--clean', '--compact']);
+}
 
 const decks = [];
 for (const name of DECKS) {
   const html = path.join(engine, 'dist', `${name}.show.html`);
   write(path.join(root, 'public', 'demo', `${name}.html`), fs.readFileSync(html));
   write(path.join(root, 'content', 'decks', name, 'deck.yaml'), fs.readFileSync(path.join(engine, 'presentations', name, 'deck.yaml')));
-  decks.push({ name, sizeKb: Math.round(fs.statSync(html).size / 1024) });
+  const yaml = fs.readFileSync(path.join(engine, 'presentations', name, 'deck.yaml'), 'utf8');
+  const slides = (yaml.split(/^slides:\s*$/m)[1] ?? '').match(/^  - /gm)?.length ?? 0;
+  decks.push({ name, sizeKb: Math.round(fs.statSync(html).size / 1024), slides });
+}
+
+if (!args.has('--no-posters')) await shootPosters();
+
+// ---------- кадры ----------
+async function launchBrowser() {
+  const req = createRequire(path.join(engine, 'package.json'));
+  let pw;
+  try { pw = req('@playwright/test'); } catch { try { pw = req('playwright'); } catch { return null; } }
+  const opts = { headless: true };
+  if (process.env.SLIDERIA_CHROME) opts.executablePath = process.env.SLIDERIA_CHROME;
+  else if (process.platform === 'win32') opts.channel = 'msedge';
+  try {
+    return await pw.chromium.launch(opts);
+  } catch (e) {
+    console.warn(`! браузер для кадров не запустился: ${String(e.message).split('\n')[0]}`);
+    return null;
+  }
+}
+
+async function webp(png, file) {
+  await sharp(png).webp({ quality: 74, effort: 6 }).toFile(file);
+  console.log(`✓ ${rel(file)}`);
+}
+
+async function shootPosters() {
+  const browser = await launchBrowser();
+  if (!browser) {
+    console.warn('! кадры не сняты: нужен Playwright из репозитория Slideria (yarn install там) — остались прежние');
+    return;
+  }
+  try {
+    for (const [name, want] of Object.entries(POSTERS)) {
+      if (!decks.find((d) => d.name === name)) continue;
+      const file = pathToFileURL(path.join(engine, 'dist', `${name}.show.html`)).href;
+      const out = path.join(root, 'public', 'demo', 'posters', name);
+      fs.rmSync(out, { recursive: true, force: true });
+      fs.mkdirSync(out, { recursive: true });
+      const count = want.slides === 'all' ? decks.find((d) => d.name === name).slides : 1;
+      for (const look of ['light', 'dark']) {
+        // Снимается настоящий показ, а не режим снимка ?shot: в нём не применяется акцент темы презентации.
+        // Окно 1280 × 776 — сцена ровно 1280 × 720 над панелью показа; рамка и панель скрыты.
+        // Каждый слайд — в отдельном контексте браузера: после другого слайда живые вставки
+        // (частицы на «Спасибо») не запускаются
+        const open = async (url, viewport) => {
+          const ctx = await browser.newContext({ viewport, colorScheme: look });
+          const page = await ctx.newPage();
+          await page.goto(url);
+          await page.addStyleTag({ content: '.stage{border:0!important;border-radius:0!important;box-shadow:none!important}.navbar,.progress-top{display:none!important}' });
+          await page.waitForTimeout(3000); // анимации появления доигрывают
+          return { ctx, page };
+        };
+        for (let k = 0; k < count; k++) {
+          const { ctx, page } = await open(`${file}#${k + 1}`, { width: 1280, height: 776 });
+          await webp(await page.screenshot({ type: 'png', clip: { x: 0, y: 0, width: 1280, height: 720 } }), path.join(out, `${look}-${k + 1}.webp`));
+          await ctx.close();
+        }
+        if (want.presenter) {
+          // Окно докладчика, второй слайд — чтобы были видны и текущий, и следующий
+          const { ctx, page } = await open(`${file}?view=presenter#2`, { width: 1280, height: 760 });
+          await webp(await page.screenshot({ type: 'png' }), path.join(out, `presenter-${look}.webp`));
+          await ctx.close();
+        }
+      }
+    }
+  } finally {
+    await browser.close();
+  }
 }
 
 // ---------- документация ----------

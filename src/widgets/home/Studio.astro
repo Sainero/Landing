@@ -1,6 +1,9 @@
 ---
 import { Bot, Code, SquareFunction, Palette, Search, Shapes } from '@lucide/astro';
+import studioDark from '@/assets/shots/studio-dark.webp';
+import studioLight from '@/assets/shots/studio-light.webp';
 import Container from '@/shared/ui-kit/Container.astro';
+import Shot from '@/shared/ui-kit/Shot.astro';
 import SectionHeading from '@/shared/ui-kit/SectionHeading.astro';
 
 const callouts = [
@@ -27,13 +30,12 @@ const more = [
     />
 
     <div data-reveal class="relative mx-auto mt-14 max-w-[1100px]">
-      <div aria-hidden="true" class="absolute -inset-x-16 -top-10 bottom-10 -z-10 bg-[radial-gradient(closest-side,color-mix(in_srgb,var(--vi)_22%,transparent),transparent)] blur-2xl"></div>
+      <div aria-hidden="true" class="absolute -inset-x-16 -top-10 bottom-10 -z-10 bg-[radial-gradient(closest-side,color-mix(in_srgb,var(--vi)_22%,transparent),transparent)]"></div>
       <figure class="overflow-hidden rounded-2xl border border-bd2/70 bg-surf shadow-[var(--shadow-lg)]">
-        <img src="/shots/studio-light.webp" width="2200" height="1375" alt="Студия Slideria: лента, миниатюры слайдов, слайд, свойства и заметки докладчика" loading="lazy" decoding="async" class="block h-auto w-full dark:hidden" />
-        <img src="/shots/studio-dark.webp" width="2200" height="1375" alt="" aria-hidden="true" loading="lazy" decoding="async" class="hidden h-auto w-full dark:block" />
+        <Shot light={studioLight} dark={studioDark} alt="Студия Slideria: лента, миниатюры слайдов, слайд, свойства и заметки докладчика" />
       </figure>
       {callouts.map((c, i) => (
-        <span class:list={['float-y absolute hidden items-center gap-2 rounded-full border border-bd bg-surf/95 px-3 py-1.5 text-[12.5px] font-semibold text-tx shadow-[var(--shadow-md)] backdrop-blur lg:inline-flex', c.cls]} style={`--d:${-i * 1.7}s`}>
+        <span class:list={['absolute hidden items-center gap-2 rounded-full border border-bd bg-surf px-3 py-1.5 text-[12.5px] font-semibold text-tx shadow-[var(--shadow-md)] lg:inline-flex', c.cls]}>
           <span class="grid size-5 place-items-center rounded-full bg-ac font-mono text-[10.5px] text-white">{i + 1}</span>{c.label}
         </span>
       ))}

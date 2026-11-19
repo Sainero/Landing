@@ -2,12 +2,14 @@
 import { Download, Globe, Plug, Workflow } from '@lucide/astro';
 import CloudLink from '@/entities/cloud/CloudLink.astro';
 import { isCloudLive } from '@/shared/lib/config';
+import studioDark from '@/assets/shots/studio-dark.webp';
 import Container from '@/shared/ui-kit/Container.astro';
+import Shot from '@/shared/ui-kit/Shot.astro';
 
 // Звёзды как в шаблоне space: детерминированный генератор, одинаково при каждой сборке
 let seed = 7;
 const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-const stars = Array.from({ length: 90 }, () => ({ x: rnd() * 100, y: rnd() * 100, s: 0.6 + rnd() * 1.6, d: rnd() * 4 }));
+const stars = Array.from({ length: 90 }, () => ({ x: rnd() * 100, y: rnd() * 100, s: 0.6 + rnd() * 1.6 }));
 
 const features = [
   { icon: Globe, title: 'Студия без установки', text: 'Тот же сервер и та же студия, что в программе, — открываются по адресу в браузере.' },
@@ -22,19 +24,20 @@ const roadmap = [
   { stage: 'Этап 3', title: 'Облако', text: 'Студия по адресу, вход, коннектор для Claude, данные из сервисов', state: 'В планах' },
 ];
 ---
-<section id="cloud" class="relative isolate overflow-hidden bg-[#05070F] py-24 text-[#E6EBF3] sm:py-32">
+<section id="cloud" data-anim class="relative isolate overflow-hidden bg-[#05070F] py-24 text-[#E6EBF3] sm:py-32">
   <!-- космос: звёзды, туманности, луч -->
   <div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10">
     <div class="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_20%_10%,rgba(37,99,235,.28),transparent),radial-gradient(ellipse_50%_40%_at_85%_80%,rgba(236,72,153,.18),transparent),radial-gradient(ellipse_40%_30%_at_70%_15%,rgba(99,102,241,.22),transparent)]"></div>
-    {stars.map((s) => (
-      <i class="absolute animate-pulse rounded-full bg-white" style={`left:${s.x.toFixed(1)}%;top:${s.y.toFixed(1)}%;width:${s.s.toFixed(1)}px;height:${s.s.toFixed(1)}px;opacity:${(0.3 + s.s / 3).toFixed(2)};animation-delay:${s.d.toFixed(2)}s;animation-duration:${(3 + s.d).toFixed(1)}s`}></i>
-    ))}
+    <!-- звёзды — одна статичная картинка, а не 90 мигающих слоёв -->
+    <svg class="absolute inset-0 size-full">
+      {stars.map((s) => <circle cx={`${s.x.toFixed(1)}%`} cy={`${s.y.toFixed(1)}%`} r={(s.s / 2).toFixed(2)} fill="#fff" opacity={(0.3 + s.s / 3).toFixed(2)} />)}
+    </svg>
     <div class="beam absolute inset-y-0 left-0 w-56 bg-gradient-to-r from-transparent via-[rgba(147,197,253,.07)] to-transparent"></div>
   </div>
 
   <Container>
     <div data-reveal class="mx-auto flex max-w-3xl flex-col items-center text-center">
-      <span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-[12px] font-bold uppercase tracking-[.16em] text-white/80 backdrop-blur">
+      <span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-[12px] font-bold uppercase tracking-[.16em] text-white/80">
         <span class="size-1.5 rounded-full bg-[#6EE7B7] shadow-[0_0_10px_#6EE7B7]"></span> Slideria Cloud · {isCloudLive ? 'открыто' : 'скоро'}
       </span>
       <h2 class="font-display mt-6 text-balance text-[clamp(30px,5vw,58px)] font-bold leading-[1.06] tracking-[-.04em]">
@@ -52,21 +55,21 @@ const roadmap = [
 
     <!-- студия в окне браузера -->
     <div data-reveal class="relative mx-auto mt-16 max-w-5xl" style="--d:.1s">
-      <div aria-hidden="true" class="absolute -inset-x-10 -top-10 bottom-0 -z-10 bg-[radial-gradient(closest-side,rgba(59,130,246,.35),transparent)] blur-2xl"></div>
+      <div aria-hidden="true" class="absolute -inset-x-10 -top-10 bottom-0 -z-10 bg-[radial-gradient(closest-side,rgba(59,130,246,.35),transparent)]"></div>
       <figure class="overflow-hidden rounded-2xl border border-white/10 bg-[#0B1120] shadow-[0_40px_120px_-30px_rgba(37,99,235,.55)]">
         <div class="flex items-center gap-3 border-b border-white/10 px-4 py-2.5">
           <span class="flex gap-1.5"><i class="size-2.5 rounded-full bg-white/15"></i><i class="size-2.5 rounded-full bg-white/15"></i><i class="size-2.5 rounded-full bg-white/15"></i></span>
           <span class="mx-auto rounded-lg bg-white/5 px-3 py-1 font-mono text-[11.5px] text-white/50">app.slideria…/<b class="text-white/80">studio</b></span>
         </div>
-        <img src="/shots/studio-dark.webp" width="2200" height="1375" alt="Студия Slideria в тёмной теме" loading="lazy" decoding="async" class="block h-auto w-full" />
+        <Shot light={studioDark} alt="Студия Slideria в тёмной теме" sizes="(min-width: 1060px) 1024px, 100vw" />
       </figure>
-      <p class="mt-4 text-center text-[12.5px] text-white/40">Так студия выглядит сейчас в программе. В облаке — она же.</p>
+      <p class="mt-4 text-center text-[12.5px] text-white/60">Так студия выглядит сейчас в программе. В облаке — она же.</p>
     </div>
 
     <!-- Что будет в облаке -->
     <div class="mt-20 grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {features.map((f, i) => (
-        <div data-reveal class="rounded-2xl border border-white/10 bg-white/[.03] p-5 backdrop-blur transition hover:border-white/20 hover:bg-white/[.06]" style={`--d:${(i % 4) * 0.06}s`}>
+        <div data-reveal class="rounded-2xl border border-white/10 bg-white/[.03] p-5 transition hover:border-white/20 hover:bg-white/[.06]" style={`--d:${(i % 4) * 0.06}s`}>
           <span class="grid size-10 place-items-center rounded-xl bg-[#3B82F6]/15 text-[#93C5FD]"><f.icon class="size-5" /></span>
           <h3 class="mt-4 text-[16px] font-bold">{f.title}</h3>
           <p class="mt-1.5 text-[14px] leading-relaxed text-white/60">{f.text}</p>
@@ -82,7 +85,7 @@ const roadmap = [
           <span class:list={['relative z-10 grid size-[42px] place-items-center rounded-full border-2 text-[13px] font-bold', r.done ? 'border-[#3B82F6] bg-[#3B82F6] text-white shadow-[0_0_24px_rgba(59,130,246,.7)]' : 'border-white/20 bg-[#05070F] text-white/60']}>
             {r.done ? '✓' : i + 1}
           </span>
-          <div class="mt-4 text-[12px] font-bold uppercase tracking-[.14em] text-white/45">{r.stage} · <span class={r.done ? 'text-[#6EE7B7]' : 'text-white/60'}>{r.state}</span></div>
+          <div class="mt-4 text-[12px] font-bold uppercase tracking-[.14em] text-white/60">{r.stage} · <span class={r.done ? 'text-[#6EE7B7]' : 'text-white/60'}>{r.state}</span></div>
           <h3 class="mt-1 text-lg font-bold">{r.title}</h3>
           <p class="mt-1 text-[14px] leading-relaxed text-white/60">{r.text}</p>
         </li>

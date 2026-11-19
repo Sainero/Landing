@@ -1,27 +1,38 @@
 ---
 /**
- * Настоящее окно докладчика движка (tour.html?view=presenter), уменьшенное до карточки.
- * Оно само находит презентацию на первом экране через BroadcastChannel и листается вместе с ней.
+ * Окно докладчика Slideria в карточке. До щелчка — кадр, после — настоящее окно (?view=presenter),
+ * уменьшенное до карточки. Оно само находит презентацию на первом экране через BroadcastChannel
+ * и листается вместе с ней, если та тоже запущена.
  */
 interface Props { deck: string; class?: string }
 const { deck, class: cls } = Astro.props;
 ---
-<div data-presenter-preview class:list={['relative aspect-[1280/760] overflow-hidden', cls]}>
-  <iframe
-    src={`/demo/${deck}.html?view=presenter#1`}
-    title="Окно докладчика"
-    loading="lazy"
-    tabindex="-1"
-    aria-hidden="true"
-    class="pointer-events-none absolute left-0 top-0 h-[760px] w-[1280px] origin-top-left border-0 bg-alt"
-  ></iframe>
+<div data-presenter-preview={deck} class:list={['relative aspect-[1280/760] overflow-hidden bg-alt', cls]}>
+  <img src={`/demo/posters/${deck}/presenter-light.webp`} width="1280" height="760" alt="" loading="lazy" decoding="async" class="absolute inset-0 size-full object-cover dark:hidden" />
+  <img src={`/demo/posters/${deck}/presenter-dark.webp`} width="1280" height="760" alt="" loading="lazy" decoding="async" class="absolute inset-0 hidden size-full object-cover dark:block" />
+  <button type="button" data-presenter-live class="group/pl absolute inset-0 z-20 grid cursor-pointer place-items-center bg-transparent transition hover:bg-black/5">
+    <span class="inline-flex items-center gap-2 rounded-full bg-ac px-4 py-2 text-[14px] font-semibold text-white shadow-[0_10px_30px_-8px_rgba(37,99,235,.8)] transition group-hover/pl:bg-ach">
+      <svg viewBox="0 0 24 24" class="size-4" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>
+      <span data-presenter-label>Открыть живое окно</span>
+    </span>
+  </button>
 </div>
 
 <script>
   document.querySelectorAll<HTMLElement>('[data-presenter-preview]').forEach((box) => {
-    const frame = box.querySelector('iframe')!;
-    const fit = () => { frame.style.transform = `scale(${box.clientWidth / 1280})`; };
-    new ResizeObserver(fit).observe(box);
-    fit();
+    const btn = box.querySelector<HTMLButtonElement>('[data-presenter-live]')!;
+    btn.addEventListener('click', () => {
+      btn.disabled = true;
+      box.querySelector('[data-presenter-label]')!.textContent = 'Загрузка…';
+      const frame = document.createElement('iframe');
+      frame.src = `/demo/${box.dataset.presenterPreview}.html?view=presenter#2`;
+      frame.title = 'Окно докладчика';
+      frame.className = 'absolute left-0 top-0 z-10 h-[760px] w-[1280px] origin-top-left border-0 bg-alt opacity-0 transition-opacity duration-300';
+      const fit = () => { frame.style.transform = `scale(${box.clientWidth / 1280})`; };
+      new ResizeObserver(fit).observe(box);
+      fit();
+      frame.addEventListener('load', () => window.setTimeout(() => { frame.classList.remove('opacity-0'); btn.remove(); }, 400), { once: true });
+      box.append(frame);
+    }, { once: true });
   });
 </script>

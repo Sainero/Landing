@@ -55,3 +55,13 @@ menu?.addEventListener('click', (e) => {
   const t = e.target as HTMLElement;
   if (t === menu || t.closest('[data-menu-close]') || t.closest('a')) menu.close();
 });
+
+// --- секции с бесконечными анимациями за экраном стоят ([data-anim] → [data-paused]) ---
+const animated = [...document.querySelectorAll<HTMLElement>('[data-anim]')];
+if (animated.length && 'IntersectionObserver' in window) {
+  const pause = new IntersectionObserver(
+    (entries) => entries.forEach((en) => en.target.toggleAttribute('data-paused', !en.isIntersecting)),
+    { rootMargin: '120px 0px' },
+  );
+  animated.forEach((el) => pause.observe(el));
+}
