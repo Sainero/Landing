@@ -1,0 +1,116 @@
+---
+/**
+ * «Полёт сквозь слайды»: настоящие кадры презентации вылетают из-за заголовка и проносятся мимо зрителя.
+ * Фон первого экрана, финального блока и страницы 404.
+ *
+ * Полёт — CSS 3D: перспектива 900 px, каждая карточка — один <canvas> с одной анимацией transform
+ * и opacity (положение и наклон приходят переменными в @keyframes), её ведёт видеокарта.
+ * Чем меньше анимированных элементов, тем дешевле пауза за экраном. В центре — вуаль цвета страницы: вдали карточки скрыты за текстом и
+ * появляются, выходя из-под него. Кадры и курсор — в lib/warp-client.ts.
+ *
+ * Без JS сцена не показывается (пустых карточек не будет), при prefers-reduced-motion карточки стоят.
+ * За экраном полёт стоит вместе с секцией: у секции-родителя должен быть data-anim.
+ */
+import { warpLayout } from '../lib/warp';
+import { siteConfig } from '@/shared/lib/config';
+
+interface Props {
+  deck?: string;
+  /** Карточек на компьютере; на телефоне видны первые 10 */
+  count?: number;
+  seed?: number;
+  /** Точка схода по вертикали — центр текста, поверх которого летят слайды */
+  focus?: string;
+  /** Прокрутка «влетает» в сцену (первый экран) */
+  dolly?: boolean;
+  /**
+   * Карточки — <img>, а не <canvas>. Для сцен ниже первого экрана: там «самый крупный элемент» (LCP)
+   * уже не считается, а картинки дешевле холстов, когда сцена появляется при прокрутке
+   * (их декодирует и растрирует не основной поток).
+   */
+  images?: boolean;
+  class?: string;
+}
+const { deck = 'slideria', count = 22, seed = 7, focus = '50%', dolly = false, images = false, class: cls } = Astro.props;
+const slides = siteConfig.engine.decks.find((d) => d.name === deck)?.slides ?? 1;
+const cards = warpLayout({ count, slides, seed });
+---
+<div aria-hidden="true" class:list={['warp', cls]} data-warp={deck} data-dolly={dolly ? '' : undefined} style={`--vy:${focus}`}>
+  <div class="warp-tilt" data-warp-tilt>
+    <div class="warp-world">
+      {cards.map((c) => {
+        const style = `--ux:${c.ux};--uy:${c.uy};--ry:${c.ry}deg;--rx:${c.rx}deg;--dur:${c.dur}s;--delay:${c.delay}s;--z0:${c.z0}px;--o0:${c.o0}`;
+        return images
+          ? <img class="warp-card" alt="" decoding="async" width="640" height="360" data-slide={c.slide} style={style} />
+          : <canvas class="warp-card" width="640" height="360" data-slide={c.slide} style={style}></canvas>;
+      })}
+    </div>
+  </div>
+  <div class="warp-veil"></div>
+</div>
+
+<script>
+  import { mountWarps } from '../lib/warp-client';
+  mountWarps();
+</script>
+
+<style>
+  .warp {
+    /* карточка и базовые радиусы: x шире y — экран шире, чем высок */
+    --cw: 440px; --ch: 248px; --bx: 756px; --by: 404px;
+    position: absolute; inset: 0; z-index: -10; overflow: hidden; pointer-events: none;
+    perspective: 900px; perspective-origin: 50% var(--vy);
+    opacity: 0; transition: opacity 1.8s cubic-bezier(.2, .7, .2, 1);
+  }
+  .warp[data-ready] { opacity: 1; }
+  .warp-tilt, .warp-world { position: absolute; transform-style: preserve-3d; }
+  .warp-tilt { inset: 0; transform-origin: 50% var(--vy); transition: transform 1.6s cubic-bezier(.2, .7, .2, 1); }
+  .warp-world { left: 50%; top: var(--vy); }
+  .warp-card {
+    /* место в стороне от оси и наклон к ней; без движения карточка стоит на --z0 */
+    --pos: calc(var(--ux) * var(--bx)), calc(var(--uy) * var(--by));
+    --rot: rotateY(var(--ry)) rotateX(var(--rx));
+    position: absolute; left: calc(var(--cw) / -2); top: calc(var(--ch) / -2); width: var(--cw); height: var(--ch);
+    max-width: none; /* базовый стиль картинок — max-width: 100%, а у центра сцены ширина нулевая */
+    border-radius: 12px; border: 1px solid var(--bd); background: var(--surf);
+    box-shadow: 0 30px 70px -30px rgba(15, 23, 42, .5);
+    transform: translate3d(var(--pos), var(--z0)) var(--rot);
+    opacity: var(--o0);
+    animation: warp-fly var(--dur) linear var(--delay) infinite;
+  }
+  :global([data-theme='dark']) .warp-card { border-color: var(--bd2); box-shadow: 0 30px 80px -30px #000; }
+  /* Z — WARP.far и WARP.near, доли проявления — WARP.fadeIn и WARP.fadeOut в lib/warp.ts */
+  @keyframes warp-fly {
+    0% { transform: translate3d(var(--pos), -4200px) var(--rot); opacity: 0; }
+    16% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translate3d(var(--pos), 560px) var(--rot); opacity: 0; }
+  }
+
+  /* Вуаль цвета страницы: под текстом карточек не видно, они выходят из-под него; вверху (под прозрачной
+     шапкой с меню) и внизу сцена тает. Размер — у элемента (closest-side), а не в градиенте:
+     min() в размере radial-gradient браузеры не принимают */
+  .warp-veil {
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(var(--bg) 24px, color-mix(in srgb, var(--bg) 72%, transparent) 72px, transparent 150px),
+      linear-gradient(to bottom, transparent 76%, var(--bg));
+  }
+  .warp-veil::before {
+    content: ''; position: absolute; left: 50%; top: var(--vy); width: var(--veil-w, min(1180px, 94%)); height: var(--veil-h, min(740px, 82%));
+    transform: translate(-50%, -50%);
+    background: radial-gradient(closest-side, var(--bg) 54%, color-mix(in srgb, var(--bg) 86%, transparent) 74%, transparent);
+  }
+
+  /* Первый экран: прокрутка «влетает» в сцену (scroll-driven animation, без JS; где не поддерживается — сцена стоит) */
+  @supports (animation-timeline: scroll()) {
+    .warp[data-dolly] .warp-world { animation: warp-dolly linear both; animation-timeline: scroll(root); animation-range: 0 100vh; }
+  }
+  @keyframes warp-dolly { to { transform: translateZ(620px); } }
+
+  /* Телефон: карточки меньше, точка схода ближе, видны первые 10 */
+  @media (max-width: 767px) {
+    .warp { --cw: 210px; --ch: 118px; --bx: 230px; --by: 320px; --veil-w: 124%; --veil-h: 60%; perspective: 700px; }
+    .warp-card:nth-child(n + 11) { display: none; }
+  }
+</style>

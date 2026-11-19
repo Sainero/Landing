@@ -2,52 +2,55 @@
 import { ArrowDown } from '@lucide/astro';
 import DownloadLink from '@/entities/app/DownloadLink.astro';
 import DeckShowcase from '@/entities/deck/ui/DeckShowcase.astro';
+import SlideWarp from '@/entities/deck/ui/SlideWarp.astro';
 import { deckSize, sizeLabel, siteConfig } from '@/shared/lib/config';
 import Button from '@/shared/ui-kit/Button.astro';
 import Container from '@/shared/ui-kit/Container.astro';
 import Kbd from '@/shared/ui-kit/Kbd.astro';
-import StageBackdrop from '@/shared/ui-kit/StageBackdrop.astro';
 
 const w = (k: number) => `--w:${(0.15 + k * 0.22).toFixed(2)}s`;
 const size = sizeLabel(deckSize('slideria'));
 const chips = ['Импорт PowerPoint', 'Окно докладчика', 'Пульт с телефона', 'Экспорт в PPTX и PDF', 'MCP для ИИ-агентов'];
 ---
-<section data-hero data-anim class="relative isolate overflow-hidden pb-16 pt-28 sm:pb-24 sm:pt-36">
-  <StageBackdrop floor />
+<section data-hero data-anim class="relative isolate overflow-hidden pb-16 sm:pb-24">
+  <!-- первый экран: слайды вылетают из-за заголовка -->
+  <div class="relative flex min-h-[max(640px,min(100svh,1000px))] flex-col justify-center pb-16 pt-28 sm:pt-32">
+    <SlideWarp dolly focus="52%" />
 
-  <Container class="relative flex flex-col items-center text-center">
-    <a href="#app" class="fade-up group mb-7 inline-flex items-center gap-2 rounded-full border border-bd bg-surf py-1 pl-1 pr-3 text-[13px] font-semibold text-tx2 shadow-[var(--shadow-sm)] transition hover:border-acb" style="--d:.05s">
-      <span class="whitespace-nowrap rounded-full bg-ac px-2 py-0.5 text-[11px] font-bold text-white">{siteConfig.name} {siteConfig.engine.version.replace(/\.0$/, '')}</span>
-      <span class="sm:hidden">Программа для Windows</span>
-      <span class="max-sm:hidden">Программа для компьютера и MCP для ИИ-агентов</span>
-      <span class="text-mu transition group-hover:translate-x-0.5">→</span>
-    </a>
+    <Container class="relative flex flex-col items-center text-center">
+      <a href="#app" class="fade-up group mb-7 inline-flex items-center gap-2 rounded-full border border-bd bg-surf py-1 pl-1 pr-3 text-[13px] font-semibold text-tx2 shadow-[var(--shadow-sm)] transition hover:border-acb" style="--d:.05s">
+        <span class="whitespace-nowrap rounded-full bg-ac px-2 py-0.5 text-[11px] font-bold text-white">{siteConfig.name} {siteConfig.engine.version.replace(/\.0$/, '')}</span>
+        <span class="sm:hidden">Программа для Windows</span>
+        <span class="max-sm:hidden">Программа для компьютера и MCP для ИИ-агентов</span>
+        <span class="text-mu transition group-hover:translate-x-0.5">→</span>
+      </a>
 
-    <h1 class="font-display text-[clamp(36px,7.2vw,88px)] font-bold leading-[1.02] tracking-[-.045em] text-tx" aria-label="Презентации, которые живут">
-      <span class="flex justify-center"><span class="word" style={w(0)}>Презентации,</span></span>
-      <span class="flex justify-center gap-x-[.26em] pb-2">
-        <span class="word" style={w(1)}>которые</span>
-        <span class="word text-gradient" style={w(2)}>живут</span>
-      </span>
-    </h1>
+      <h1 class="font-display text-[clamp(36px,7.2vw,88px)] font-bold leading-[1.02] tracking-[-.045em] text-tx" aria-label="Презентации, которые живут">
+        <span class="flex justify-center"><span class="word" style={w(0)}>Презентации,</span></span>
+        <span class="flex justify-center gap-x-[.26em] pb-2">
+          <span class="word" style={w(1)}>которые</span>
+          <span class="word text-gradient" style={w(2)}>живут</span>
+        </span>
+      </h1>
 
-    <p class="fade-up mt-6 max-w-2xl text-pretty text-[17px] leading-relaxed text-tx2 sm:text-xl" style="--d:.75s">
-      Слайды как данные, правка как в PowerPoint, показ как кино.
-      И всё это — <b class="text-tx">один HTML-файл</b>, который открывается где угодно. Нужен PowerPoint или PDF — тоже в два щелчка.
-    </p>
+      <p class="fade-up mt-6 max-w-2xl text-pretty text-[17px] leading-relaxed text-tx2 sm:text-xl" style="--d:.75s">
+        Слайды как данные, правка как в PowerPoint, показ как кино.
+        И всё это — <b class="text-tx">один HTML-файл</b>, который открывается где угодно. Нужен PowerPoint или PDF — тоже в два щелчка.
+      </p>
 
-    <div class="fade-up mt-9 flex flex-wrap items-center justify-center gap-3" style="--d:.9s">
-      <Button href="#demo" variant="glow" size="lg">
-        Смотреть живое демо <ArrowDown class="size-4 transition group-hover/btn:translate-y-0.5" />
-      </Button>
-      <DownloadLink size="lg" />
-    </div>
-    <ul class="fade-up mt-6 flex flex-wrap justify-center gap-x-4 gap-y-2 text-[13.5px] font-semibold text-mu" style="--d:1s">
-      {chips.map((c) => <li class="inline-flex items-center gap-2"><span class="size-1.5 rounded-full bg-[linear-gradient(135deg,var(--ac),var(--pk))]"></span>{c}</li>)}
-    </ul>
-  </Container>
+      <div class="fade-up mt-9 flex flex-wrap items-center justify-center gap-3" style="--d:.9s">
+        <Button href="#demo" variant="glow" size="lg">
+          Смотреть живое демо <ArrowDown class="size-4 transition group-hover/btn:translate-y-0.5" />
+        </Button>
+        <DownloadLink size="lg" />
+      </div>
+      <ul class="fade-up mt-6 flex flex-wrap justify-center gap-x-4 gap-y-2 text-[13.5px] font-semibold text-mu" style="--d:1s">
+        {chips.map((c) => <li class="inline-flex items-center gap-2"><span class="size-1.5 rounded-full bg-[linear-gradient(135deg,var(--ac),var(--pk))]"></span>{c}</li>)}
+      </ul>
+    </Container>
+  </div>
 
-  <Container class="relative mt-16 sm:mt-20">
+  <Container class="relative">
     <div id="demo" class="fade-up relative scroll-mt-24" style="--d:1.1s">
       <!-- плавающая метка -->
       <div aria-hidden="true" class="absolute -top-11 right-[max(0px,calc(50%-532px))] z-30 hidden items-center gap-2 rounded-xl border border-bd bg-surf px-3 py-2 text-[12.5px] font-semibold text-tx shadow-[var(--shadow-md)] md:flex">

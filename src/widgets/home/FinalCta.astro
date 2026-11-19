@@ -2,15 +2,15 @@
 import { BookOpen } from '@lucide/astro';
 import DownloadLink from '@/entities/app/DownloadLink.astro';
 import CloudLink from '@/entities/cloud/CloudLink.astro';
+import SlideWarp from '@/entities/deck/ui/SlideWarp.astro';
 import Button from '@/shared/ui-kit/Button.astro';
 import Container from '@/shared/ui-kit/Container.astro';
 import LogoMark from '@/shared/ui-kit/LogoMark.astro';
-import StageBackdrop from '@/shared/ui-kit/StageBackdrop.astro';
 
 const title = ['Презентации,', 'которые', 'живут'];
 ---
 <section data-anim class="relative isolate overflow-hidden py-28 sm:py-36">
-  <StageBackdrop />
+  <SlideWarp count={16} seed={21} images />
 
   <Container class="flex flex-col items-center text-center">
     <div data-reveal class="rounded-[26px] shadow-[0_0_0_12px_color-mix(in_srgb,var(--ac)_8%,transparent),0_14px_40px_-8px_rgba(37,99,235,.5)]">

@@ -1,11 +1,11 @@
 ---
 import SiteLayout from '@/app/layouts/SiteLayout.astro';
 import Button from '@/shared/ui-kit/Button.astro';
-import StageBackdrop from '@/shared/ui-kit/StageBackdrop.astro';
+import SlideWarp from '@/entities/deck/ui/SlideWarp.astro';
 ---
 <SiteLayout title="Страница не найдена">
   <section data-anim class="relative isolate grid min-h-[80dvh] place-items-center overflow-hidden px-4 pt-24 text-center">
-    <StageBackdrop />
+    <SlideWarp count={12} seed={404} />
     <div class="flex flex-col items-center">
       <div class="font-mono text-sm text-mu">слайд не найден</div>
       <h1 class="mt-3 text-[clamp(80px,18vw,180px)] font-extrabold leading-none tracking-[-.06em] text-gradient">404</h1>

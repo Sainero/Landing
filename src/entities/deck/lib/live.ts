@@ -28,6 +28,11 @@ export function posterUrl(deck: string, index: number, look: 'light' | 'dark'): 
   return `/demo/posters/${deck}/${look}-${index + 1}.webp`;
 }
 
+/** Уменьшенный кадр 640 × 360 — для полёта слайдов (SlideWarp) */
+export function thumbUrl(deck: string, index: number, look: 'light' | 'dark'): string {
+  return `/demo/posters/${deck}/thumbs/${look}-${index + 1}.webp`;
+}
+
 export function siteLook(): 'light' | 'dark' {
   return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
 }

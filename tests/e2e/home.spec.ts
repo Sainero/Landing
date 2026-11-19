@@ -92,3 +92,53 @@ test('каталог блоков: группы и «Показать все»',
   // в каталоге — названия блоков, а не имена в данных
   await expect(catalog.locator('code')).toHaveCount(0);
 });
+
+// ---------- полёт сквозь слайды (SlideWarp) ----------
+const warp = (page: import('@playwright/test').Page) => page.locator('[data-hero] [data-warp]');
+/** Темы кадров на видимых карточках: «light», «dark» */
+const paintedLooks = (page: import('@playwright/test').Page) => warp(page).locator('canvas').evaluateAll((cs) => [
+  ...new Set((cs as HTMLCanvasElement[]).filter((c) => c.getClientRects().length).map((c) => (c.dataset.painted ?? 'none').split(':')[0])),
+]);
+
+test('полёт слайдов: кадры нарисованы в холстах, картинок нет', async ({ page }) => {
+  const done = watchErrors(page);
+  await expect(warp(page)).toHaveAttribute('data-ready', '');
+  await expect(warp(page).locator('img')).toHaveCount(0);
+  await expect.poll(() => paintedLooks(page)).toEqual(['light']);
+  // карточки летят анимацией CSS, а не скриптом
+  const name = await warp(page).locator('.warp-card').first().evaluate((el) => getComputedStyle(el).animationName);
+  expect(name).toContain('warp-fly');
+  done();
+});
+
+test('самый крупный элемент (LCP) — не карточка полёта', async ({ page }) => {
+  await expect(warp(page)).toHaveAttribute('data-ready', '');
+  await page.waitForTimeout(1500);
+  const lcp = await page.evaluate(() => new Promise<string>((ok) => {
+    new PerformanceObserver((list) => {
+      const el = (list.getEntries().at(-1) as PerformanceEntry & { element?: Element } | undefined)?.element;
+      ok(!el ? 'none' : el.closest('[data-warp]') ? 'warp' : el.tagName);
+    }).observe({ type: 'largest-contentful-paint', buffered: true });
+  }));
+  expect(lcp).not.toBe('warp');
+});
+
+test('смена темы перерисовывает кадры полёта', async ({ page }) => {
+  await expect(warp(page)).toHaveAttribute('data-ready', '');
+  await expect.poll(() => paintedLooks(page)).toEqual(['light']);
+  await page.locator('header [data-theme-toggle]').click();
+  await expect.poll(() => paintedLooks(page)).toEqual(['dark']);
+});
+
+test('если движение просили убрать, карточки стоят', async ({ browser }) => {
+  const ctx = await browser.newContext({ reducedMotion: 'reduce', viewport: { width: 1440, height: 900 } });
+  const page = await ctx.newPage();
+  await page.goto('/');
+  await expect(warp(page)).toHaveAttribute('data-ready', '');
+  const state = () => warp(page).locator('.warp-card').evaluateAll((els) => els.map((el) => `${getComputedStyle(el).animationName}|${getComputedStyle(el).transform}`));
+  const before = await state();
+  expect(before.every((s) => s.startsWith('none|'))).toBe(true);
+  await page.waitForTimeout(600);
+  expect(await state()).toEqual(before);
+  await ctx.close();
+});

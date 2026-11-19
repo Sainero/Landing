@@ -4,6 +4,7 @@
 //   - разделы README и docs/ о работе в программе        → content/docs/*.md (раздел /docs)
 //   - справочник компонентов (данные каталога блоков)    → content/catalog/components.md
 //   - кадры слайдов и окна докладчика (светлые и тёмные)  → public/demo/posters/<имя>/*.webp
+//     и их уменьшенные копии для полёта слайдов           → public/demo/posters/<имя>/thumbs/*.webp
 //   - версия программы                                  → content/engine.json
 //
 // Кадры нужны, чтобы страница не запускала тяжёлые презентации сразу: до щелчка «Запустить показ»
@@ -69,6 +70,7 @@ for (const name of DECKS) {
 }
 
 if (!args.has('--no-posters')) await shootPosters();
+await makeThumbs();
 
 // ---------- кадры ----------
 async function launchBrowser() {
@@ -133,6 +135,21 @@ async function shootPosters() {
     }
   } finally {
     await browser.close();
+  }
+}
+
+// Маленькие кадры 640 × 360 для полёта слайдов на первом экране (SlideWarp): карточек много, крупные не нужны.
+// Делаются из больших кадров, поэтому работают и с --no-posters.
+async function makeThumbs() {
+  for (const name of Object.keys(POSTERS)) {
+    const dir = path.join(root, 'public', 'demo', 'posters', name);
+    if (!fs.existsSync(dir)) continue;
+    const out = path.join(dir, 'thumbs');
+    fs.rmSync(out, { recursive: true, force: true });
+    fs.mkdirSync(out, { recursive: true });
+    const files = fs.readdirSync(dir).filter((f) => /^(light|dark)-\d+\.webp$/.test(f));
+    for (const f of files) await sharp(path.join(dir, f)).resize(640, 360).webp({ quality: 72, effort: 6 }).toFile(path.join(out, f));
+    console.log(`✓ ${rel(out)}/ — ${files.length} кадров`);
   }
 }
 
