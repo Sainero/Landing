@@ -1,10 +1,9 @@
 ---
 /**
- * «Студия» на первом экране: слева deck.yaml слайда, справа сам слайд.
- * До щелчка «Запустить показ» справа — кадры слайдов (лёгкие картинки), после — настоящая собранная
- * презентация во фрейме. Вкладки, автопрокрутка и показ связаны протоколом Slideria (lib/protocol.ts).
+ * Витрина на первом экране: окно браузера с кадром слайда и вкладки слайдов под ним.
+ * До щелчка «Запустить показ» — кадры (лёгкие картинки), после — сама собранная презентация во фрейме.
+ * Вкладки, автопрокрутка и показ связаны протоколом Slideria (lib/protocol.ts).
  */
-import { Code } from 'astro:components';
 import { deckSize, sizeLabel } from '@/shared/lib/config';
 import { readDeck } from '../lib/readDeck';
 
@@ -12,34 +11,10 @@ interface Props { deck: string; class?: string }
 const { deck: name, class: cls } = Astro.props;
 const deck = await readDeck(name);
 const size = sizeLabel(deckSize(name));
-const total = deck.slides.reduce((s, x) => s + x.lines, 0);
-const codeCls = 'code-lines absolute inset-0 overflow-auto px-2 py-3 font-mono text-[12.5px] leading-[1.7] [scrollbar-color:rgba(255,255,255,.15)_transparent] [scrollbar-width:thin]';
 ---
-<div data-studio={name} data-title={deck.title} class:list={['group/studio relative grid grid-cols-[minmax(0,1fr)] gap-3 lg:grid-cols-[minmax(0,.82fr)_minmax(0,1.38fr)]', cls]}>
-  <!-- Редактор: YAML текущего слайда -->
-  <div class="relative order-2 flex min-h-0 flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#0B1020] text-[#E6EDF3] shadow-[var(--shadow-lg)] lg:order-1">
-    <div class="flex items-center gap-2 border-b border-white/10 px-4 py-2.5">
-      <span class="flex gap-1.5" aria-hidden="true"><i class="size-2.5 rounded-full bg-[#FF5F57]"></i><i class="size-2.5 rounded-full bg-[#FEBC2E]"></i><i class="size-2.5 rounded-full bg-[#28C840]"></i></span>
-      <span class="ml-2 truncate font-mono text-xs text-white/70"><span class="max-sm:hidden">presentations/{name}/</span><b class="font-semibold text-white">deck.yaml</b></span>
-      <span class="ml-auto whitespace-nowrap font-mono text-[11px] text-white/60">{total} строк</span>
-    </div>
-    <div class="relative h-[300px] min-h-0 overflow-hidden sm:h-[340px] lg:h-auto lg:flex-1">
-      <div data-yaml-view class={codeCls}><Code code={deck.slides[0].yaml} lang="yaml" theme="github-dark-default" /></div>
-      <!-- YAML остальных слайдов — в <template>: браузер не раскладывает их, пока слайд не выбран -->
-      {deck.slides.slice(1).map((s, i) => (
-        <template data-yaml={i + 1}><Code code={s.yaml} lang="yaml" theme="github-dark-default" /></template>
-      ))}
-      <div class="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-16 bg-gradient-to-t from-[#0B1020] to-transparent"></div>
-    </div>
-    <div class="flex items-center gap-2 border-t border-white/10 px-4 py-2 font-mono text-[11px] text-white/60">
-      <span class="size-1.5 rounded-full bg-[#28C840]"></span>
-      <span>правки видны сразу</span>
-      <span class="ml-auto" data-studio-counter>слайд 1 / {deck.slides.length}</span>
-    </div>
-  </div>
-
+<div data-showcase={name} data-title={deck.title} class:list={['group/showcase relative mx-auto flex max-w-[1040px] flex-col gap-3', cls]}>
   <!-- Окно браузера: кадр слайда, а по щелчку — сама презентация -->
-  <div class="order-1 overflow-hidden rounded-2xl border border-bd2/70 bg-surf shadow-[var(--shadow-lg)] lg:order-2">
+  <div class="overflow-hidden rounded-2xl border border-bd2/70 bg-surf shadow-[var(--shadow-lg)]">
     <div class="flex items-center gap-3 border-b border-bd px-4 py-2.5">
       <span class="flex gap-1.5" aria-hidden="true"><i class="size-2.5 rounded-full bg-bd2"></i><i class="size-2.5 rounded-full bg-bd2"></i><i class="size-2.5 rounded-full bg-bd2"></i></span>
       <div class="mx-auto flex min-w-0 items-center gap-2 rounded-lg bg-alt px-3 py-1 font-mono text-[11.5px] text-mu">
@@ -59,14 +34,14 @@ const codeCls = 'code-lines absolute inset-0 overflow-auto px-2 py-3 font-mono t
             <svg viewBox="0 0 24 24" class="size-4" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>
             <span data-live-label>Запустить показ</span>
           </button>
-          <span class="font-mono text-[11px] text-mu max-sm:hidden">{size}</span>
+          <span class="w-[52px] max-sm:hidden" aria-hidden="true"></span>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Вкладки слайдов с автопрокруткой -->
-  <div class="order-3 lg:col-span-2" role="tablist" aria-label="Слайды витрины">
+  <div role="tablist" aria-label="Слайды витрины">
     <div class="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:px-0">
       {deck.slides.map((s, i) => (
         <button
@@ -74,13 +49,10 @@ const codeCls = 'code-lines absolute inset-0 overflow-auto px-2 py-3 font-mono t
           role="tab"
           data-slide-tab={i}
           aria-selected={i === 0 ? 'true' : 'false'}
-          class="group/tab relative min-w-[150px] flex-1 overflow-hidden rounded-xl border border-bd bg-surf px-3 py-2.5 text-left transition hover:border-acb aria-selected:border-acb aria-selected:bg-acs"
+          class="group/tab relative flex min-w-[140px] flex-1 items-center gap-2 overflow-hidden rounded-xl border border-bd bg-surf px-3 py-2.5 text-left transition hover:border-acb aria-selected:border-acb aria-selected:bg-acs"
         >
-          <span class="flex items-center gap-2">
-            <span class="grid size-5 shrink-0 place-items-center rounded-full bg-alt font-mono text-[10.5px] font-bold text-tx2 group-aria-selected/tab:bg-ac group-aria-selected/tab:text-white">{i + 1}</span>
-            <span class="truncate text-[13px] font-semibold text-tx2 group-aria-selected/tab:text-tx">{s.label}</span>
-          </span>
-          <span class="mt-1 block font-mono text-[10.5px] text-mu">{s.template === 'content' ? `${s.lines} строк` : `template: ${s.template}`}</span>
+          <span class="grid size-5 shrink-0 place-items-center rounded-full bg-alt font-mono text-[10.5px] font-bold text-tx2 group-aria-selected/tab:bg-ac group-aria-selected/tab:text-white">{i + 1}</span>
+          <span class="truncate text-[13px] font-semibold text-tx2 group-aria-selected/tab:text-tx">{s.label}</span>
           <span data-tab-progress class="absolute inset-x-0 bottom-0 h-0.5 origin-left scale-x-0 bg-ac"></span>
         </button>
       ))}
@@ -89,10 +61,10 @@ const codeCls = 'code-lines absolute inset-0 overflow-auto px-2 py-3 font-mono t
 </div>
 
 <style>
-  [data-studio][data-autoplay] [aria-selected='true'] [data-tab-progress] {
+  [data-showcase][data-autoplay] [aria-selected='true'] [data-tab-progress] {
     animation: tab-fill var(--slide-ms, 7000ms) linear both;
   }
-  [data-studio][data-paused] [data-tab-progress] { animation-play-state: paused !important; }
+  [data-showcase][data-paused] [data-tab-progress] { animation-play-state: paused !important; }
   @keyframes tab-fill { to { transform: scaleX(1); } }
 </style>
 
@@ -102,19 +74,15 @@ const codeCls = 'code-lines absolute inset-0 overflow-auto px-2 py-3 font-mono t
 
   const SLIDE_MS = 7000;
 
-  document.querySelectorAll<HTMLElement>('[data-studio]').forEach((studio) => {
-    const deck = studio.dataset.studio!;
-    const stage = studio.querySelector<HTMLElement>('[data-stage]')!;
-    const poster = studio.querySelector<HTMLElement>('[data-poster]')!;
-    const posterBar = studio.querySelector<HTMLElement>('[data-poster-bar]')!;
-    const posterCount = studio.querySelector<HTMLElement>('[data-poster-count]')!;
-    const startBtn = studio.querySelector<HTMLButtonElement>('[data-live-start]')!;
+  document.querySelectorAll<HTMLElement>('[data-showcase]').forEach((showcase) => {
+    const deck = showcase.dataset.showcase!;
+    const stage = showcase.querySelector<HTMLElement>('[data-stage]')!;
+    const poster = showcase.querySelector<HTMLElement>('[data-poster]')!;
+    const posterBar = showcase.querySelector<HTMLElement>('[data-poster-bar]')!;
+    const posterCount = showcase.querySelector<HTMLElement>('[data-poster-count]')!;
+    const startBtn = showcase.querySelector<HTMLButtonElement>('[data-live-start]')!;
     const imgs = [...poster.querySelectorAll<HTMLImageElement>('img[data-look]')];
-    const yamlView = studio.querySelector<HTMLElement>('[data-yaml-view]')!;
-    const templates = new Map([...studio.querySelectorAll<HTMLTemplateElement>('template[data-yaml]')].map((t) => [Number(t.dataset.yaml), t]));
-    const firstYaml = yamlView.innerHTML;
-    const tabs = [...studio.querySelectorAll<HTMLButtonElement>('[data-slide-tab]')];
-    const counter = studio.querySelector('[data-studio-counter]');
+    const tabs = [...showcase.querySelectorAll<HTMLButtonElement>('[data-slide-tab]')];
     const n = tabs.length;
     let frame: HTMLIFrameElement | null = null;
     let index = 0;
@@ -124,7 +92,7 @@ const codeCls = 'code-lines absolute inset-0 overflow-auto px-2 py-3 font-mono t
     let visible = false;
     let timer = 0;
 
-    studio.style.setProperty('--slide-ms', `${SLIDE_MS}ms`);
+    showcase.style.setProperty('--slide-ms', `${SLIDE_MS}ms`);
 
     const showPoster = (i: number) => {
       imgs.forEach((img) => {
@@ -142,11 +110,6 @@ const codeCls = 'code-lines absolute inset-0 overflow-auto px-2 py-3 font-mono t
       if (i === index && tabs[i].getAttribute('aria-selected') === 'true') return;
       index = i;
       tabs.forEach((t, k) => t.setAttribute('aria-selected', String(k === i)));
-      const tpl = templates.get(i);
-      if (tpl) yamlView.replaceChildren(tpl.content.cloneNode(true));
-      else yamlView.innerHTML = firstYaml;
-      yamlView.scrollTop = 0;
-      if (counter) counter.textContent = `слайд ${i + 1} / ${n}`;
       tabs[i].scrollIntoView({ block: 'nearest', inline: 'nearest' });
       if (!frame) showPoster(i);
       schedule();
@@ -161,16 +124,16 @@ const codeCls = 'code-lines absolute inset-0 overflow-auto px-2 py-3 font-mono t
     function stopAutoplay(): void {
       autoplay = false;
       clearTimeout(timer);
-      studio.removeAttribute('data-autoplay');
+      showcase.removeAttribute('data-autoplay');
     }
 
     function schedule(): void {
       clearTimeout(timer);
       if (!autoplay) return;
       // перезапуск полоски прогресса на активной вкладке
-      studio.removeAttribute('data-autoplay');
-      void studio.offsetWidth;
-      studio.setAttribute('data-autoplay', '');
+      showcase.removeAttribute('data-autoplay');
+      void showcase.offsetWidth;
+      showcase.setAttribute('data-autoplay', '');
       timer = window.setTimeout(tick, SLIDE_MS);
     }
 
@@ -186,33 +149,33 @@ const codeCls = 'code-lines absolute inset-0 overflow-auto px-2 py-3 font-mono t
     function goLive(): void {
       if (frame) return;
       startBtn.disabled = true;
-      studio.querySelector('[data-live-label]')!.textContent = 'Загрузка…';
+      showcase.querySelector('[data-live-label]')!.textContent = 'Загрузка…';
       expected = index;
-      frame = createDeckFrame(deck, index, `Живая презентация: ${studio.dataset.title}`, () => {
+      frame = createDeckFrame(deck, index, `Живая презентация: ${showcase.dataset.title}`, () => {
         poster.remove();
         posterBar.remove();
       });
       stage.append(frame);
     }
 
-    const syncPaused = () => studio.toggleAttribute('data-paused', hovered || !visible);
+    const syncPaused = () => showcase.toggleAttribute('data-paused', hovered || !visible);
 
     startBtn.addEventListener('click', goLive);
     poster.addEventListener('click', goLive);
     tabs.forEach((t, i) => t.addEventListener('click', () => { stopAutoplay(); goto(i); }));
-    studio.addEventListener('pointerenter', () => { hovered = true; syncPaused(); });
-    studio.addEventListener('pointerleave', () => { hovered = false; syncPaused(); });
+    showcase.addEventListener('pointerenter', () => { hovered = true; syncPaused(); });
+    showcase.addEventListener('pointerleave', () => { hovered = false; syncPaused(); });
     // Клик внутри презентации переводит фокус во фрейм — пользователь листает сам
     addEventListener('blur', () => { if (frame && document.activeElement === frame) stopAutoplay(); });
 
-    new IntersectionObserver(([e]) => { visible = e.isIntersecting; syncPaused(); }, { threshold: 0.35 }).observe(studio);
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; syncPaused(); }, { threshold: 0.35 }).observe(showcase);
 
     addEventListener('message', (e) => {
       if (!frame || e.source !== frame.contentWindow) return;
       const msg = readEnvelope(e.data, deck);
       if (msg?.type !== 'state') return;
       if (msg.index !== expected) {
-        // листают внутри презентации: показываем нужный YAML и не мешаем
+        // листают внутри презентации: вкладки следуют, автопрокрутка не мешает
         expected = msg.index;
         stopAutoplay();
       }

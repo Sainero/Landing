@@ -14,51 +14,54 @@ test('при загрузке нет ни одного фрейма с през�
   done();
 });
 
-test('вкладки листают кадры и YAML витрины', async ({ page }) => {
-  const studio = page.locator('[data-studio]');
-  await studio.locator('[data-slide-tab="3"]').click();
-  await expect(studio.locator('[data-slide-tab="3"]')).toHaveAttribute('aria-selected', 'true');
-  await expect(studio.locator('[data-poster] img[data-look="light"]')).toHaveAttribute('src', /light-4\.webp$/);
-  await expect(studio.locator('[data-studio-counter]')).toHaveText('слайд 4 / 14');
-  await expect(studio.locator('[data-yaml-view] .line').first()).toContainText('- id:');
-  await expect(studio.locator('[data-poster-count]')).toHaveText('4 из 14');
+test('вкладки листают кадры витрины', async ({ page }) => {
+  const showcase = page.locator('[data-showcase]');
+  await showcase.locator('[data-slide-tab="3"]').click();
+  await expect(showcase.locator('[data-slide-tab="3"]')).toHaveAttribute('aria-selected', 'true');
+  await expect(showcase.locator('[data-poster] img[data-look="light"]')).toHaveAttribute('src', /light-4\.webp$/);
+  await expect(showcase.locator('[data-poster-count]')).toHaveText('4 из 14');
+});
+
+test('на первом экране нет кода: ни YAML, ни имён файлов данных', async ({ page }) => {
+  const hero = page.locator('[data-hero]');
+  await expect(hero.locator('pre, code')).toHaveCount(0);
+  await expect(hero).not.toContainText(/deck\.yaml|YAML|template:/);
 });
 
 test('«Запустить показ» открывает витрину на том же слайде, дальше всё синхронно', async ({ page }) => {
   const done = watchErrors(page);
-  const studio = page.locator('[data-studio]');
-  await studio.locator('[data-slide-tab="3"]').click();
-  await studio.locator('[data-live-start]').click();
-  const counter = deckCounter(page, '[data-studio] iframe');
+  const showcase = page.locator('[data-showcase]');
+  await showcase.locator('[data-slide-tab="3"]').click();
+  await showcase.locator('[data-live-start]').click();
+  const counter = deckCounter(page, '[data-showcase] iframe');
   await expect(counter).toHaveText('4 из 14');
-  await expect(studio.locator('[data-poster]')).toHaveCount(0);
+  await expect(showcase.locator('[data-poster]')).toHaveCount(0);
 
   // вкладка → слайд показа
-  await studio.locator('[data-slide-tab="6"]').click();
+  await showcase.locator('[data-slide-tab="6"]').click();
   await expect(counter).toHaveText('7 из 14');
 
-  // листание внутри показа → вкладка и YAML
-  await page.frameLocator('[data-studio] iframe').locator('#nx').click();
-  await expect(studio.locator('[data-slide-tab="7"]')).toHaveAttribute('aria-selected', 'true');
-  await expect(studio.locator('[data-studio-counter]')).toHaveText('слайд 8 / 14');
+  // листание внутри показа → вкладка
+  await page.frameLocator('[data-showcase] iframe').locator('#nx').click();
+  await expect(showcase.locator('[data-slide-tab="7"]')).toHaveAttribute('aria-selected', 'true');
   done();
 });
 
 test('тема сайта передаётся в запущенную презентацию', async ({ page }) => {
-  await page.locator('[data-studio] [data-live-start]').click();
-  await expect(deckCounter(page, '[data-studio] iframe')).toHaveText('1 из 14');
+  await page.locator('[data-showcase] [data-live-start]').click();
+  await expect(deckCounter(page, '[data-showcase] iframe')).toHaveText('1 из 14');
   const before = await page.locator('html').getAttribute('data-theme');
   const after = before === 'dark' ? 'light' : 'dark';
   await page.locator('header [data-theme-toggle]').click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', after);
-  await expect(page.frameLocator('[data-studio] iframe').locator('html')).toHaveAttribute('data-theme', after);
+  await expect(page.frameLocator('[data-showcase] iframe').locator('html')).toHaveAttribute('data-theme', after);
 });
 
 test('окно докладчика запускается по щелчку и идёт за витриной', async ({ page }) => {
-  await page.locator('[data-studio] [data-live-start]').click();
-  await expect(deckCounter(page, '[data-studio] iframe')).toHaveText('1 из 14');
-  await page.locator('[data-studio] [data-slide-tab="4"]').click();
-  await expect(deckCounter(page, '[data-studio] iframe')).toHaveText('5 из 14');
+  await page.locator('[data-showcase] [data-live-start]').click();
+  await expect(deckCounter(page, '[data-showcase] iframe')).toHaveText('1 из 14');
+  await page.locator('[data-showcase] [data-slide-tab="4"]').click();
+  await expect(deckCounter(page, '[data-showcase] iframe')).toHaveText('5 из 14');
 
   await page.locator('[data-presenter-live]').click();
   await expect(page.frameLocator('[data-presenter-preview] iframe').locator('#ct')).toHaveText('5 / 14', { timeout: 15_000 });

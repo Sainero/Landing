@@ -1,5 +1,5 @@
 /**
- * Общее поведение страниц (без фреймворка): тема, копирование, появление при прокрутке,
+ * Общее поведение страниц (без фреймворка): тема, появление при прокрутке,
  * шапка при прокрутке, мобильное меню. Подключается один раз в BaseLayout.
  */
 import { broadcastTheme } from '@/entities/deck/lib/protocol';
@@ -15,17 +15,6 @@ document.addEventListener('click', (e) => {
   root.setAttribute('data-theme', next);
   try { localStorage.setItem(THEME_KEY, next); } catch { /* приватный режим */ }
   broadcastTheme(next);
-});
-
-// --- копирование ---
-document.addEventListener('click', async (e) => {
-  const btn = (e.target as HTMLElement).closest<HTMLElement>('[data-copy]');
-  if (!btn) return;
-  try {
-    await navigator.clipboard.writeText(btn.dataset.copy ?? '');
-    btn.setAttribute('data-done', '');
-    setTimeout(() => btn.removeAttribute('data-done'), 1600);
-  } catch { /* нет доступа к буферу обмена */ }
 });
 
 // --- появление при прокрутке ---

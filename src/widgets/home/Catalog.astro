@@ -26,7 +26,7 @@ const count = (id: string) => (id === 'all' ? catalog.length : catalog.filter((c
             data-filter={g.id}
             aria-selected={i === 0 ? 'true' : 'false'}
             class="whitespace-nowrap rounded-xl px-4 py-2 text-[14px] font-semibold text-tx2 transition hover:text-tx aria-selected:bg-ac aria-selected:text-white"
-          >{g.label} <span class="ml-1 font-mono text-[11px] opacity-60">{count(g.id)}</span></button>
+          >{g.label} <span class="ml-1 font-mono text-[11px]">{count(g.id)}</span></button>
         ))}
       </div>
 

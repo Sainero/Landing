@@ -175,16 +175,6 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .astro-code-themes, :root:not([data-theme="light"]) .astro-code-themes span { color: var(--shiki-dark) !important; }
 }
-.code-lines code { counter-reset: ln; }
-.code-lines .line::before {
-  counter-increment: ln;
-  content: counter(ln);
-  display: inline-block;
-  width: 2.2em;
-  margin-right: 1.1em;
-  text-align: right;
-  color: rgba(148, 163, 184, .38);
-}
 
 /* ---------- документация ---------- */
 .prose-doc { color: var(--tx2); font-size: 16px; line-height: 1.7; }

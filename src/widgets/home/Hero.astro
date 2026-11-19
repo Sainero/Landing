@@ -1,7 +1,7 @@
 ---
 import { ArrowDown } from '@lucide/astro';
 import DownloadLink from '@/entities/app/DownloadLink.astro';
-import DeckStudio from '@/entities/deck/ui/DeckStudio.astro';
+import DeckShowcase from '@/entities/deck/ui/DeckShowcase.astro';
 import { deckSize, sizeLabel, siteConfig } from '@/shared/lib/config';
 import Button from '@/shared/ui-kit/Button.astro';
 import Container from '@/shared/ui-kit/Container.astro';
@@ -60,18 +60,15 @@ const chips = ['Импорт PowerPoint', 'Окно докладчика', 'Пу
         {[0, 1.5, 3, 4.5].map((d) => <span class="ring" style={`--d:${d}s`}></span>)}
       </div>
 
-      <!-- плавающие метки -->
-      <div aria-hidden="true" class="absolute -left-3 -top-11 z-30 hidden items-center gap-2 rounded-xl border border-bd bg-surf px-3 py-2 text-[12.5px] font-semibold text-tx shadow-[var(--shadow-md)] md:flex">
-        <span class="grid size-6 place-items-center rounded-md bg-acs font-mono text-[11px] text-ac">{'{}'}</span> Слева — deck.yaml, справа — то, что из него собрано
-      </div>
-      <div aria-hidden="true" class="absolute -right-3 -top-11 z-30 hidden items-center gap-2 rounded-xl border border-bd bg-surf px-3 py-2 text-[12.5px] font-semibold text-tx shadow-[var(--shadow-md)] md:flex">
+      <!-- плавающая метка -->
+      <div aria-hidden="true" class="absolute -top-11 right-[max(0px,calc(50%-532px))] z-30 hidden items-center gap-2 rounded-xl border border-bd bg-surf px-3 py-2 text-[12.5px] font-semibold text-tx shadow-[var(--shadow-md)] md:flex">
         <span class="size-2 rounded-full bg-ok shadow-[0_0_10px_var(--ok)]"></span> Один файл · {size} · офлайн
       </div>
 
-      <DeckStudio deck="slideria" />
+      <DeckShowcase deck="slideria" />
     </div>
     <p class="mt-5 flex flex-wrap items-center justify-center gap-x-2 gap-y-2 text-center text-[13.5px] text-mu">
-      Справа — кадры витрины Slideria. «Запустить показ» откроет сам файл: листайте
+      Это кадры витрины Slideria. «Запустить показ» откроет сам файл: листайте
       <Kbd>←</Kbd><Kbd>→</Kbd>, <Kbd>O</Kbd> — обзор, <Kbd>P</Kbd> — окно докладчика, <Kbd>T</Kbd> — тема.
     </p>
   </Container>
