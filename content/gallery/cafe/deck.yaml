@@ -1,0 +1,85 @@
+# Галерея блоков для сайта: открытие кофейни (Гант, водопад и доли, риски).
+# Собирается движком Slideria в scripts/sync-engine.mjs; на сайте — кадры слайдов (раздел «Блоки», полёт, карточки).
+title: Кофейня «Зерно» — план открытия
+lang: ru
+# Тема — как у витрины Slideria (content/decks/slideria/deck.yaml): весь сайт в одном стиле
+theme:
+  accent: "#6366F1"
+  accent2: "#EC4899"
+  accentFlow: true
+
+slides:
+  - id: plan
+    title: План открытия — {g:duo|шесть месяцев}
+    badge: Гант
+    body:
+      - type: gantt
+        scale: [Май, Июн, Июл, Авг, Сен, Окт]
+        today: 3.5
+        items:
+          - { title: Помещение, section: true }
+          - { title: Аренда и договор, text: Основатели, from: 1, to: 1.5, done: 100 }
+          - { title: Ремонт зала, text: Подрядчик, from: 1.5, to: 3.5, done: 80 }
+          - { title: Команда и меню, section: true }
+          - { title: Кофемашина и гриль, text: Поставщик, from: 2.5, to: 4, done: 50 }
+          - { title: Найм бариста, text: 4 человека, from: 3, to: 4.5, done: 30 }
+          - { title: Меню и дегустации, text: Шеф, from: 4, to: 5.5, done: 0 }
+          - { title: Запуск, section: true }
+          - { title: Вывеска и соцсети, text: Маркетинг, from: 4.5, to: 6, done: 0 }
+          - { title: Пробная неделя, text: Вся команда, from: 5.5, to: 6, done: 0 }
+          - { title: Открытие, from: 6, milestone: true }
+
+  - id: money
+    title: Откуда {g:duo|выручка}
+    badge: Финансы
+    body:
+      - type: grid
+        columns: 2
+        items:
+          - type: card
+            title: Оборот за год, млн ₽
+            body:
+              type: waterfall
+              values: [4.2, 1.6, 0.9, -0.7, -0.4]
+              labels: ['2025', Новые гости, Завтраки, Аренда, Списания]
+              total: '2026'
+              unit: ' млн'
+          - type: card
+            title: Кто наши гости
+            body:
+              type: donut
+              values: [46, 31, 23]
+              labels: [Офисы рядом, Прохожие, Доставка]
+              center: '180'
+              sub: гостей в день
+              unit: ' %'
+      - type: grid
+        columns: 3
+        items:
+          - { type: card, body: { type: stat, value: "420 ₽", label: средний чек, delta: "+35 ₽" } }
+          - { type: card, body: { type: stat, value: "14 мес.", label: окупаемость, note: при 180 гостях в день } }
+          - { type: card, body: { type: stat, value: "4,8", label: рейтинг на картах, delta: "+0,3" } }
+
+  - id: risks
+    title: Что может {g:duo|помешать}
+    badge: Риски
+    body:
+      - type: risks
+        size: 5
+        items:
+          - { title: Ремонт затянется, text: Штраф подрядчику в договоре, p: 4, i: 4 }
+          - { title: Задержка поставки кофемашины, text: Аренда машины на месяц, p: 3, i: 5 }
+          - { title: Не наберём бариста, text: Обучение с нуля, p: 2, i: 3 }
+          - { title: Рост цен на зерно, text: Два обжарщика в договоре, p: 3, i: 2 }
+          - { title: Мало гостей в первый месяц, text: Скидка для офисов, p: 2, i: 4 }
+
+  - id: cover
+    template: cover
+    title: Кофейня «Зерно»
+    lead: План открытия, деньги и риски — на одной странице для партнёров
+    meta: Май 2026 · команда основателей
+    visual:
+      type: orbit
+      center: Зерно
+      sub: кофейня у офисов
+      items: [{ title: Меню }, { title: Команда }, { title: Деньги }, { title: Гости }]

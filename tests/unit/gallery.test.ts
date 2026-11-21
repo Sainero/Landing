@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import YAML from 'yaml';
-import { blockSlides, gallery, galleryThemes, warpThumbs } from '@/entities/gallery/gallery';
+import { blockSlides, gallery, galleryTopics, warpThumbs } from '@/entities/gallery/gallery';
 
 const root = process.cwd();
 const slidesIn = (deck: string) => YAML.parse(fs.readFileSync(path.join(root, 'content', 'gallery', deck, 'deck.yaml'), 'utf8')).slides.length as number;
@@ -20,12 +20,12 @@ describe('галерея блоков', () => {
   });
 
   it('все слайды всех презентаций галереи подписаны', () => {
-    for (const deck of Object.keys(galleryThemes)) {
+    for (const deck of Object.keys(galleryTopics)) {
       expect(gallery.filter((g) => g.deck === deck).length).toBe(slidesIn(deck));
     }
   });
 
-  it('в разделе «Блоки» девять разных слайдов, в каждом ряду три разные темы', () => {
+  it('в разделе «Блоки» девять разных слайдов, в каждом ряду три разные презентации', () => {
     expect(blockSlides).toHaveLength(9);
     expect(new Set(blockSlides.map((b) => `${b.deck}/${b.n}`)).size).toBe(9);
     for (let r = 0; r < 3; r++) {

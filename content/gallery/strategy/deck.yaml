@@ -1,0 +1,64 @@
+# Галерея блоков для сайта: стратегия компании (дорожная карта, матрица решений, рынок).
+title: Стратегия на 2027 год
+lang: ru
+# Тема — как у витрины Slideria (content/decks/slideria/deck.yaml): весь сайт в одном стиле
+theme:
+  accent: "#6366F1"
+  accent2: "#EC4899"
+  accentFlow: true
+
+slides:
+  - id: roadmap
+    title: Как вернём {g:duo|рост}
+    badge: Дорожная карта
+    body:
+      - type: roadmap
+        items:
+          - { title: Наставники для новичков, text: I квартал, done: true }
+          - { title: Счёт за час, text: II квартал, done: true }
+          - { title: Мобильное приложение, text: III квартал }
+          - { title: Второй офис, text: IV квартал }
+          - { title: Продажи ×2, text: 2028 }
+      - type: grid
+        columns: 3
+        items:
+          - { type: card, body: { type: stat, value: "1 час", label: на счёт клиенту, note: было три дня } }
+          - { type: card, body: { type: stat, value: "2 мес.", label: до плана у новичка, note: с наставником } }
+          - { type: card, body: { type: stat, value: "×2", label: продажи к 2028 году, note: цель стратегии } }
+
+  - id: decision
+    title: Где открыть второй {g:duo|офис}
+    badge: Матрица решений
+    body:
+      - type: decision
+        options: [Казань, Екатеринбург, Новосибирск]
+        scale: 5
+        criteria:
+          - { title: Аренда и зарплаты, weight: 30, scores: [4, 3, 5] }
+          - { title: Найм инженеров, weight: 25, scores: [3, 5, 4] }
+          - { title: Перелёт до клиентов, weight: 20, scores: [5, 4, 2] }
+          - { title: Налоговые льготы, weight: 15, scores: [4, 3, 3] }
+          - { title: Качество жизни, weight: 10, scores: [4, 4, 3] }
+
+  - id: market
+    title: Рынок {g:duo|онлайн-курсов}
+    badge: TAM · SAM · SOM
+    body:
+      - type: nested
+        items:
+          - { title: TAM, text: "120 млрд ₽ — весь рынок онлайн-обучения" }
+          - { title: SAM, text: "18 млрд ₽ — курсы для инженеров" }
+          - { title: SOM, text: "1,2 млрд ₽ — наша доля за три года" }
+
+  - id: cover
+    template: cover
+    title: Стратегия на 2027 год
+    lead: Куда растём и как туда дойти за год
+    meta: Совет директоров · ноябрь 2026
+    visual:
+      type: pillars
+      center: Рост ×2
+      items:
+        - { title: Люди, text: Наставники для новичков }
+        - { title: Процессы, text: Счёт за час }
+        - { title: Рынок, text: Второй офис }

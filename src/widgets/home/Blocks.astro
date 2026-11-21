@@ -1,26 +1,26 @@
 ---
 /**
- * «Блоки»: девять слайдов галереи — блоки, которых нет на витрине, в четырёх разных темах студии
+ * «Блоки»: девять слайдов галереи — блоки, которых нет на витрине, в теме Slideria
  * (src/entities/gallery). Не перечень: полный список — в студии. Щелчок открывает слайд крупно,
  * стрелки листают. На телефоне — лента вбок, на планшете — две колонки, на компьютере — три.
  */
 import type { ImageMetadata } from 'astro';
 import { ChevronLeft, ChevronRight, Maximize2, X } from '@lucide/astro';
-import { blockSlides, galleryAccents, galleryThemes } from '@/entities/gallery/gallery';
+import { blockSlides, galleryTopics } from '@/entities/gallery/gallery';
 import Container from '@/shared/ui-kit/Container.astro';
 import SectionHeading from '@/shared/ui-kit/SectionHeading.astro';
 import Shot from '@/shared/ui-kit/Shot.astro';
 
 const shots = import.meta.glob<{ default: ImageMetadata }>('/src/assets/gallery/*.webp', { eager: true });
 const shot = (deck: string, n: number, look: 'light' | 'dark') => shots[`/src/assets/gallery/${deck}-${n}-${look}.webp`].default;
-const more = ['дорожная карта', 'лестница роста', 'шестерёнки', 'карта идей', 'карточки-перевёртыши', '3D-модель', 'песочница с кодом'];
+const more = ['спидометр', 'лестница роста', 'шестерёнки', 'карта идей', 'карточки-перевёртыши', '3D-модель', 'песочница с кодом'];
 ---
 <section id="components" class="relative py-24 sm:py-32">
   <Container>
     <SectionHeading
       eyebrow="Блоки"
       title="Блок на любой слайд"
-      lead="Гант и матрица рисков, тест для зала, формулы с ползунками, схемы из текста. Блок сам берёт цвета и шрифты темы — здесь четыре из 22 тем студии."
+      lead="Гант и дорожная карта, тест для зала, формулы с ползунками, схемы из текста. Каждый блок сам берёт цвета и шрифты темы и оживает при показе."
     />
 
     <ul data-blocks class="-mx-4 mt-14 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-3">
@@ -31,7 +31,7 @@ const more = ['дорожная карта', 'лестница роста', 'ш�
               <Shot
                 light={shot(b.deck, b.n, 'light')}
                 dark={shot(b.deck, b.n, 'dark')}
-                alt={`${b.block} — слайд в теме «${galleryThemes[b.deck]}»`}
+                alt={`${b.block} — слайд из презентации «${galleryTopics[b.deck]}»`}
                 widths={[480, 800, 1200, 1600]}
                 sizes="(min-width: 1200px) 376px, (min-width: 1024px) 31vw, (min-width: 640px) 46vw, 84vw"
                 class="transition-transform duration-500 ease-out group-hover:scale-[1.03]"
@@ -41,9 +41,7 @@ const more = ['дорожная карта', 'лестница роста', 'ш�
             <figcaption class="flex flex-col gap-1 px-4 py-3.5">
               <span class="flex items-center justify-between gap-3">
                 <b data-zoom-title class="text-[15.5px] leading-snug text-tx">{b.block}</b>
-                <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-bd px-2 py-0.5 text-[11.5px] font-semibold text-tx2">
-                  <i class="size-2 rounded-full" style={`background:${galleryAccents[b.deck]}`}></i>{galleryThemes[b.deck]}
-                </span>
+                <span class="shrink-0 rounded-full bg-acs px-2.5 py-0.5 text-[11.5px] font-semibold text-ac">{b.tag}</span>
               </span>
               <span data-zoom-text class="text-[13.5px] leading-snug text-mu">{b.text}</span>
             </figcaption>

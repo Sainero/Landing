@@ -87,7 +87,7 @@ test('окно докладчика запускается по щелчку и 
   await expect(page.frameLocator('[data-presenter-preview] iframe').locator('#ct')).toHaveText('5 / 14', { timeout: 15_000 });
 });
 
-test('блоки: девять слайдов галереи в разных темах, картинки в теме сайта', async ({ page }) => {
+test('блоки: девять слайдов галереи, картинки в теме сайта', async ({ page }) => {
   const blocks = page.locator('[data-blocks] [data-block]');
   await expect(blocks).toHaveCount(9);
   const loaded = () => blocks.locator('img:visible').evaluateAll((imgs) => (imgs as HTMLImageElement[]).map((i) => i.complete && i.naturalWidth > 0));
@@ -95,7 +95,7 @@ test('блоки: девять слайдов галереи в разных т�
   await expect.poll(loaded).toEqual(Array(9).fill(true));
   // слайды галереи, не витрины; видимы светлые, после смены темы — тёмные
   const src = () => blocks.locator('img:visible').evaluateAll((imgs) => (imgs as HTMLImageElement[]).map((i) => i.currentSrc));
-  expect((await src()).every((u) => /(sand|mint|editorial|graphite)-\d-light/.test(u))).toBe(true);
+  expect((await src()).every((u) => /(cafe|lesson|strategy|payments)-\d-light/.test(u))).toBe(true);
   await page.locator('header [data-theme-toggle]').click();
   await expect.poll(async () => (await src()).every((u) => /-dark/.test(u))).toBe(true);
 });
