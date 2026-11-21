@@ -1,19 +1,16 @@
 ---
 /**
- * Маленький кадр слайда витрины (640 × 360) в теме сайта: светлый и тёмный переключаются вместе с ней.
- * Скрытый кадр с loading="lazy" браузер не загружает.
+ * Маленький кадр слайда (640 × 360) в теме сайта: светлый и тёмный переключаются вместе с ней.
+ * thumb — адрес с {look} (galleryThumb, showcaseThumb). Скрытый кадр с loading="lazy" браузер не загружает.
  */
 import { cn } from '@/shared/lib/cn';
-import { thumbUrl } from '../lib/live';
 
 interface Props {
-  /** Номер слайда, с единицы */
-  slide: number;
-  deck?: string;
+  thumb: string;
   class?: string;
 }
-const { slide, deck = 'slideria', class: cls } = Astro.props;
+const { thumb, class: cls } = Astro.props;
 const base = 'block aspect-video h-auto w-full rounded-lg border border-bd object-cover shadow-[var(--shadow-sm)]';
 ---
-<img src={thumbUrl(deck, slide - 1, 'light')} alt="" width="640" height="360" loading="lazy" decoding="async" class={cn(base, 'dark:hidden', cls)} />
-<img src={thumbUrl(deck, slide - 1, 'dark')} alt="" width="640" height="360" loading="lazy" decoding="async" class={cn(base, 'hidden dark:block', cls)} />
+<img src={thumb.replace('{look}', 'light')} alt="" width="640" height="360" loading="lazy" decoding="async" class={cn(base, 'dark:hidden', cls)} />
+<img src={thumb.replace('{look}', 'dark')} alt="" width="640" height="360" loading="lazy" decoding="async" class={cn(base, 'hidden dark:block', cls)} />

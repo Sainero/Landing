@@ -1,6 +1,6 @@
 // Полёт сквозь слайды: раскладка карточек — одинаковая при каждой сборке и равномерная на любом экране
 import { describe, expect, it } from 'vitest';
-import { WARP, mulberry32, warpLayout, warpOpacity } from '@/entities/deck/lib/warp';
+import { WARP, mulberry32, slideStep, warpLayout, warpOpacity } from '@/entities/deck/lib/warp';
 
 describe('warpLayout', () => {
   const cards = warpLayout({ count: 22, slides: 14, seed: 7 });
@@ -57,6 +57,13 @@ describe('warpLayout', () => {
       if (Math.abs(c.ux) > 0.2) expect(Math.sign(c.ry)).toBe(-Math.sign(c.ux));
       if (Math.abs(c.uy) > 0.2) expect(Math.sign(c.rx)).toBe(Math.sign(c.uy));
     }
+  });
+
+  it('при 30 кадрах (витрина и галерея) 22 карточки показывают 22 разных', () => {
+    const many = warpLayout({ count: 22, slides: 30, seed: 7 }).map((c) => c.slide);
+    expect(new Set(many).size).toBe(22);
+    expect(slideStep(30)).toBe(7);
+    expect(slideStep(14)).toBe(5);
   });
 
   it('без кадров — нулевой слайд, без ошибок', () => {

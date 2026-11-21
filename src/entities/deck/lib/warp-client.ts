@@ -11,7 +11,7 @@
  *  - смена темы сайта перерисовывает кадры в другой теме;
  *  - на компьютере сцена слегка поворачивается за курсором (переход transform, тоже видеокарта).
  */
-import { siteLook, thumbUrl } from './live';
+import { siteLook } from './live';
 
 type Look = 'light' | 'dark';
 type Source = ImageBitmap | HTMLImageElement;
@@ -53,14 +53,13 @@ function enqueue(job: () => Promise<void>): void {
 }
 
 function mount(root: HTMLElement): void {
-  const deck = root.dataset.warp!;
-  const cards = [...root.querySelectorAll<HTMLCanvasElement | HTMLImageElement>('[data-slide]')];
+  const cards = [...root.querySelectorAll<HTMLCanvasElement | HTMLImageElement>('[data-thumb]')];
   let look: Look = siteLook();
 
   async function paint(card: HTMLCanvasElement | HTMLImageElement): Promise<void> {
-    const key = `${look}:${card.dataset.slide}`;
+    const key = `${look}:${card.dataset.thumb}`;
     card.dataset.want = key;
-    const url = thumbUrl(deck, Number(card.dataset.slide), look);
+    const url = card.dataset.thumb!.replace('{look}', look);
     if (card instanceof HTMLImageElement) {
       card.src = url;
       await card.decode().catch(() => undefined);
@@ -79,7 +78,7 @@ function mount(root: HTMLElement): void {
   }
   // Рисуются только видимые карточки: на телефоне часть скрыта, им не нужна память
   const paintVisible = () => new Promise<void>((done) => {
-    const todo = cards.filter((c) => visible(c) && c.dataset.painted !== `${look}:${c.dataset.slide}`);
+    const todo = cards.filter((c) => visible(c) && c.dataset.painted !== `${look}:${c.dataset.thumb}`);
     if (!todo.length) return done();
     let left = todo.length;
     todo.forEach((c) => enqueue(() => paint(c).finally(() => { if (--left === 0) done(); })));

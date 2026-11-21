@@ -4,7 +4,8 @@
 //   - разделы README и docs/ о работе в программе        → content/docs/*.md (раздел /docs)
 //   - кадры слайдов и окна докладчика (светлые и тёмные)  → public/demo/posters/<имя>/*.webp
 //     и их уменьшенные копии для полёта слайдов           → public/demo/posters/<имя>/thumbs/*.webp
-//   - вырезки блоков со слайдов витрины (раздел «Блоки») → src/assets/blocks/*.webp
+//   - галерея блоков: презентации content/gallery/ в разных темах, собранные движком;
+//     их кадры (раздел «Блоки», полёт слайдов, карточки)  → src/assets/gallery/, public/demo/gallery/thumbs/
 //   - версия программы                                  → content/engine.json
 //
 // Кадры нужны, чтобы страница не запускала тяжёлые презентации сразу: до щелчка «Запустить показ»
@@ -25,16 +26,13 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import sharp from 'sharp';
 import { dropDeadAnchors, fixLinks, forUsers, keepSections, section } from './lib/docs-transform.mjs';
-import { shootBlocks } from './lib/block-shots.mjs';
+import { buildGallery, shootGallery } from './lib/gallery.mjs';
 
 const root = process.cwd();
 const engine = path.resolve(process.env.SLIDERIA_DIR ?? path.join(root, '..', 'HTMLPPTX'));
 const DECKS = (process.env.DECKS ?? 'slideria').split(',').map((s) => s.trim()).filter(Boolean);
-/**
- * Чьи кадры нужны: all — каждого слайда (витрина на первом экране), first — только первого;
- * blocks — ещё и вырезки блоков для раздела «Блоки» (scripts/lib/block-shots.mjs)
- */
-const POSTERS = { slideria: { slides: 'all', presenter: true, blocks: true } };
+/** Чьи кадры нужны: all — каждого слайда (витрина на первом экране), first — только первого */
+const POSTERS = { slideria: { slides: 'all', presenter: true } };
 const args = new Set(process.argv.slice(2));
 
 if (!fs.existsSync(path.join(engine, 'package.json'))) {
@@ -73,7 +71,12 @@ for (const name of DECKS) {
   decks.push({ name, sizeKb: Math.round(fs.statSync(html).size / 1024), slides });
 }
 
-if (!args.has('--no-posters')) await shootPosters();
+let gallery = [];
+if (!args.has('--no-posters')) {
+  console.log('… собираю галерею блоков (content/gallery)');
+  gallery = buildGallery({ root, engine, run });
+  await shootPosters();
+}
 await makeThumbs();
 
 // ---------- кадры ----------
@@ -136,8 +139,8 @@ async function shootPosters() {
           await ctx.close();
         }
       }
-      if (want.blocks) await shootBlocks(browser, file, path.join(root, 'src', 'assets', 'blocks'), (f) => console.log(`✓ ${rel(f)}`));
     }
+    if (gallery.length) await shootGallery(browser, gallery, { root, done: (f) => console.log(`✓ ${rel(f)}`) });
   } finally {
     await browser.close();
   }

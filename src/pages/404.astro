@@ -2,10 +2,11 @@
 import SiteLayout from '@/app/layouts/SiteLayout.astro';
 import Button from '@/shared/ui-kit/Button.astro';
 import SlideWarp from '@/entities/deck/ui/SlideWarp.astro';
+import { warpThumbs } from '@/entities/gallery/gallery';
 ---
 <SiteLayout title="Страница не найдена">
   <section data-anim class="relative isolate grid min-h-[80dvh] place-items-center overflow-hidden px-4 pt-24 text-center">
-    <SlideWarp count={12} seed={404} />
+    <SlideWarp count={12} seed={404} thumbs={warpThumbs()} />
     <div class="flex flex-col items-center">
       <div class="font-mono text-sm text-mu">слайд не найден</div>
       <h1 class="mt-3 text-[clamp(80px,18vw,180px)] font-extrabold leading-none tracking-[-.06em] text-gradient">404</h1>

@@ -53,8 +53,16 @@ test('«Запустить показ» открывает витрину на �
   await showcase.locator('[data-slide-tab="6"]').click();
   await expect(counter).toHaveText('7 из 14');
 
-  // листание внутри показа → вкладка
-  await page.frameLocator('[data-showcase] iframe').locator('#nx').click();
+  // листание внутри показа → вкладка. Стрелка — прямо в документ показа: тест о том, что сайт идёт за показом,
+  // а не о мыши и фокусе (щелчок по «Далее» внутри фрейма при параллельном прогоне иногда теряется).
+  // Пока показ доигрывает переход, он может пропустить нажатие — тогда ещё раз, но только пока он на седьмом слайде
+  const show = page.frame({ url: /\/demo\/slideria\.html/ })!;
+  await expect(async () => {
+    if ((await counter.textContent()) === '7 из 14') {
+      await show.evaluate(() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', code: 'ArrowRight', bubbles: true })));
+    }
+    await expect(counter).toHaveText('8 из 14', { timeout: 1500 });
+  }).toPass({ timeout: 10_000 });
   await expect(showcase.locator('[data-slide-tab="7"]')).toHaveAttribute('aria-selected', 'true');
   done();
 });
@@ -79,21 +87,33 @@ test('окно докладчика запускается по щелчку и 
   await expect(page.frameLocator('[data-presenter-preview] iframe').locator('#ct')).toHaveText('5 / 14', { timeout: 15_000 });
 });
 
-test('блоки: несколько настоящих блоков с витрины, картинки в теме сайта', async ({ page }) => {
+test('блоки: девять слайдов галереи в разных темах, картинки в теме сайта', async ({ page }) => {
   const blocks = page.locator('[data-blocks] [data-block]');
-  await expect(blocks).toHaveCount(6);
-  // не каталог: ни фильтров, ни «Показать все»
-  await expect(page.locator('#components [role="tab"], #components button')).toHaveCount(0);
+  await expect(blocks).toHaveCount(9);
   const loaded = () => blocks.locator('img:visible').evaluateAll((imgs) => (imgs as HTMLImageElement[]).map((i) => i.complete && i.naturalWidth > 0));
-  await page.locator('#components').scrollIntoViewIfNeeded();
   for (const b of await blocks.all()) await b.scrollIntoViewIfNeeded();
-  await expect.poll(loaded).toEqual(Array(6).fill(true));
-  // видимы светлые кадры; после смены темы — тёмные
+  await expect.poll(loaded).toEqual(Array(9).fill(true));
+  // слайды галереи, не витрины; видимы светлые, после смены темы — тёмные
   const src = () => blocks.locator('img:visible').evaluateAll((imgs) => (imgs as HTMLImageElement[]).map((i) => i.currentSrc));
-  expect((await src()).every((u) => /-light/.test(u))).toBe(true);
+  expect((await src()).every((u) => /(sand|mint|editorial|graphite)-\d-light/.test(u))).toBe(true);
   await page.locator('header [data-theme-toggle]').click();
   await expect.poll(async () => (await src()).every((u) => /-dark/.test(u))).toBe(true);
-  await expect.poll(loaded).toEqual(Array(6).fill(true));
+});
+
+test('блоки: слайд открывается крупно, стрелки листают, Esc закрывает', async ({ page }) => {
+  const done = watchErrors(page);
+  const dialog = page.locator('[data-zoom-dialog]');
+  await page.locator('[data-zoom]').nth(1).scrollIntoViewIfNeeded();
+  await page.locator('[data-zoom]').nth(1).click();
+  await expect(dialog).toBeVisible();
+  await expect(dialog.locator('[data-zoom-name]')).toHaveText('Тест для зала');
+  const big = dialog.locator('img:visible');
+  await expect.poll(() => big.evaluate((i: HTMLImageElement) => i.complete && i.naturalWidth >= 1200)).toBe(true);
+  await page.keyboard.press('ArrowRight');
+  await expect(dialog.locator('[data-zoom-name]')).toHaveText('Матрица решений');
+  await page.keyboard.press('Escape');
+  await expect(dialog).toBeHidden();
+  done();
 });
 
 test('три способа: у карточек одно устройство и ни слова о 187 фигурах', async ({ page }) => {

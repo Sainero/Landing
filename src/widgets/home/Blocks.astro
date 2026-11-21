@@ -1,71 +1,111 @@
 ---
 /**
- * «Блоки»: не весь список (их полсотни, полный — в студии), а несколько самых выразительных
- * из разных групп — настоящие, вырезаны со слайдов витрины в обеих темах (scripts/lib/block-shots.mjs).
- * Две колонки разной высоты вместо сетки: у вырезок своя пропорция, и в карточках нет пустот.
+ * «Блоки»: девять слайдов галереи — блоки, которых нет на витрине, в четырёх разных темах студии
+ * (src/entities/gallery). Не перечень: полный список — в студии. Щелчок открывает слайд крупно,
+ * стрелки листают. На телефоне — лента вбок, на планшете — две колонки, на компьютере — три.
  */
 import type { ImageMetadata } from 'astro';
+import { ChevronLeft, ChevronRight, Maximize2, X } from '@lucide/astro';
+import { blockSlides, galleryAccents, galleryThemes } from '@/entities/gallery/gallery';
 import Container from '@/shared/ui-kit/Container.astro';
 import SectionHeading from '@/shared/ui-kit/SectionHeading.astro';
 import Shot from '@/shared/ui-kit/Shot.astro';
 
-const shots = import.meta.glob<{ default: ImageMetadata }>('/src/assets/blocks/*.webp', { eager: true });
-const shot = (id: string, look: 'light' | 'dark') => shots[`/src/assets/blocks/${id}-${look}.webp`].default;
-
-interface Block { id: string; tag: string; title: string; text: string }
-const columns: Block[][] = [
-  [
-    { id: 'charts', tag: 'Данные', title: 'Графики, которые прорисовываются', text: 'Линии, столбцы, ключевые числа и полоса доступности — в цветах темы, с анимацией при открытии слайда.' },
-    { id: 'formulas', tag: 'Интерактив', title: 'Слайд, который считает', text: 'Ползунок задаёт переменную, а числа, столбцы и подписи пересчитываются прямо во время показа.' },
-    { id: 'media', tag: 'Медиа', title: 'Видео, GIF и 3D', text: 'Видео и ссылки YouTube, GIF, SVG, фото и 3D-модель, которую при показе крутят мышью.' },
-  ],
-  [
-    { id: 'type', tag: 'Типографика', title: 'Текст с градиентом', text: 'Градиент ложится на слово, фразу или весь заголовок, а текст остаётся обычным и правится на месте.' },
-    { id: 'code', tag: 'Код', title: 'Код прямо на слайде', text: 'Редактор и результат рядом: поправили при показе — результат обновился на лету.' },
-    { id: 'tables', tag: 'Таблицы и планы', title: 'Таблицы и хронология', text: 'Строка под мышью подсвечивается, хронология прорисовывается до пройденного этапа.' },
-  ],
-];
-const more = ['диаграмма Ганта', 'матрица рисков', '«рыбья кость»', 'диаграмма Венна', 'формулы', 'тест для зала', 'схемы сети'];
+const shots = import.meta.glob<{ default: ImageMetadata }>('/src/assets/gallery/*.webp', { eager: true });
+const shot = (deck: string, n: number, look: 'light' | 'dark') => shots[`/src/assets/gallery/${deck}-${n}-${look}.webp`].default;
+const more = ['дорожная карта', 'лестница роста', 'шестерёнки', 'карта идей', 'карточки-перевёртыши', '3D-модель', 'песочница с кодом'];
 ---
 <section id="components" class="relative py-24 sm:py-32">
   <Container>
     <SectionHeading
       eyebrow="Блоки"
       title="Блок на любой слайд"
-      lead="Графики, формулы, код, 3D — каждый блок в цветах вашей темы и с анимацией появления. Вот несколько с витрины."
+      lead="Гант и матрица рисков, тест для зала, формулы с ползунками, схемы из текста. Блок сам берёт цвета и шрифты темы — здесь четыре из 22 тем студии."
     />
 
-    <div data-blocks class="mt-14 grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-2">
-      {columns.map((col, c) => (
-        <ul class="flex flex-col gap-5">
-          {col.map((b, i) => (
-            <li data-reveal style={`--d:${(c * 0.08 + i * 0.06).toFixed(2)}s`}>
-              <figure data-block={b.id} class="group overflow-hidden rounded-3xl border border-bd bg-surf shadow-[var(--shadow-sm)] transition hover:border-acb hover:shadow-[var(--shadow-md)]">
-                <div class="overflow-hidden border-b border-bd">
-                  <Shot
-                    light={shot(b.id, 'light')}
-                    dark={shot(b.id, 'dark')}
-                    alt={`${b.title} — блок на слайде витрины Slideria`}
-                    widths={[560, 900, 1200, 1600]}
-                    sizes="(min-width: 1200px) 576px, (min-width: 1024px) 48vw, 100vw"
-                    class="transition-transform duration-500 ease-out group-hover:scale-[1.02]"
-                  />
-                </div>
-                <figcaption class="flex flex-col gap-1.5 px-6 py-5">
-                  <span class="w-fit rounded-full bg-acs px-2.5 py-0.5 text-[12px] font-semibold text-ac">{b.tag}</span>
-                  <b class="mt-1 text-[18px] leading-snug text-tx">{b.title}</b>
-                  <span class="text-[14.5px] leading-relaxed text-mu">{b.text}</span>
-                </figcaption>
-              </figure>
-            </li>
-          ))}
-        </ul>
+    <ul data-blocks class="-mx-4 mt-14 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-3">
+      {blockSlides.map((b, i) => (
+        <li data-reveal class="w-[84%] shrink-0 snap-center sm:w-auto" style={`--d:${((i % 3) * 0.07).toFixed(2)}s`}>
+          <figure data-block={`${b.deck}-${b.n}`} class="group h-full overflow-hidden rounded-2xl border border-bd bg-surf shadow-[var(--shadow-sm)] transition hover:border-acb hover:shadow-[var(--shadow-md)]">
+            <button type="button" data-zoom={i} class="relative block w-full overflow-hidden border-b border-bd" aria-label={`Открыть крупно: ${b.block}`}>
+              <Shot
+                light={shot(b.deck, b.n, 'light')}
+                dark={shot(b.deck, b.n, 'dark')}
+                alt={`${b.block} — слайд в теме «${galleryThemes[b.deck]}»`}
+                widths={[480, 800, 1200, 1600]}
+                sizes="(min-width: 1200px) 376px, (min-width: 1024px) 31vw, (min-width: 640px) 46vw, 84vw"
+                class="transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+              />
+              <span aria-hidden="true" class="absolute right-2.5 top-2.5 grid size-8 place-items-center rounded-full bg-[rgba(2,6,23,.55)] text-white opacity-0 transition group-hover:opacity-100"><Maximize2 class="size-4" /></span>
+            </button>
+            <figcaption class="flex flex-col gap-1 px-4 py-3.5">
+              <span class="flex items-center justify-between gap-3">
+                <b data-zoom-title class="text-[15.5px] leading-snug text-tx">{b.block}</b>
+                <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-bd px-2 py-0.5 text-[11.5px] font-semibold text-tx2">
+                  <i class="size-2 rounded-full" style={`background:${galleryAccents[b.deck]}`}></i>{galleryThemes[b.deck]}
+                </span>
+              </span>
+              <span data-zoom-text class="text-[13.5px] leading-snug text-mu">{b.text}</span>
+            </figcaption>
+          </figure>
+        </li>
       ))}
-    </div>
+    </ul>
 
     <p data-reveal class="mx-auto mt-10 max-w-3xl text-pretty text-center text-[15.5px] leading-relaxed text-mu">
-      И ещё полсотни блоков: {more.join(', ')}.
+      И ещё: {more.join(', ')}.
       Все — в студии на вкладке <b class="font-semibold text-tx">«Вставка» → «Блоки»</b>, с живыми превью в цветах вашей темы.
     </p>
   </Container>
+
+  <!-- крупный просмотр слайда -->
+  <dialog data-zoom-dialog aria-label="Слайд крупно" class="m-auto w-[min(1200px,94vw)] max-w-none overflow-hidden rounded-2xl border border-bd bg-surf p-0 text-tx shadow-[var(--shadow-lg)] backdrop:bg-[rgba(2,6,23,.72)]">
+    <div data-zoom-body class="aspect-video bg-alt"></div>
+    <div class="flex items-center gap-3 px-4 py-3 sm:px-5">
+      <div class="min-w-0 flex-1">
+        <b data-zoom-name class="block text-[16px] text-tx"></b>
+        <span data-zoom-desc class="block truncate text-[14px] text-mu"></span>
+      </div>
+      <button type="button" data-zoom-step="-1" aria-label="Предыдущий слайд" class="grid size-10 place-items-center rounded-xl border border-bd text-tx2 transition hover:border-acb hover:text-tx"><ChevronLeft class="size-5" /></button>
+      <button type="button" data-zoom-step="1" aria-label="Следующий слайд" class="grid size-10 place-items-center rounded-xl border border-bd text-tx2 transition hover:border-acb hover:text-tx"><ChevronRight class="size-5" /></button>
+      <button type="button" data-zoom-close aria-label="Закрыть" class="grid size-10 place-items-center rounded-xl border border-bd text-tx2 transition hover:border-acb hover:text-tx"><X class="size-5" /></button>
+    </div>
+  </dialog>
 </section>
+
+<script>
+  // Крупный просмотр: в окно копируются картинки плитки (светлая и тёмная) с другим sizes —
+  // браузер сам берёт кадр крупнее из того же набора ширин
+  const dialog = document.querySelector<HTMLDialogElement>('[data-zoom-dialog]');
+  const tiles = [...document.querySelectorAll<HTMLButtonElement>('[data-zoom]')];
+  if (dialog && tiles.length) {
+    const body = dialog.querySelector<HTMLElement>('[data-zoom-body]')!;
+    const name = dialog.querySelector<HTMLElement>('[data-zoom-name]')!;
+    const desc = dialog.querySelector<HTMLElement>('[data-zoom-desc]')!;
+    let current = 0;
+    const show = (i: number) => {
+      current = (i + tiles.length) % tiles.length;
+      const tile = tiles[current];
+      const fig = tile.closest('figure')!;
+      body.replaceChildren(...[...tile.querySelectorAll('picture')].map((p) => {
+        const copy = p.cloneNode(true) as HTMLElement;
+        copy.querySelectorAll('source, img').forEach((el) => el.setAttribute('sizes', 'min(1200px, 94vw)'));
+        copy.querySelector('img')?.setAttribute('loading', 'eager');
+        copy.querySelector('img')?.classList.remove('group-hover:scale-[1.03]');
+        return copy;
+      }));
+      name.textContent = fig.querySelector('[data-zoom-title]')?.textContent ?? '';
+      desc.textContent = fig.querySelector('[data-zoom-text]')?.textContent ?? '';
+    };
+    tiles.forEach((t, i) => t.addEventListener('click', () => { show(i); dialog.showModal(); }));
+    dialog.querySelectorAll<HTMLButtonElement>('[data-zoom-step]').forEach((b) => b.addEventListener('click', () => show(current + Number(b.dataset.zoomStep))));
+    dialog.querySelector('[data-zoom-close]')?.addEventListener('click', () => dialog.close());
+    // щелчок по затемнению вокруг окна закрывает его
+    dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
+    dialog.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') show(current + 1);
+      if (e.key === 'ArrowLeft') show(current - 1);
+    });
+    dialog.addEventListener('close', () => tiles[current]?.focus());
+  }
+</script>

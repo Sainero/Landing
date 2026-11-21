@@ -16,6 +16,8 @@ import { siteConfig } from '@/shared/lib/config';
 
 interface Props {
   deck?: string;
+  /** Кадры карточек: адреса с {look} вместо light или dark; по умолчанию — слайды витрины deck */
+  thumbs?: string[];
   /** Карточек на компьютере; на телефоне видны первые 10 */
   count?: number;
   seed?: number;
@@ -31,18 +33,19 @@ interface Props {
   images?: boolean;
   class?: string;
 }
-const { deck = 'slideria', count = 22, seed = 7, focus = '50%', dolly = false, images = false, class: cls } = Astro.props;
-const slides = siteConfig.engine.decks.find((d) => d.name === deck)?.slides ?? 1;
-const cards = warpLayout({ count, slides, seed });
+const { deck = 'slideria', thumbs, count = 22, seed = 7, focus = '50%', dolly = false, images = false, class: cls } = Astro.props;
+const showcase = siteConfig.engine.decks.find((d) => d.name === deck)?.slides ?? 1;
+const pool = thumbs?.length ? thumbs : Array.from({ length: showcase }, (_, i) => `/demo/posters/${deck}/thumbs/{look}-${i + 1}.webp`);
+const cards = warpLayout({ count, slides: pool.length, seed });
 ---
-<div aria-hidden="true" class:list={['warp', cls]} data-warp={deck} data-dolly={dolly ? '' : undefined} style={`--vy:${focus}`}>
+<div aria-hidden="true" class:list={['warp', cls]} data-warp data-dolly={dolly ? '' : undefined} style={`--vy:${focus}`}>
   <div class="warp-tilt" data-warp-tilt>
     <div class="warp-world">
       {cards.map((c) => {
         const style = `--ux:${c.ux};--uy:${c.uy};--ry:${c.ry}deg;--rx:${c.rx}deg;--dur:${c.dur}s;--delay:${c.delay}s;--z0:${c.z0}px;--o0:${c.o0}`;
         return images
-          ? <img class="warp-card" alt="" decoding="async" width="640" height="360" data-slide={c.slide} style={style} />
-          : <canvas class="warp-card" width="640" height="360" data-slide={c.slide} style={style}></canvas>;
+          ? <img class="warp-card" alt="" decoding="async" width="640" height="360" data-thumb={pool[c.slide]} style={style} />
+          : <canvas class="warp-card" width="640" height="360" data-thumb={pool[c.slide]} style={style}></canvas>;
       })}
     </div>
   </div>

@@ -3,6 +3,7 @@ import { ArrowDown } from '@lucide/astro';
 import DownloadLink from '@/entities/app/DownloadLink.astro';
 import DeckShowcase from '@/entities/deck/ui/DeckShowcase.astro';
 import SlideWarp from '@/entities/deck/ui/SlideWarp.astro';
+import { warpThumbs } from '@/entities/gallery/gallery';
 import { deckSize, sizeLabel, siteConfig } from '@/shared/lib/config';
 import Button from '@/shared/ui-kit/Button.astro';
 import Container from '@/shared/ui-kit/Container.astro';
@@ -15,7 +16,7 @@ const chips = ['Импорт PowerPoint', 'Окно докладчика', 'Пу
 <section data-hero data-anim class="relative isolate overflow-hidden pb-16 sm:pb-24">
   <!-- первый экран: слайды вылетают из-за заголовка -->
   <div class="relative flex min-h-[max(640px,min(100svh,1000px))] flex-col justify-center pb-16 pt-28 sm:pt-32">
-    <SlideWarp dolly focus="52%" />
+    <SlideWarp dolly focus="52%" thumbs={warpThumbs()} />
 
     <Container class="relative flex flex-col items-center text-center">
       <a href="#app" class="fade-up group mb-7 inline-flex items-center gap-2 rounded-full border border-bd bg-surf py-1 pl-1 pr-3 text-[13px] font-semibold text-tx2 shadow-[var(--shadow-sm)] transition hover:border-acb" style="--d:.05s">

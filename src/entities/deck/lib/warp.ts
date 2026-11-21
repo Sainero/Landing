@@ -54,8 +54,11 @@ export function warpOpacity(p: number): number {
 
 const GOLDEN_ANGLE = 2.399963229728653;
 const GOLDEN_RATIO = 0.6180339887498949;
-/** Шаг по кадрам: взаимно прост с 14, поэтому первые 14 карточек показывают разные слайды */
-export const SLIDE_STEP = 5;
+const gcd = (a: number, b: number): number => (b ? gcd(b, a % b) : a);
+/** Шаг по кадрам, взаимно простой с их числом: тогда первые карточки показывают разные слайды */
+export function slideStep(slides: number): number {
+  return [5, 7, 11, 13, 17, 19, 23].find((s) => gcd(s, slides) === 1) ?? 1;
+}
 
 const r2 = (n: number) => Math.round(n * 100) / 100 || 0;
 
@@ -65,6 +68,7 @@ const r2 = (n: number) => Math.round(n * 100) / 100 || 0;
  */
 export function warpLayout({ count, slides, seed = 1 }: { count: number; slides: number; seed?: number }): WarpCard[] {
   const rnd = mulberry32(seed);
+  const step = slideStep(slides);
   return Array.from({ length: count }, (_, i) => {
     const a = i * GOLDEN_ANGLE + (rnd() - 0.5) * 0.5;
     const r = 1.15 + rnd() * 1.45;
@@ -79,7 +83,7 @@ export function warpLayout({ count, slides, seed = 1 }: { count: number; slides:
       delay: r2(-phase * dur),
       z0: Math.round(WARP.far + phase * (WARP.near - WARP.far)),
       o0: r2(warpOpacity(phase)),
-      slide: slides > 0 ? (i * SLIDE_STEP) % slides : 0,
+      slide: slides > 0 ? (i * step) % slides : 0,
     };
   });
 }
