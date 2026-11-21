@@ -99,3 +99,23 @@ test('sitemap и robots.txt', async ({ request }) => {
   const robots = await request.get('/robots.txt');
   expect(await robots.text()).toContain('Sitemap:');
 });
+
+// Секции главной ниже первого экрана при загрузке не рисуются (content-visibility) — якорь всё равно ведёт точно к разделу
+for (const id of ['components', 'agents', 'faq']) {
+  test(`переход по якорю /#${id} — раздел сразу под шапкой`, async ({ page }) => {
+    await page.goto(`/#${id}`);
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(500);
+    const top = await page.locator(`#${id}`).evaluate((el) => el.getBoundingClientRect().top);
+    expect(Math.abs(top - 88)).toBeLessThan(4);
+  });
+}
+
+test('ссылка на раздел сразу после загрузки ведёт точно к нему', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('header a[href$="#agents"]').first().click();
+  await expect.poll(() => page.locator('#agents').evaluate((el) => Math.round(el.getBoundingClientRect().top)), { timeout: 5000 }).toBeLessThan(92);
+  await page.waitForTimeout(1500);
+  const top = await page.locator('#agents').evaluate((el) => el.getBoundingClientRect().top);
+  expect(Math.abs(top - 88)).toBeLessThan(4);
+});

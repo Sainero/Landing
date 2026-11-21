@@ -54,3 +54,36 @@ if (animated.length && 'IntersectionObserver' in window) {
   );
   animated.forEach((el) => pause.observe(el));
 }
+
+// --- секции ниже первого экрана: при загрузке браузер их пропускает (content-visibility: auto в globals.css),
+// а после загрузки, в простое, они дорисовываются по одной за кадр. Загрузка не тратит время на невидимое,
+// а к началу прокрутки всё уже готово: секции не дорисовываются прямо во время неё.
+// Переход к разделу (якорь в адресе или ссылка) сначала дорисовывает всё: иначе секции выше цели
+// вырастут из запасной высоты уже после прокрутки, и раздел съедет ---
+const later = [...document.querySelectorAll<HTMLElement>('#main > section:not([data-hero])')];
+if (later.length) {
+  const show = (section: HTMLElement) => { section.style.contentVisibility = 'visible'; };
+  const finish = () => later.splice(0).forEach(show);
+
+  const id = decodeURIComponent(location.hash.slice(1));
+  const target = id ? document.getElementById(id) : null;
+  if (target) {
+    finish();
+    requestAnimationFrame(() => target.scrollIntoView({ behavior: 'instant' }));
+  } else {
+    const idle = (fn: () => void) => ('requestIdleCallback' in window ? requestIdleCallback(fn, { timeout: 800 }) : setTimeout(fn, 50));
+    const warm = () => {
+      const section = later.shift();
+      if (!section) return;
+      show(section);
+      requestAnimationFrame(() => idle(warm));
+    };
+    const start = () => setTimeout(() => idle(warm), 300);
+    if (document.readyState === 'complete') start();
+    else addEventListener('load', start, { once: true });
+  }
+  // щелчок по ссылке на раздел раньше, чем всё дорисовалось: дорисовать до прокрутки (фаза перехвата — раньше перехода)
+  document.addEventListener('click', (e) => {
+    if (later.length && (e.target as Element).closest?.('a[href*="#"]')) finish();
+  }, true);
+}

@@ -1,0 +1,71 @@
+---
+/**
+ * «Блоки»: не весь список (их полсотни, полный — в студии), а несколько самых выразительных
+ * из разных групп — настоящие, вырезаны со слайдов витрины в обеих темах (scripts/lib/block-shots.mjs).
+ * Две колонки разной высоты вместо сетки: у вырезок своя пропорция, и в карточках нет пустот.
+ */
+import type { ImageMetadata } from 'astro';
+import Container from '@/shared/ui-kit/Container.astro';
+import SectionHeading from '@/shared/ui-kit/SectionHeading.astro';
+import Shot from '@/shared/ui-kit/Shot.astro';
+
+const shots = import.meta.glob<{ default: ImageMetadata }>('/src/assets/blocks/*.webp', { eager: true });
+const shot = (id: string, look: 'light' | 'dark') => shots[`/src/assets/blocks/${id}-${look}.webp`].default;
+
+interface Block { id: string; tag: string; title: string; text: string }
+const columns: Block[][] = [
+  [
+    { id: 'charts', tag: 'Данные', title: 'Графики, которые прорисовываются', text: 'Линии, столбцы, ключевые числа и полоса доступности — в цветах темы, с анимацией при открытии слайда.' },
+    { id: 'formulas', tag: 'Интерактив', title: 'Слайд, который считает', text: 'Ползунок задаёт переменную, а числа, столбцы и подписи пересчитываются прямо во время показа.' },
+    { id: 'media', tag: 'Медиа', title: 'Видео, GIF и 3D', text: 'Видео и ссылки YouTube, GIF, SVG, фото и 3D-модель, которую при показе крутят мышью.' },
+  ],
+  [
+    { id: 'type', tag: 'Типографика', title: 'Текст с градиентом', text: 'Градиент ложится на слово, фразу или весь заголовок, а текст остаётся обычным и правится на месте.' },
+    { id: 'code', tag: 'Код', title: 'Код прямо на слайде', text: 'Редактор и результат рядом: поправили при показе — результат обновился на лету.' },
+    { id: 'tables', tag: 'Таблицы и планы', title: 'Таблицы и хронология', text: 'Строка под мышью подсвечивается, хронология прорисовывается до пройденного этапа.' },
+  ],
+];
+const more = ['диаграмма Ганта', 'матрица рисков', '«рыбья кость»', 'диаграмма Венна', 'формулы', 'тест для зала', 'схемы сети'];
+---
+<section id="components" class="relative py-24 sm:py-32">
+  <Container>
+    <SectionHeading
+      eyebrow="Блоки"
+      title="Блок на любой слайд"
+      lead="Графики, формулы, код, 3D — каждый блок в цветах вашей темы и с анимацией появления. Вот несколько с витрины."
+    />
+
+    <div data-blocks class="mt-14 grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-2">
+      {columns.map((col, c) => (
+        <ul class="flex flex-col gap-5">
+          {col.map((b, i) => (
+            <li data-reveal style={`--d:${(c * 0.08 + i * 0.06).toFixed(2)}s`}>
+              <figure data-block={b.id} class="group overflow-hidden rounded-3xl border border-bd bg-surf shadow-[var(--shadow-sm)] transition hover:border-acb hover:shadow-[var(--shadow-md)]">
+                <div class="overflow-hidden border-b border-bd">
+                  <Shot
+                    light={shot(b.id, 'light')}
+                    dark={shot(b.id, 'dark')}
+                    alt={`${b.title} — блок на слайде витрины Slideria`}
+                    widths={[560, 900, 1200, 1600]}
+                    sizes="(min-width: 1200px) 576px, (min-width: 1024px) 48vw, 100vw"
+                    class="transition-transform duration-500 ease-out group-hover:scale-[1.02]"
+                  />
+                </div>
+                <figcaption class="flex flex-col gap-1.5 px-6 py-5">
+                  <span class="w-fit rounded-full bg-acs px-2.5 py-0.5 text-[12px] font-semibold text-ac">{b.tag}</span>
+                  <b class="mt-1 text-[18px] leading-snug text-tx">{b.title}</b>
+                  <span class="text-[14.5px] leading-relaxed text-mu">{b.text}</span>
+                </figcaption>
+              </figure>
+            </li>
+          ))}
+        </ul>
+      ))}
+    </div>
+
+    <p data-reveal class="mx-auto mt-10 max-w-3xl text-pretty text-center text-[15.5px] leading-relaxed text-mu">
+      И ещё полсотни блоков: {more.join(', ')}.
+      Все — в студии на вкладке <b class="font-semibold text-tx">«Вставка» → «Блоки»</b>, с живыми превью в цветах вашей темы.
+    </p>
+  </Container>
+</section>

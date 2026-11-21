@@ -166,6 +166,10 @@
 .poster-in { animation: poster-in .35s ease both; }
 @keyframes poster-in { from { opacity: 0; } }
 
+/* Секции главной ниже первого экрана браузер рисует, когда к ним подходят: при загрузке меньше стилей и раскладки.
+   auto в contain-intrinsic-size запоминает настоящую высоту, поэтому якоря и прокрутка не прыгают */
+#main > section:not([data-hero]) { content-visibility: auto; contain-intrinsic-size: auto 960px; }
+
 /* Секция за экраном: бесконечные анимации стоят (метка ставится в shared/lib/client/site.ts) */
 [data-paused] *, [data-paused] *::before, [data-paused] *::after { animation-play-state: paused !important; }
 

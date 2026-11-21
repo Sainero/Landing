@@ -79,18 +79,35 @@ test('окно докладчика запускается по щелчку и 
   await expect(page.frameLocator('[data-presenter-preview] iframe').locator('#ct')).toHaveText('5 / 14', { timeout: 15_000 });
 });
 
-test('каталог блоков: группы и «Показать все»', async ({ page }) => {
-  const catalog = page.locator('[data-catalog]');
-  const visible = catalog.locator('[data-group]:visible');
-  await expect(visible).toHaveCount(16);
-  await catalog.locator('[data-catalog-more]').click();
-  const all = await catalog.locator('[data-group]').count();
-  await expect(visible).toHaveCount(all);
-  await catalog.locator('[data-filter="templates"]').click();
-  const templates = await catalog.locator('[data-group="templates"]').count();
-  await expect(visible).toHaveCount(templates);
-  // в каталоге — названия блоков, а не имена в данных
-  await expect(catalog.locator('code')).toHaveCount(0);
+test('блоки: несколько настоящих блоков с витрины, картинки в теме сайта', async ({ page }) => {
+  const blocks = page.locator('[data-blocks] [data-block]');
+  await expect(blocks).toHaveCount(6);
+  // не каталог: ни фильтров, ни «Показать все»
+  await expect(page.locator('#components [role="tab"], #components button')).toHaveCount(0);
+  const loaded = () => blocks.locator('img:visible').evaluateAll((imgs) => (imgs as HTMLImageElement[]).map((i) => i.complete && i.naturalWidth > 0));
+  await page.locator('#components').scrollIntoViewIfNeeded();
+  for (const b of await blocks.all()) await b.scrollIntoViewIfNeeded();
+  await expect.poll(loaded).toEqual(Array(6).fill(true));
+  // видимы светлые кадры; после смены темы — тёмные
+  const src = () => blocks.locator('img:visible').evaluateAll((imgs) => (imgs as HTMLImageElement[]).map((i) => i.currentSrc));
+  expect((await src()).every((u) => /-light/.test(u))).toBe(true);
+  await page.locator('header [data-theme-toggle]').click();
+  await expect.poll(async () => (await src()).every((u) => /-dark/.test(u))).toBe(true);
+  await expect.poll(loaded).toEqual(Array(6).fill(true));
+});
+
+test('три способа: у карточек одно устройство и ни слова о 187 фигурах', async ({ page }) => {
+  const ways = page.locator('#how [data-way]');
+  await expect(ways).toHaveCount(3);
+  for (const w of await ways.all()) {
+    await expect(w.locator('h3')).toHaveCount(1);
+    await expect(w.locator('li')).toHaveCount(3);
+  }
+  // фигур в студии меньше, 187 — это то, что понимает импорт: на главной числа нет
+  await expect(page.locator('main')).not.toContainText('187');
+  // карточки в ряд одной высоты
+  const heights = await ways.evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().height)));
+  expect(new Set(heights).size).toBe(1);
 });
 
 // ---------- полёт сквозь слайды (SlideWarp) ----------

@@ -13,10 +13,11 @@ interface Props {
   dark?: ImageMetadata;
   alt: string;
   sizes?: string;
+  /** Ширины, на которые режется кадр */
+  widths?: number[];
   class?: string;
 }
-const { light, dark, alt, sizes = '(min-width: 1140px) 1100px, 100vw', class: cls } = Astro.props;
-const widths = [640, 1100, 1600, 2200];
+const { light, dark, alt, sizes = '(min-width: 1140px) 1100px, 100vw', widths = [640, 1100, 1600, 2200], class: cls } = Astro.props;
 ---
 <Picture src={light} alt={alt} widths={widths} sizes={sizes} formats={['avif', 'webp']} loading="lazy" decoding="async" class={cn('block h-auto w-full', dark && 'dark:hidden', cls)} />
 {dark && <Picture src={dark} alt="" aria-hidden="true" widths={widths} sizes={sizes} formats={['avif', 'webp']} loading="lazy" decoding="async" class={cn('hidden h-auto w-full dark:block', cls)} />}

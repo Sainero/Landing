@@ -2,9 +2,9 @@
 //   - собранные демо-презентации (для показа, компактные) → public/demo/<имя>.html
 //   - их deck.yaml (для показа кода)                    → content/decks/<имя>/deck.yaml
 //   - разделы README и docs/ о работе в программе        → content/docs/*.md (раздел /docs)
-//   - справочник компонентов (данные каталога блоков)    → content/catalog/components.md
 //   - кадры слайдов и окна докладчика (светлые и тёмные)  → public/demo/posters/<имя>/*.webp
 //     и их уменьшенные копии для полёта слайдов           → public/demo/posters/<имя>/thumbs/*.webp
+//   - вырезки блоков со слайдов витрины (раздел «Блоки») → src/assets/blocks/*.webp
 //   - версия программы                                  → content/engine.json
 //
 // Кадры нужны, чтобы страница не запускала тяжёлые презентации сразу: до щелчка «Запустить показ»
@@ -25,12 +25,16 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import sharp from 'sharp';
 import { dropDeadAnchors, fixLinks, forUsers, keepSections, section } from './lib/docs-transform.mjs';
+import { shootBlocks } from './lib/block-shots.mjs';
 
 const root = process.cwd();
 const engine = path.resolve(process.env.SLIDERIA_DIR ?? path.join(root, '..', 'HTMLPPTX'));
 const DECKS = (process.env.DECKS ?? 'slideria').split(',').map((s) => s.trim()).filter(Boolean);
-/** Чьи кадры нужны: all — каждого слайда (витрина на первом экране), first — только первого */
-const POSTERS = { slideria: { slides: 'all', presenter: true } };
+/**
+ * Чьи кадры нужны: all — каждого слайда (витрина на первом экране), first — только первого;
+ * blocks — ещё и вырезки блоков для раздела «Блоки» (scripts/lib/block-shots.mjs)
+ */
+const POSTERS = { slideria: { slides: 'all', presenter: true, blocks: true } };
 const args = new Set(process.argv.slice(2));
 
 if (!fs.existsSync(path.join(engine, 'package.json'))) {
@@ -132,6 +136,7 @@ async function shootPosters() {
           await ctx.close();
         }
       }
+      if (want.blocks) await shootBlocks(browser, file, path.join(root, 'src', 'assets', 'blocks'), (f) => console.log(`✓ ${rel(f)}`));
     }
   } finally {
     await browser.close();
@@ -204,8 +209,6 @@ page('agent', { title: 'Агент в студии', group: 'Агенты', orde
   keepSections(doc('AGENT.md'), ['Где', 'Сервисы', 'Голос', 'Дальше']));
 page('roadmap', { title: 'Что дальше', group: 'О проекте', order: 9 }, section(readme, 'Что дальше'));
 
-// Справочник компонентов — не страница, а данные для каталога блоков на главной
-write(path.join(root, 'content', 'catalog', 'components.md'), doc('COMPONENTS.md'));
 
 // ---------- версия ----------
 let commit = null;
